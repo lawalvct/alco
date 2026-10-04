@@ -15,12 +15,13 @@ Launch scope includes all eleven calculator families listed below, the blog/Insi
 | Field                 | Value                                                                                                     |
 | --------------------- | --------------------------------------------------------------------------------------------------------- |
 | Business name         | ALCO Associate Solutions                                                                                  |
+| Production domain     | https://alcosolutions.ng (owner-confirmed; deployment and DNS status still to verify)                     |
 | CAC business category | Accounting and Auditing Consultancy                                                                       |
 | Positioning statement | Professional Accounting Services. Bookkeeping \| Financial Reporting \| Tax Filings \| Business Solutions |
 | Address               | 18, Lagos Street, Ebute-Metta, Lagos State, Nigeria                                                       |
 | Telephone 1           | +2348140824230                                                                                            |
 | Telephone 2           | +2348148484955                                                                                            |
-| Enquiries email       | info@alcosoluntion.ng (confirm exact spelling and active mailbox before publication)                     |
+| Enquiries email       | info@alcosolutions.ng (owner-confirmed)                                                                   |
 | Leadership            | Abdulsalam Latifat Damilola; Abdulazeez Azeez Olaitan                                                     |
 | Facebook handle       | alco_solutions.ng                                                                                         |
 | TikTok handle         | alco_solutions.ng                                                                                         |
@@ -32,7 +33,7 @@ Use these exact names and contact details in seed content. Keep social handles a
 
 The previous conversation establishes the stack and the expanded blog/tools scope. Foremost Consulting is a reference for useful professional-services functionality, not a theme to clone. Its local project brief at `C:\laragon\www\foremost-consulting\docs\SIMILAR_PROFESSIONAL_SERVICES_PROJECT_BRIEF.md` was unavailable during initial preparation and has since been reviewed for reusable structure and content requirements. Do not copy its company-specific facts or claims.
 
-The two images from the original conversation have not been visually assessed for this specification. Before design approval, inspect the original logo/brand files, confirm usage rights, and extract approved colors. Outstanding inputs: domain, logo files, confirmation that the supplied enquiries mailbox is correctly spelled and active, verified social URLs, service descriptions, leadership bios/photos/titles, brand palette, tax reviewer, privacy wording, hosting access, and SMTP provider. Development can proceed with clearly marked placeholders; public launch requires their resolution.
+The two images from the original conversation have not been visually assessed for this specification. Before design approval, inspect the original logo/brand files, confirm usage rights, and extract approved colors. The owner has confirmed `alcosolutions.ng` as the production domain and `info@alcosolutions.ng` as the enquiries address. Outstanding inputs: logo files, verified social URLs, service descriptions, leadership bios/photos/titles, brand palette, tax reviewer, privacy wording, hosting access, and SMTP provider. Development can proceed with clearly marked placeholders; public launch requires their resolution.
 
 ## 2. Technology and application architecture
 

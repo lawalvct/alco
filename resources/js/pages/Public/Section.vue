@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { Head, Link } from '@inertiajs/vue3';
-import { ArrowRight, ArrowUpRight, MapPin, Phone } from '@lucide/vue';
+import { ArrowRight, ArrowUpRight, Mail, MapPin, Phone } from '@lucide/vue';
 import { computed } from 'vue';
 import PublicLayout from '@/layouts/PublicLayout.vue';
-import { plannedTools, services } from '@/lib/publicSite';
+import { contactEmail, plannedTools, services } from '@/lib/publicSite';
 
 type SectionKind =
     | 'about'
@@ -42,12 +42,12 @@ const pageContent: Record<
     contact: {
         eyebrow: 'Contact',
         title: 'Start a conversation with ALCO.',
-        intro: 'Speak with us about bookkeeping, reporting, tax filings or a business question.',
+        intro: 'Call or email us about bookkeeping, reporting, tax filings or a business question.',
     },
     consultation: {
         eyebrow: 'Book a consultation',
         title: 'Let’s talk through what your business needs.',
-        intro: 'Call either number below to request a consultation. We will confirm availability directly with you.',
+        intro: 'Call or email us to request a consultation. We will confirm availability directly with you.',
     },
 };
 
@@ -192,12 +192,19 @@ const content = computed(() => pageContent[props.kind]);
                         <div
                             class="rounded-xl border border-[#dbe6ec] bg-white p-8 shadow-sm"
                         >
-                            <h2 class="text-2xl font-semibold">Call ALCO</h2>
+                            <h2 class="text-2xl font-semibold">Contact ALCO</h2>
                             <p class="mt-3 text-base leading-7 text-[#4d6273]">
-                                Choose either number to speak with us or arrange
-                                a consultation.
+                                Call either number or send an email to start a
+                                conversation or request a consultation.
                             </p>
                             <div class="mt-7 grid gap-4">
+                                <a
+                                    :href="`mailto:${contactEmail}`"
+                                    class="inline-flex items-center gap-3 text-lg font-semibold text-[#087c9e] hover:underline"
+                                    ><Mail :size="19" aria-hidden="true" />{{
+                                        contactEmail
+                                    }}</a
+                                >
                                 <a
                                     href="tel:+2348140824230"
                                     class="inline-flex items-center gap-3 text-lg font-semibold text-[#087c9e] hover:underline"

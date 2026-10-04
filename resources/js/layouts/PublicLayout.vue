@@ -2,7 +2,7 @@
 import { Link, usePage } from '@inertiajs/vue3';
 import { ArrowUpRight, MapPin, Menu, Phone, X } from '@lucide/vue';
 import { ref } from 'vue';
-import { navigation } from '@/lib/publicSite';
+import { contactEmail, navigation } from '@/lib/publicSite';
 
 const page = usePage();
 const menuOpen = ref(false);
@@ -185,11 +185,16 @@ function isActive(href: string): boolean {
                     </div>
                 </div>
                 <div>
-                    <p class="font-semibold text-white">Visit or call</p>
+                    <p class="font-semibold text-white">Visit or contact</p>
                     <address class="mt-4 text-sm leading-6 not-italic">
                         18, Lagos Street, Ebute-Metta,<br />Lagos State, Nigeria
                     </address>
                     <div class="mt-3 grid gap-1 text-sm">
+                        <a
+                            :href="`mailto:${contactEmail}`"
+                            class="hover:text-[#58d8ef]"
+                            >{{ contactEmail }}</a
+                        >
                         <a
                             href="tel:+2348140824230"
                             class="hover:text-[#58d8ef]"
