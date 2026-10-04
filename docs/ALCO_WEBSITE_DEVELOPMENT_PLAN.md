@@ -20,6 +20,7 @@ Launch scope includes all eleven calculator families listed below, the blog/Insi
 | Address               | 18, Lagos Street, Ebute-Metta, Lagos State, Nigeria                                                       |
 | Telephone 1           | +2348140824230                                                                                            |
 | Telephone 2           | +2348148484955                                                                                            |
+| Enquiries email       | info@alcosoluntion.ng (confirm exact spelling and active mailbox before publication)                     |
 | Leadership            | Abdulsalam Latifat Damilola; Abdulazeez Azeez Olaitan                                                     |
 | Facebook handle       | alco_solutions.ng                                                                                         |
 | TikTok handle         | alco_solutions.ng                                                                                         |
@@ -29,9 +30,9 @@ Use these exact names and contact details in seed content. Keep social handles a
 
 ### Reference and unresolved inputs
 
-The previous conversation establishes the stack and the expanded blog/tools scope. Foremost Consulting is a reference for useful professional-services functionality, not a theme to clone. Its local project brief at `C:\laragon\www\foremost-consulting\docs\SIMILAR_PROFESSIONAL_SERVICES_PROJECT_BRIEF.md` was not accessible during preparation. The live site could not be retrieved. Do not assume its implementation details were reviewed.
+The previous conversation establishes the stack and the expanded blog/tools scope. Foremost Consulting is a reference for useful professional-services functionality, not a theme to clone. Its local project brief at `C:\laragon\www\foremost-consulting\docs\SIMILAR_PROFESSIONAL_SERVICES_PROJECT_BRIEF.md` was unavailable during initial preparation and has since been reviewed for reusable structure and content requirements. Do not copy its company-specific facts or claims.
 
-The two images from the original conversation have not been visually assessed for this specification. Before design approval, inspect the original logo/brand files, confirm usage rights, and extract approved colors. Outstanding inputs: domain, logo files, email destination, verified social URLs, service descriptions, leadership bios/photos/titles, brand palette, tax reviewer, privacy wording, hosting access, and SMTP provider. Development can proceed with clearly marked placeholders; public launch requires their resolution.
+The two images from the original conversation have not been visually assessed for this specification. Before design approval, inspect the original logo/brand files, confirm usage rights, and extract approved colors. Outstanding inputs: domain, logo files, confirmation that the supplied enquiries mailbox is correctly spelled and active, verified social URLs, service descriptions, leadership bios/photos/titles, brand palette, tax reviewer, privacy wording, hosting access, and SMTP provider. Development can proceed with clearly marked placeholders; public launch requires their resolution.
 
 ## 2. Technology and application architecture
 

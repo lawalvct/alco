@@ -17,7 +17,7 @@ This local checkout already has a dedicated `alco` MySQL database, `alco_local` 
 
 ## Initial admin account
 
-Run `php artisan alco:make-admin` in an interactive terminal. The command asks for the administrator's name, email and a password of at least 12 characters; it does not take the password as a command argument. Sign in at `http://alco.test/admin`. Public registration is disabled and the Filament panel admits only designated admin users. No admin account has been created yet because an approved email address was not supplied.
+Run `php artisan alco:make-admin` in an interactive terminal. The command asks for the administrator's name, email and a password of at least 12 characters; it does not take the password as a command argument. Sign in at `http://alco.test/admin`. Public registration is disabled and the Filament panel admits only designated admin users. No admin account has been created yet; the general enquiries address is not assumed to be a staff login.
 
 The starter also includes Laravel Fortify login, password reset, email verification, 2FA and passkey components. Their final staff workflow will be reviewed as CMS roles are implemented. SMTP is still set to the local log mailer; configure a real provider before relying on email verification or password reset outside development.
 
