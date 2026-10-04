@@ -12,8 +12,9 @@ The owner has confirmed `https://alcosolutions.ng` as the intended production do
 2. In `C:\laragon\www\alco`, run `composer install` and `npm ci`.
 3. Copy `.env.example` to `.env` if needed and configure a local MySQL database. Never commit `.env` or an application key.
 4. Run `php artisan key:generate` for a fresh environment, then `php artisan migrate`.
-5. Run `npm run build:ssr` for production-style client and SSR bundles. For active frontend work, run `npm run dev` and keep the SSR process available when testing server-rendered pages.
-6. Open `http://alco.test` when Laragon's automatic virtual hosts are active. A new folder may need Laragon to reload its hosts. For an immediate local smoke test, run `php artisan serve` and open `http://127.0.0.1:8000`; adjust `APP_URL` in `.env` for that mode if generated links need the same host. Set a manually configured web host's document root to this project's `public` directory.
+5. Optional: run `php artisan db:seed --class=LocalContentSeeder` to add provisional homepage and four service records for local review. This seeder refuses non-local environments and does not overwrite existing records.
+6. Run `npm run build:ssr` for production-style client and SSR bundles. For active frontend work, run `npm run dev` and keep the SSR process available when testing server-rendered pages.
+7. Open `http://alco.test` when Laragon's automatic virtual hosts are active. A new folder may need Laragon to reload its hosts. For an immediate local smoke test, run `php artisan serve` and open `http://127.0.0.1:8000`; adjust `APP_URL` in `.env` for that mode if generated links need the same host. Set a manually configured web host's document root to this project's `public` directory.
 
 This local checkout already has a dedicated `alco` MySQL database, `alco_local` account, configured `.env`, application key and completed migrations. The password is stored only in the ignored `.env` file.
 
@@ -22,6 +23,12 @@ This local checkout already has a dedicated `alco` MySQL database, `alco_local` 
 Run `php artisan alco:make-admin` in an interactive terminal. The command asks for the administrator's name, email and a password of at least 12 characters; it does not take the password as a command argument. Sign in at `http://alco.test/admin`. Public registration is disabled and the Filament panel admits only designated admin users. No admin account has been created yet; the general enquiries address is not assumed to be a staff login.
 
 The starter also includes Laravel Fortify login, password reset, email verification, 2FA and passkey components. Their final staff workflow will be reviewed as CMS roles are implemented. SMTP is still set to the local log mailer; configure a real provider before relying on email verification or password reset outside development.
+
+## First CMS content slice
+
+Filament now has **Pages** and **Services** resources. The Pages resource currently supports the homepage template; Services supports the four core service records and new draft services. Staff save draft fields, then use **Publish saved draft** when ready. The public site reads a saved publication snapshot, so later draft edits stay private until republished. Each publication creates a history snapshot. Archived and future-dated records are excluded from public routes; published service slugs have individual pages.
+
+The local database contains provisional sample copy for visual review. It is not tax advice or final client-approved copy. Review all service scope, audience, process and FAQ wording before a production release. At this stage every designated admin can publish; finer editor/reviewer/publisher roles, preview links, content media and the remaining page templates are still planned.
 
 ## Checks
 
@@ -36,6 +43,6 @@ The Laravel starter's client and SSR builds are generated under ignored `public/
 
 ## Current scope
 
-Foundation and scaffolding are in place: application, frontend toolchain, CMS panel, MySQL connection, admin access gate, source logo, design references and planning document. Option 2's homepage and public navigation have been implemented. The About, Services, Insights, Tools, Contact and consultation destinations currently have initial content so every navigation link works; they are marked `noindex` while being developed. Insights publishing, calculators, lead forms and CMS-managed page content are subsequent implementation phases. The consultation page currently provides the supplied phone numbers for enquiries.
+Foundation and scaffolding are in place: application, frontend toolchain, CMS panel, MySQL connection, admin access gate, source logo, design references and planning document. Option 2's homepage and public navigation are implemented. The homepage sections, core service cards and service detail pages now read published CMS content. About, Insights, Tools, Contact and consultation destinations still have initial content so every navigation link works; they are marked `noindex` while being developed. Insights publishing, calculators, lead forms and broader CMS-managed content remain subsequent implementation phases. The consultation page currently provides the supplied phone numbers and email for enquiries.
 
 The hero photograph was generated for this project from a prompt for three Nigerian professionals reviewing financial documents in a contemporary Lagos office. It is served as an optimized WebP at `public/images/hero-consultation.webp`. The white navigation mark is a small SVG reconstruction of the supplied ALCO logo, while the original JPEG remains in `public/brand/` for reference.

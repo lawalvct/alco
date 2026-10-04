@@ -2,11 +2,14 @@
 
 namespace Tests\Feature;
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia as Assert;
 use Tests\TestCase;
 
 class PublicPagesTest extends TestCase
 {
+    use RefreshDatabase;
+
     public function test_homepage_renders_the_selected_public_page(): void
     {
         $this->get('/')->assertOk()->assertInertia(fn (Assert $page) => $page

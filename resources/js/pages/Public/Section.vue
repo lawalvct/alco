@@ -3,7 +3,12 @@ import { Head, Link } from '@inertiajs/vue3';
 import { ArrowRight, ArrowUpRight, Mail, MapPin, Phone } from '@lucide/vue';
 import { computed } from 'vue';
 import PublicLayout from '@/layouts/PublicLayout.vue';
-import { contactEmail, plannedTools, services } from '@/lib/publicSite';
+import {
+    contactEmail,
+    plannedTools,
+    services as fallbackServices,
+} from '@/lib/publicSite';
+import type { ServiceSummary } from '@/types/publicContent';
 
 type SectionKind =
     | 'about'
@@ -13,7 +18,24 @@ type SectionKind =
     | 'contact'
     | 'consultation';
 
-const props = defineProps<{ kind: SectionKind }>();
+const props = defineProps<{
+    kind: SectionKind;
+    publishedServices?: ServiceSummary[];
+}>();
+
+const serviceCards = computed(() =>
+    props.publishedServices?.length
+        ? props.publishedServices.map((service) => ({
+              slug: service.slug,
+              title: service.title,
+              description: service.summary,
+              href: `/services/${service.slug}`,
+          }))
+        : fallbackServices.map((service) => ({
+              ...service,
+              href: '/book-consultation',
+          })),
+);
 
 const pageContent: Record<
     SectionKind,
@@ -90,7 +112,7 @@ const content = computed(() => pageContent[props.kind]);
                 <template v-if="kind === 'services'">
                     <div class="grid gap-5 md:grid-cols-2">
                         <article
-                            v-for="(service, index) in services"
+                            v-for="(service, index) in serviceCards"
                             :id="service.slug"
                             :key="service.slug"
                             class="scroll-mt-7 rounded-xl border border-[#dbe6ec] bg-white p-7 shadow-sm"
@@ -107,10 +129,10 @@ const content = computed(() => pageContent[props.kind]);
                                 {{ service.description }}
                             </p>
                             <Link
-                                href="/book-consultation"
+                                :href="service.href"
                                 class="mt-7 inline-flex items-center gap-2 text-sm font-semibold text-[#087c9e] hover:underline"
                             >
-                                Discuss this service
+                                Explore this service
                                 <ArrowUpRight :size="17" aria-hidden="true" />
                             </Link>
                         </article>

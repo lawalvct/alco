@@ -8,17 +8,54 @@ import {
     FileText,
     UsersRound,
 } from '@lucide/vue';
+import { computed } from 'vue';
+import HomeSections from '@/components/HomeSections.vue';
 import PublicLayout from '@/layouts/PublicLayout.vue';
-import { services } from '@/lib/publicSite';
+import { services as fallbackServices } from '@/lib/publicSite';
+import type { HomeContent, ServiceSummary } from '@/types/publicContent';
 
 const serviceIcons = [BookOpen, ChartNoAxesCombined, FileText, UsersRound];
+const props = defineProps<{
+    home?: HomeContent | null;
+    publishedServices?: ServiceSummary[];
+}>();
+
+const defaultHome: HomeContent = {
+    title: 'Home',
+    hero_eyebrow: 'ALCO Associate Solutions',
+    hero_line_one: 'Your numbers, in order.',
+    hero_line_two: 'Your business,',
+    hero_accent: 'moving forward.',
+    hero_description:
+        'Professional accounting, clear reporting and practical business support.',
+    seo_description:
+        'ALCO Associate Solutions offers bookkeeping, financial reporting, tax filings and business solutions in Lagos, Nigeria.',
+    blocks: [],
+};
+
+const homeContent = computed(() => props.home ?? defaultHome);
+const serviceCards = computed(() =>
+    props.publishedServices?.length
+        ? props.publishedServices.map((service) => ({
+              slug: service.slug,
+              title: service.title,
+              description: service.summary,
+              href: `/services/${service.slug}`,
+          }))
+        : fallbackServices.map((service) => ({
+              ...service,
+              href: `/services#${service.slug}`,
+          })),
+);
 </script>
 
 <template>
     <Head title="Home">
         <meta
             name="description"
-            content="ALCO Associate Solutions offers bookkeeping, financial reporting, tax filings and business solutions in Lagos, Nigeria."
+            :content="
+                homeContent.seo_description ?? defaultHome.seo_description
+            "
         />
     </Head>
 
@@ -70,25 +107,24 @@ const serviceIcons = [BookOpen, ChartNoAxesCombined, FileText, UsersRound];
                         <p
                             class="text-xs font-bold tracking-[0.23em] text-[#51d7f0] uppercase sm:text-sm"
                         >
-                            ALCO Associate Solutions
+                            {{ homeContent.hero_eyebrow }}
                         </p>
                         <h1
                             id="hero-title"
                             class="mx-auto mt-6 text-[clamp(2.6rem,5.3vw,5rem)] leading-[1.09] font-semibold tracking-[-0.046em]"
                         >
-                            Your numbers, in order.
+                            {{ homeContent.hero_line_one }}
                             <span class="block">
-                                Your business,
-                                <span class="text-[#51d7f0]"
-                                    >moving forward.</span
-                                >
+                                {{ homeContent.hero_line_two }}
+                                <span class="text-[#51d7f0]">{{
+                                    homeContent.hero_accent
+                                }}</span>
                             </span>
                         </h1>
                         <p
                             class="mx-auto mt-6 max-w-[780px] text-base leading-7 text-white/80 sm:text-lg"
                         >
-                            Professional accounting, clear reporting and
-                            practical business support.
+                            {{ homeContent.hero_description }}
                         </p>
                         <div
                             class="mt-8 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center sm:gap-4"
@@ -130,13 +166,13 @@ const serviceIcons = [BookOpen, ChartNoAxesCombined, FileText, UsersRound];
                         aria-label="Explore ALCO services"
                     >
                         <Link
-                            v-for="(service, index) in services"
+                            v-for="(service, index) in serviceCards"
                             :key="service.slug"
-                            :href="'/services#' + service.slug"
+                            :href="service.href"
                             class="group flex min-h-21 items-center gap-3 rounded-lg px-3 py-3 transition-colors hover:bg-[#eaf6fb] focus-visible:outline-2 focus-visible:outline-[#1d9fc0] sm:gap-4 sm:px-5 md:min-h-19"
                         >
                             <component
-                                :is="serviceIcons[index]"
+                                :is="serviceIcons[index % serviceIcons.length]"
                                 :size="27"
                                 :stroke-width="1.8"
                                 class="shrink-0"
@@ -187,13 +223,13 @@ const serviceIcons = [BookOpen, ChartNoAxesCombined, FileText, UsersRound];
                     </div>
                     <div class="mt-10 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
                         <Link
-                            v-for="(service, index) in services"
+                            v-for="(service, index) in serviceCards"
                             :key="service.slug"
-                            :href="'/services#' + service.slug"
+                            :href="service.href"
                             class="group flex min-h-62 flex-col rounded-xl border border-[#dbe6ec] bg-[#f8fbfc] p-6 transition-colors hover:border-[#42cce8] hover:bg-[#f0faff] focus-visible:outline-2 focus-visible:outline-[#168bae]"
                         >
                             <component
-                                :is="serviceIcons[index]"
+                                :is="serviceIcons[index % serviceIcons.length]"
                                 :size="30"
                                 :stroke-width="1.7"
                                 class="text-[#0f87a9]"
@@ -217,6 +253,11 @@ const serviceIcons = [BookOpen, ChartNoAxesCombined, FileText, UsersRound];
                     </div>
                 </div>
             </section>
+
+            <HomeSections
+                v-if="homeContent.blocks?.length"
+                :blocks="homeContent.blocks"
+            />
 
             <section
                 class="bg-[#eaf6fb] py-20 sm:py-24"
