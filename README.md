@@ -2,7 +2,7 @@
 
 Laravel 13 application for ALCO Associate Solutions. The public site uses Inertia 3, Vue 3, TypeScript, Tailwind CSS 4 and server-side rendering. The content management panel uses Filament 5 at `/admin`. The local database is MySQL.
 
-The homepage currently displays a neutral ALCO placeholder. The client is choosing among three visual options in `docs/design-options/`; do not treat any mockup as the selected design yet. The project specification is `docs/ALCO_WEBSITE_DEVELOPMENT_PLAN.md`.
+The client selected design **Option 2** in `docs/design-options/`. Its responsive public homepage is implemented with the navy and cyan visual style, consultation imagery, service navigation, and desktop/mobile menus. The project specification is `docs/ALCO_WEBSITE_DEVELOPMENT_PLAN.md`.
 
 ## Local setup (Laragon on Windows)
 
@@ -34,4 +34,6 @@ The Laravel starter's client and SSR builds are generated under ignored `public/
 
 ## Current scope
 
-Foundation and scaffolding are in place: application, frontend toolchain, CMS panel, MySQL connection, admin access gate, source logo, design references and planning document. Services, blog, tools, lead workflows and the chosen homepage design are the next implementation phases.
+Foundation and scaffolding are in place: application, frontend toolchain, CMS panel, MySQL connection, admin access gate, source logo, design references and planning document. Option 2's homepage and public navigation have been implemented. The About, Services, Insights, Tools, Contact and consultation destinations currently have initial content so every navigation link works; they are marked `noindex` while being developed. Insights publishing, calculators, lead forms and CMS-managed page content are subsequent implementation phases. The consultation page currently provides the supplied phone numbers for enquiries.
+
+The hero photograph was generated for this project from a prompt for three Nigerian professionals reviewing financial documents in a contemporary Lagos office. It is served as an optimized WebP at `public/images/hero-consultation.webp`. The white navigation mark is a small SVG reconstruction of the supplied ALCO logo, while the original JPEG remains in `public/brand/` for reference.
