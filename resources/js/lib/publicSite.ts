@@ -1,5 +1,3 @@
-export const contactEmail = 'info@alcosolutions.ng';
-
 export const navigation = [
     { label: 'Home', href: '/' },
     { label: 'About', href: '/about' },

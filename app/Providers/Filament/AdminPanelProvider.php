@@ -10,6 +10,7 @@ use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
+use Filament\Support\Facades\FilamentTimezone;
 use Filament\Widgets\AccountWidget;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
@@ -20,6 +21,12 @@ use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 class AdminPanelProvider extends PanelProvider
 {
+    public function boot(): void
+    {
+        // Store instants in UTC; staff read and schedule in Lagos time.
+        FilamentTimezone::set('Africa/Lagos');
+    }
+
     public function panel(Panel $panel): Panel
     {
         return $panel
@@ -66,6 +73,7 @@ class AdminPanelProvider extends PanelProvider
                 ],
                 'gray' => Color::Slate,
             ])
+            ->navigationGroups(['Website', 'Library', 'Settings'])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
             ->pages([

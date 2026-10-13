@@ -1,0 +1,28 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('team_members', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->string('role')->nullable();
+            $table->text('bio')->nullable();
+            $table->foreignId('portrait_media_asset_id')->nullable()->constrained('media_assets')->restrictOnDelete();
+            $table->unsignedSmallInteger('sort_order')->default(0);
+            $table->boolean('is_published')->default(false);
+            $table->timestamps();
+            $table->index(['is_published', 'sort_order']);
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('team_members');
+    }
+};

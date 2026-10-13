@@ -25,12 +25,16 @@ class PublicPagesTest extends TestCase
             '/insights' => 'insights',
             '/tools' => 'tools',
             '/contact' => 'contact',
-            '/book-consultation' => 'consultation',
         ] as $path => $kind) {
             $this->get($path)->assertOk()->assertInertia(fn (Assert $page) => $page
                 ->component('Public/Section')
                 ->where('kind', $kind)
                 ->etc());
         }
+
+        $this->get('/book-consultation')->assertOk()->assertInertia(fn (Assert $page) => $page
+            ->component('Public/Consultation')
+            ->where('selectedPackage', null)
+            ->etc());
     }
 }

@@ -1,32 +1,34 @@
 <script setup lang="ts">
 import { Head } from '@inertiajs/vue3';
-import { Mail, MapPin, Phone } from '@lucide/vue';
 import { computed } from 'vue';
+import ContactCard from '@/components/public/ContactCard.vue';
 import CtaLink from '@/components/public/CtaLink.vue';
+import PackageCard from '@/components/public/PackageCard.vue';
 import PageHero from '@/components/public/PageHero.vue';
+import SectionHeading from '@/components/public/SectionHeading.vue';
+import VisitCard from '@/components/public/VisitCard.vue';
 import PublicLayout from '@/layouts/PublicLayout.vue';
-import {
-    contactEmail,
-    plannedTools,
-    services as fallbackServices,
-} from '@/lib/publicSite';
-import type { ServiceSummary } from '@/types/publicContent';
+import { plannedTools, services as fallbackServices } from '@/lib/publicSite';
+import type {
+    PackageSummary,
+    ServiceSummary,
+    TeamProfile,
+} from '@/types/publicContent';
 
-type SectionKind =
-    | 'about'
-    | 'services'
-    | 'insights'
-    | 'tools'
-    | 'contact'
-    | 'consultation';
+type SectionKind = 'about' | 'services' | 'insights' | 'tools' | 'contact';
 
-const props = defineProps<{
-    kind: SectionKind;
-    publishedServices?: ServiceSummary[];
-}>();
+const props = withDefaults(
+    defineProps<{
+        kind: SectionKind;
+        publishedServices?: ServiceSummary[];
+        packages?: PackageSummary[];
+        team?: TeamProfile[];
+    }>(),
+    { publishedServices: () => [], packages: () => [], team: () => [] },
+);
 
 const serviceCards = computed(() =>
-    props.publishedServices?.length
+    props.publishedServices.length
         ? props.publishedServices.map((service) => ({
               slug: service.slug,
               title: service.title,
@@ -68,11 +70,6 @@ const pageContent: Record<
         title: 'Start a conversation with ALCO.',
         intro: 'Call or email us about bookkeeping, reporting, tax filings or a business question.',
     },
-    consultation: {
-        eyebrow: 'Book a consultation',
-        title: 'Let’s talk through what your business needs.',
-        intro: 'Call or email us to request a consultation. We will confirm availability directly with you.',
-    },
 };
 
 const content = computed(() => pageContent[props.kind]);
@@ -91,8 +88,8 @@ const content = computed(() => pageContent[props.kind]);
             :intro="content.intro"
         />
 
-        <section class="site-container py-16 sm:py-20">
-            <template v-if="kind === 'services'">
+        <template v-if="kind === 'services'">
+            <section class="site-container py-16 sm:py-20">
                 <div class="grid gap-5 md:grid-cols-2">
                     <article
                         v-for="(service, index) in serviceCards"
@@ -120,9 +117,42 @@ const content = computed(() => pageContent[props.kind]);
                         </CtaLink>
                     </article>
                 </div>
-            </template>
+            </section>
 
-            <template v-else-if="kind === 'about'">
+            <section
+                v-if="packages.length"
+                id="packages"
+                class="scroll-mt-7 border-t border-border bg-muted py-16 sm:py-20"
+                aria-labelledby="packages-title"
+            >
+                <div class="site-container">
+                    <SectionHeading
+                        id="packages-title"
+                        class="max-w-3xl"
+                        eyebrow="Engagement packages"
+                        title="Choose a starting point for ongoing support."
+                        description="Each package builds on the one before it. Choosing a package adds it to your consultation request; we confirm suitability, scope and terms with you before any work begins."
+                    />
+                    <ol class="mt-10 grid gap-5 lg:grid-cols-3">
+                        <li v-for="(pkg, index) in packages" :key="pkg.slug">
+                            <PackageCard :pkg="pkg" :position="index + 1" />
+                        </li>
+                    </ol>
+                    <p class="mt-8 text-sm leading-6 text-muted-foreground">
+                        Need something different?
+                        <CtaLink
+                            href="/book-consultation"
+                            variant="link"
+                            icon="none"
+                            >Request a tailored engagement</CtaLink
+                        >.
+                    </p>
+                </div>
+            </section>
+        </template>
+
+        <section v-else class="site-container py-16 sm:py-20">
+            <template v-if="kind === 'about'">
                 <div class="grid gap-10 lg:grid-cols-[1.2fr_0.8fr]">
                     <div>
                         <h2 class="text-2xl font-semibold">
@@ -143,11 +173,43 @@ const content = computed(() => pageContent[props.kind]);
                             Explore our services
                         </CtaLink>
                     </div>
-                    <div class="rounded-xl bg-aqua-50 p-7">
+                    <div v-if="team.length" class="rounded-xl bg-aqua-50 p-7">
                         <h2 class="text-xl font-semibold">Leadership</h2>
-                        <ul class="mt-5 grid gap-4 text-base">
-                            <li>Abdulsalam Latifah Damilola</li>
-                            <li>Abdulazeez Azeez Olaitan</li>
+                        <ul class="mt-5 grid gap-6">
+                            <li
+                                v-for="member in team"
+                                :key="member.id"
+                                class="flex gap-4"
+                            >
+                                <img
+                                    v-if="member.portrait"
+                                    :src="member.portrait.src"
+                                    alt=""
+                                    :width="member.portrait.width ?? undefined"
+                                    :height="
+                                        member.portrait.height ?? undefined
+                                    "
+                                    loading="lazy"
+                                    class="size-16 shrink-0 rounded-full object-cover"
+                                />
+                                <div>
+                                    <p class="text-base font-semibold">
+                                        {{ member.name }}
+                                    </p>
+                                    <p
+                                        v-if="member.role"
+                                        class="text-sm font-medium text-aqua-700"
+                                    >
+                                        {{ member.role }}
+                                    </p>
+                                    <p
+                                        v-if="member.bio"
+                                        class="mt-2 text-sm leading-6 whitespace-pre-line text-muted-foreground"
+                                    >
+                                        {{ member.bio }}
+                                    </p>
+                                </div>
+                            </li>
                         </ul>
                     </div>
                 </div>
@@ -190,58 +252,10 @@ const content = computed(() => pageContent[props.kind]);
                 </div>
             </template>
 
-            <template v-else>
-                <div class="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
-                    <div
-                        class="rounded-xl border border-border bg-card p-8 shadow-card"
-                    >
-                        <h2 class="text-2xl font-semibold">Contact ALCO</h2>
-                        <p
-                            class="mt-3 text-base leading-7 text-muted-foreground"
-                        >
-                            Call either number or send an email to start a
-                            conversation or request a consultation.
-                        </p>
-                        <div class="mt-7 grid gap-4">
-                            <a
-                                :href="`mailto:${contactEmail}`"
-                                class="inline-flex w-fit items-center gap-3 text-lg font-semibold break-all text-aqua-700 hover:underline"
-                                ><Mail
-                                    :size="19"
-                                    class="shrink-0"
-                                    aria-hidden="true"
-                                />{{ contactEmail }}</a
-                            >
-                            <a
-                                href="tel:+2348140824230"
-                                class="inline-flex w-fit items-center gap-3 text-lg font-semibold text-aqua-700 hover:underline"
-                                ><Phone :size="19" aria-hidden="true" />+234 814
-                                082 4230</a
-                            >
-                            <a
-                                href="tel:+2348148484955"
-                                class="inline-flex w-fit items-center gap-3 text-lg font-semibold text-aqua-700 hover:underline"
-                                ><Phone :size="19" aria-hidden="true" />+234 814
-                                848 4955</a
-                            >
-                        </div>
-                    </div>
-                    <div class="rounded-xl bg-aqua-50 p-8">
-                        <MapPin
-                            :size="26"
-                            class="text-aqua-600"
-                            aria-hidden="true"
-                        />
-                        <h2 class="mt-5 text-xl font-semibold">Visit us</h2>
-                        <address
-                            class="mt-3 text-base leading-7 text-muted-foreground not-italic"
-                        >
-                            18, Lagos Street,<br />Ebute-Metta, Lagos State,
-                            Nigeria
-                        </address>
-                    </div>
-                </div>
-            </template>
+            <div v-else class="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
+                <ContactCard />
+                <VisitCard />
+            </div>
         </section>
     </PublicLayout>
 </template>

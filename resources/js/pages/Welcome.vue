@@ -11,10 +11,17 @@ import { computed } from 'vue';
 import HomeSections from '@/components/HomeSections.vue';
 import BrandPattern from '@/components/public/BrandPattern.vue';
 import CtaLink from '@/components/public/CtaLink.vue';
+import HeroSlider from '@/components/public/HeroSlider.vue';
 import SectionHeading from '@/components/public/SectionHeading.vue';
 import PublicLayout from '@/layouts/PublicLayout.vue';
 import { services as fallbackServices } from '@/lib/publicSite';
-import type { HomeContent, ServiceSummary } from '@/types/publicContent';
+import type {
+    HeroSlide,
+    HeroSliderSettings,
+    HomeContent,
+    PackageSummary,
+    ServiceSummary,
+} from '@/types/publicContent';
 
 const serviceIcons = [BookOpen, ChartNoAxesCombined, FileText, UsersRound];
 const discoverCards = [
@@ -31,10 +38,29 @@ const discoverCards = [
         text: 'Calculators to help you test and understand key figures.',
     },
 ];
-const props = defineProps<{
-    home?: HomeContent | null;
-    publishedServices?: ServiceSummary[];
-}>();
+// Shown when no slide is visible, so the hero is never empty.
+const heroFallback = {
+    src: '/images/hero-consultation.webp',
+    alt: 'Three professionals reviewing financial documents together at a conference table',
+    width: 1983,
+    height: 793,
+};
+const props = withDefaults(
+    defineProps<{
+        home?: HomeContent | null;
+        publishedServices?: ServiceSummary[];
+        heroSlides?: HeroSlide[];
+        heroSlider?: HeroSliderSettings;
+        packages?: PackageSummary[];
+    }>(),
+    {
+        home: null,
+        publishedServices: () => [],
+        heroSlides: () => [],
+        heroSlider: () => ({ autoplay: true, interval_seconds: 8 }),
+        packages: () => [],
+    },
+);
 
 const defaultHome: HomeContent = {
     title: 'Home',
@@ -132,21 +158,18 @@ const serviceCards = computed(() =>
                     </div>
                 </div>
 
-                <figure class="mt-11 sm:mt-14">
-                    <figcaption
+                <div class="mt-11 sm:mt-14">
+                    <p
                         class="mb-3 text-xs font-semibold tracking-widest text-white/85"
                     >
                         Clarity today. Confidence for what comes next.
-                    </figcaption>
-                    <img
-                        src="/images/hero-consultation.webp"
-                        alt="Three professionals reviewing financial documents together at a conference table"
-                        width="1983"
-                        height="793"
-                        fetchpriority="high"
-                        class="h-61.25 w-full rounded-xl object-cover object-center sm:h-87.5 lg:h-107.5"
+                    </p>
+                    <HeroSlider
+                        :slides="heroSlides"
+                        :settings="heroSlider"
+                        :fallback="heroFallback"
                     />
-                </figure>
+                </div>
 
                 <nav
                     class="relative z-10 mx-auto -mt-9 grid grid-cols-2 rounded-2xl bg-white px-3 py-2 text-navy-900 shadow-float md:grid-cols-4 md:px-5 md:py-3"
@@ -233,6 +256,7 @@ const serviceCards = computed(() =>
         <HomeSections
             v-if="homeContent.blocks?.length"
             :blocks="homeContent.blocks"
+            :packages="packages"
         />
 
         <!-- White with a hairline so it stays distinct whichever CMS block precedes it. -->

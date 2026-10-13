@@ -2,12 +2,16 @@
 import { Head, Link } from '@inertiajs/vue3';
 import { ArrowLeft, Check } from '@lucide/vue';
 import CtaLink from '@/components/public/CtaLink.vue';
+import PackageCard from '@/components/public/PackageCard.vue';
 import PageHero from '@/components/public/PageHero.vue';
 import SectionHeading from '@/components/public/SectionHeading.vue';
 import PublicLayout from '@/layouts/PublicLayout.vue';
-import type { ServiceDetail } from '@/types/publicContent';
+import type { PackageSummary, ServiceDetail } from '@/types/publicContent';
 
-defineProps<{ service: ServiceDetail }>();
+withDefaults(
+    defineProps<{ service: ServiceDetail; packages?: PackageSummary[] }>(),
+    { packages: () => [] },
+);
 </script>
 
 <template>
@@ -79,6 +83,38 @@ defineProps<{ service: ServiceDetail }>();
                         </CtaLink>
                     </div>
                 </div>
+            </div>
+        </section>
+
+        <section
+            v-if="packages.length"
+            class="border-t border-border bg-muted py-16 sm:py-20"
+            aria-labelledby="service-packages-title"
+        >
+            <div class="site-container">
+                <div
+                    class="flex flex-col justify-between gap-6 md:flex-row md:items-end"
+                >
+                    <SectionHeading
+                        id="service-packages-title"
+                        class="max-w-2xl"
+                        eyebrow="Engagement packages"
+                        title="Packages that include this support."
+                        description="Pick a starting point, or ask us to shape a tailored engagement."
+                    />
+                    <CtaLink
+                        href="/services#packages"
+                        variant="link"
+                        icon="arrow-right"
+                    >
+                        Compare all packages
+                    </CtaLink>
+                </div>
+                <ul class="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+                    <li v-for="pkg in packages" :key="pkg.slug">
+                        <PackageCard :pkg="pkg" :show-inclusions="false" />
+                    </li>
+                </ul>
             </div>
         </section>
     </PublicLayout>

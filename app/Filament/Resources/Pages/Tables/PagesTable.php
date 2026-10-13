@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Pages\Tables;
 
+use App\Filament\Tables\PublicationColumns;
 use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -14,8 +15,7 @@ class PagesTable
             ->columns([
                 TextColumn::make('title')->searchable()->sortable(),
                 TextColumn::make('slug')->searchable(),
-                TextColumn::make('publication_status')->badge(),
-                TextColumn::make('published_at')->dateTime()->sortable(),
+                ...PublicationColumns::make(),
             ])
             ->recordActions([
                 EditAction::make(),

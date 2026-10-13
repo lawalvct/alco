@@ -10,6 +10,7 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Text;
 use Filament\Schemas\Schema;
 
 class PageForm
@@ -53,6 +54,14 @@ class PageForm
                             ->schema([
                                 Builder::make('blocks')
                                     ->blocks([
+                                        Block::make('packages')
+                                            ->label('Engagement packages')
+                                            ->schema([
+                                                Text::make('Lists the published packages from Website → Packages, with a link to compare them. Hidden while none are published.'),
+                                                TextInput::make('eyebrow')->required()->maxLength(80),
+                                                TextInput::make('title')->required()->maxLength(160),
+                                                Textarea::make('body')->maxLength(400),
+                                            ]),
                                         Block::make('intro')
                                             ->label('Introduction')
                                             ->schema([

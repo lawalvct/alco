@@ -2,9 +2,14 @@
 
 namespace Database\Seeders;
 
+use App\Models\EngagementPackage;
+use App\Models\HomepageHeroSlide;
+use App\Models\MediaAsset;
 use App\Models\Page;
 use App\Models\Service;
+use App\Models\TeamMember;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Storage;
 use RuntimeException;
 
 class LocalContentSeeder extends Seeder
@@ -29,6 +34,14 @@ class LocalContentSeeder extends Seeder
                     'hero_description' => 'Professional accounting, clear reporting and practical business support.',
                     'seo_description' => 'ALCO Associate Solutions offers bookkeeping, financial reporting, tax filings and business solutions in Lagos, Nigeria.',
                     'blocks' => [
+                        [
+                            'type' => 'packages',
+                            'data' => [
+                                'eyebrow' => 'Engagement packages',
+                                'title' => 'A clear starting point for ongoing support.',
+                                'body' => 'Choose the level of support that fits today. We confirm suitability, scope and terms with you before any work begins.',
+                            ],
+                        ],
                         [
                             'type' => 'intro',
                             'data' => [
@@ -97,6 +110,121 @@ class LocalContentSeeder extends Seeder
                 $service->publish();
             }
         }
+
+        $this->seedPackages();
+        $this->seedTeam();
+        $this->seedHeroSlides();
+    }
+
+    /**
+     * Client-supplied package copy, seeded as unpublished drafts: ALCO must
+     * approve wording and terms before publishing (development plan §5).
+     */
+    private function seedPackages(): void
+    {
+        $serviceIds = Service::query()->pluck('id', 'slug');
+        $parent = null;
+
+        foreach ($this->packages() as $position => $item) {
+            $package = EngagementPackage::firstOrCreate(
+                ['slug' => $item['slug']],
+                [
+                    'title' => $item['title'],
+                    'parent_id' => $parent?->id,
+                    'sort_order' => $position + 1,
+                    'is_selectable' => true,
+                    'draft_data' => [
+                        'summary' => $item['summary'],
+                        'audience' => $item['audience'],
+                        'inclusions' => array_map(fn (string $label): array => ['label' => $label], $item['inclusions']),
+                        'service_ids' => $serviceIds->only($item['services'])->values()->all(),
+                    ],
+                ],
+            );
+
+            $parent = $package;
+        }
+    }
+
+    /** Names are owner-supplied; roles, biographies and photos await approval. */
+    private function seedTeam(): void
+    {
+        foreach (['Abdulsalam Latifah Damilola', 'Abdulazeez Azeez Olaitan'] as $position => $name) {
+            TeamMember::firstOrCreate(
+                ['name' => $name],
+                ['sort_order' => $position + 1, 'is_published' => true],
+            );
+        }
+    }
+
+    /**
+     * Registers the sample banner images as hidden slides. Their usage rights
+     * are unconfirmed, so they stay hidden until someone confirms rights in
+     * the media library and turns the slide on.
+     */
+    private function seedHeroSlides(): void
+    {
+        $images = [
+            ['file' => 'hero-slider1.png', 'title' => 'Homepage slider – team meeting', 'alt' => 'Four professionals talking around a boardroom table, with a city skyline and a growth chart on a screen behind them.'],
+            ['file' => 'hero-slider2.png', 'title' => 'Homepage slider – reviewing reports', 'alt' => 'A professional reviewing financial documents at a desk with a calculator and laptop, with a city skyline and bridge through the window.'],
+        ];
+
+        foreach ($images as $position => $image) {
+            $source = public_path('images/'.$image['file']);
+            $path = 'media/sample-'.$image['file'];
+
+            if (! is_file($source) || MediaAsset::where('path', $path)->exists()) {
+                continue;
+            }
+
+            Storage::disk('public')->put($path, (string) file_get_contents($source));
+
+            $asset = MediaAsset::create([
+                'title' => $image['title'],
+                'path' => $path,
+                'original_name' => $image['file'],
+                'alt_text' => $image['alt'],
+                'usage_rights' => 'Supplied for development. Confirm the source and licence before publishing.',
+                'rights_confirmed' => false,
+            ]);
+
+            HomepageHeroSlide::create([
+                'media_asset_id' => $asset->id,
+                'sort_order' => $position + 1,
+                'is_visible' => false,
+            ]);
+        }
+    }
+
+    /** @return list<array{slug: string, title: string, summary: string, audience: string, inclusions: list<string>, services: list<string>}> */
+    private function packages(): array
+    {
+        return [
+            [
+                'slug' => 'essentials',
+                'title' => 'Essentials',
+                'summary' => 'Bookkeeping, reconciliations and tax',
+                'audience' => 'Startups, freelancers and small businesses that need clean records, accurate reporting and peace of mind at tax time.',
+                'inclusions' => ['Bookkeeping and accounting', 'Reconciliation and account management', 'Tax preparation and filing'],
+                'services' => ['bookkeeping', 'tax-filings'],
+            ],
+            [
+                'slug' => 'growth',
+                'title' => 'Growth',
+                'summary' => 'Performance and financial health',
+                'audience' => 'Scaling companies seeking visibility into profit leaks, margins and operational performance.',
+                'inclusions' => ['Financial performance analysis', 'Financial health and profitability reviews', 'Cash-flow planning'],
+                'services' => ['financial-reporting', 'business-solutions'],
+            ],
+            [
+                'slug' => 'strategic',
+                'title' => 'Strategic',
+                'summary' => 'Forecasting and decision support',
+                'audience' => 'Mature mid-market companies navigating complex growth and structural shifts that need forward planning and high-level financial guidance.',
+                'inclusions' => ['Budgeting and forecasting', 'Advanced scenario planning', 'Business decision support'],
+                'services' => ['business-solutions'],
+            ],
+        ];
     }
 
     /** @return list<array{slug: string, title: string, summary: string, body: string, audience: string, deliverables: list<array{label: string}>}> */

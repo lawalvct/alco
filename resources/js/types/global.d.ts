@@ -1,5 +1,6 @@
 import type { Directive } from 'vue';
 import type { Auth } from '@/types/auth';
+import type { SiteInfo } from '@/types/publicContent';
 
 // Extend ImportMeta interface for Vite...
 declare module 'vite/client' {
@@ -20,6 +21,7 @@ declare module '@inertiajs/core' {
             name: string;
             auth: Auth;
             sidebarOpen: boolean;
+            site: SiteInfo;
             [key: string]: unknown;
         };
     }

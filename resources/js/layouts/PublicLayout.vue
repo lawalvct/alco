@@ -1,12 +1,17 @@
 <script setup lang="ts">
 import { Link, usePage } from '@inertiajs/vue3';
 import { ArrowUpRight, MapPin, Menu, Phone, X } from '@lucide/vue';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import BrandLockup from '@/components/public/BrandLockup.vue';
-import { contactEmail, navigation } from '@/lib/publicSite';
+import { useSite } from '@/composables/useSite';
+import { navigation } from '@/lib/publicSite';
 
 const page = usePage();
+const site = useSite();
 const menuOpen = ref(false);
+const whatsappPhones = computed(() =>
+    site.value.phones.filter((phone) => phone.whatsapp),
+);
 
 function isActive(href: string): boolean {
     return href === '/' ? page.url === '/' : page.url.startsWith(href);
@@ -27,22 +32,33 @@ function isActive(href: string): boolean {
             >
                 <span class="inline-flex items-center gap-2">
                     <MapPin :size="14" aria-hidden="true" />
-                    Ebute-Metta, Lagos, Nigeria
+                    {{ site.address.summary }}
                 </span>
-                <div class="hidden items-center gap-3 sm:flex">
+                <div
+                    v-if="site.phones.length"
+                    class="hidden items-center gap-3 sm:flex"
+                >
                     <Phone :size="14" aria-hidden="true" />
-                    <a class="hover:underline" href="tel:+2348140824230"
-                        >+234 814 082 4230</a
+                    <template
+                        v-for="(phone, index) in site.phones"
+                        :key="phone.tel"
                     >
-                    <span aria-hidden="true" class="text-navy-400">|</span>
-                    <a class="hover:underline" href="tel:+2348148484955"
-                        >+234 814 848 4955</a
-                    >
+                        <span
+                            v-if="index > 0"
+                            aria-hidden="true"
+                            class="text-navy-400"
+                            >|</span
+                        >
+                        <a class="hover:underline" :href="`tel:${phone.tel}`">{{
+                            phone.display
+                        }}</a>
+                    </template>
                 </div>
                 <a
+                    v-if="site.phones[0]"
                     class="inline-flex min-h-6 min-w-6 items-center justify-center sm:hidden"
-                    href="tel:+2348140824230"
-                    aria-label="Call ALCO on +234 814 082 4230"
+                    :href="`tel:${site.phones[0].tel}`"
+                    :aria-label="`Call ALCO on ${site.phones[0].display}`"
                 >
                     <Phone :size="16" aria-hidden="true" />
                 </a>
@@ -153,10 +169,29 @@ function isActive(href: string): boolean {
             >
                 <div>
                     <BrandLockup class="text-white" />
-                    <p class="mt-5 max-w-xs text-sm leading-6">
-                        Professional Accounting Services. Bookkeeping, financial
-                        reporting, tax filings and business solutions.
+                    <p
+                        v-if="site.positioning"
+                        class="mt-5 max-w-xs text-sm leading-6"
+                    >
+                        {{ site.positioning }}
                     </p>
+                    <ul
+                        v-if="site.social.length"
+                        class="mt-5 flex flex-wrap gap-x-5 gap-y-2 text-sm"
+                    >
+                        <li v-for="link in site.social" :key="link.url">
+                            <a
+                                :href="link.url"
+                                class="font-semibold text-white hover:text-aqua-400"
+                                rel="noopener"
+                                target="_blank"
+                                >{{ link.label
+                                }}<span class="sr-only">
+                                    (opens in a new tab)</span
+                                ></a
+                            >
+                        </li>
+                    </ul>
                 </div>
                 <div>
                     <p class="font-semibold text-white">Explore</p>
@@ -174,30 +209,44 @@ function isActive(href: string): boolean {
                 <div>
                     <p class="font-semibold text-white">Visit or contact</p>
                     <address class="mt-4 text-sm leading-6 not-italic">
-                        18, Lagos Street, Ebute-Metta,<br />Lagos State, Nigeria
+                        {{ site.address.street }},
+                        {{ site.address.locality }},<br />{{
+                            site.address.region
+                        }},
+                        {{ site.address.country }}
                     </address>
                     <div class="mt-3 grid gap-1 text-sm">
                         <a
-                            :href="`mailto:${contactEmail}`"
+                            v-if="site.email"
+                            :href="`mailto:${site.email}`"
                             class="w-fit hover:text-aqua-400"
-                            >{{ contactEmail }}</a
+                            >{{ site.email }}</a
                         >
                         <a
-                            href="tel:+2348140824230"
+                            v-for="phone in site.phones"
+                            :key="phone.tel"
+                            :href="`tel:${phone.tel}`"
                             class="w-fit hover:text-aqua-400"
-                            >+234 814 082 4230</a
+                            >{{ phone.display }}</a
                         >
                         <a
-                            href="tel:+2348148484955"
+                            v-for="phone in whatsappPhones"
+                            :key="`wa-${phone.tel}`"
+                            :href="phone.whatsapp ?? undefined"
                             class="w-fit hover:text-aqua-400"
-                            >+234 814 848 4955</a
+                            rel="noopener"
+                            target="_blank"
+                            >WhatsApp {{ phone.display
+                            }}<span class="sr-only">
+                                (opens in a new tab)</span
+                            ></a
                         >
                     </div>
                 </div>
             </div>
             <div class="border-t border-white/10">
                 <p class="site-container py-5 text-xs text-white/60">
-                    © {{ new Date().getFullYear() }} ALCO Associate Solutions
+                    © {{ new Date().getFullYear() }} {{ site.name }}
                 </p>
             </div>
         </footer>

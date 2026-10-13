@@ -31,6 +31,12 @@ trait HasPublishedContent
         return $this->morphMany(ContentRevision::class, 'contentable');
     }
 
+    /** True when the saved draft differs from what visitors currently see. */
+    public function hasUnpublishedChanges(): bool
+    {
+        return $this->published_data === null || $this->published_data != $this->draftSnapshot();
+    }
+
     public function publish(?CarbonInterface $when = null, ?User $publisher = null): void
     {
         if (blank($this->title)) {
@@ -40,7 +46,7 @@ trait HasPublishedContent
         }
 
         $when ??= now();
-        $snapshot = array_merge($this->draft_data ?? [], ['title' => $this->title]);
+        $snapshot = $this->draftSnapshot();
 
         DB::transaction(function () use ($when, $publisher, $snapshot): void {
             $this->forceFill([
@@ -56,5 +62,11 @@ trait HasPublishedContent
                 'published_at' => $when,
             ]);
         });
+    }
+
+    /** @return array<string, mixed> */
+    private function draftSnapshot(): array
+    {
+        return array_merge($this->draft_data ?? [], ['title' => $this->title]);
     }
 }

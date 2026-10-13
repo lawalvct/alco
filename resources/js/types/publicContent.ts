@@ -12,7 +12,7 @@ export interface ServiceDetail extends ServiceSummary {
 }
 
 export interface HomeBlock {
-    type: 'intro' | 'audience' | 'process' | 'faq';
+    type: 'intro' | 'audience' | 'process' | 'faq' | 'packages';
     data: {
         eyebrow: string;
         title: string;
@@ -36,4 +36,57 @@ export interface HomeContent {
     hero_description: string;
     seo_description?: string;
     blocks: HomeBlock[];
+}
+
+export interface SiteInfo {
+    name: string;
+    positioning: string;
+    category: string;
+    address: {
+        street: string;
+        locality: string;
+        region: string;
+        country: string;
+        summary: string;
+    };
+    email: string;
+    phones: { tel: string; display: string; whatsapp: string | null }[];
+    social: { label: string; url: string }[];
+}
+
+export interface ImageSource {
+    src: string;
+    width: number | null;
+    height: number | null;
+}
+
+export interface HeroSlide extends ImageSource {
+    id: number;
+    alt: string;
+    position: string;
+    mobile: ImageSource | null;
+    mobile_position: string;
+}
+
+export interface HeroSliderSettings {
+    autoplay: boolean;
+    interval_seconds: number;
+}
+
+export interface PackageSummary {
+    slug: string;
+    name: string;
+    summary: string;
+    audience: string;
+    inclusions: string[];
+    includes: { slug: string; name: string } | null;
+    selectable: boolean;
+}
+
+export interface TeamProfile {
+    id: number;
+    name: string;
+    role: string | null;
+    bio: string | null;
+    portrait: ImageSource | null;
 }
