@@ -26,7 +26,7 @@ class SiteSettingsTest extends TestCase
     {
         $this->get('/contact')->assertOk()->assertInertia(fn (Assert $page) => $page
             ->where('site.name', 'ALCO Associate Solutions')
-            ->where('site.email', 'info@alcosolutions.ng')
+            ->where('site.emails', ['alcosolutionsng@gmail.com', 'info@alcosolutions.ng'])
             ->where('site.address.summary', 'Ebute-Metta, Lagos, Nigeria')
             ->where('site.phones.0.tel', '+2348140824230')
             ->where('site.phones.0.display', '+234 814 082 4230')
@@ -41,7 +41,7 @@ class SiteSettingsTest extends TestCase
         $this->actingAs($admin);
 
         $state = SiteSettings::DEFAULTS;
-        $state['contact']['email'] = 'hello@alcosolutions.ng';
+        $state['contact']['emails'] = ['info@alcosolutions.ng', 'alcosolutionsng@gmail.com'];
         $state['contact']['phones'] = [
             ['number' => '+2348140824230', 'whatsapp' => true],
         ];
@@ -57,7 +57,7 @@ class SiteSettingsTest extends TestCase
         $this->assertSame($admin->id, SiteSetting::where('group', 'contact')->value('updated_by'));
 
         $this->get('/contact')->assertOk()->assertInertia(fn (Assert $page) => $page
-            ->where('site.email', 'hello@alcosolutions.ng')
+            ->where('site.emails', ['info@alcosolutions.ng', 'alcosolutionsng@gmail.com'])
             ->has('site.phones', 1)
             ->where('site.phones.0.whatsapp', 'https://wa.me/2348140824230')
             ->where('site.social.0.label', 'LinkedIn')
@@ -91,13 +91,28 @@ class SiteSettingsTest extends TestCase
 
     public function test_new_setting_defaults_apply_even_when_saved_settings_are_cached(): void
     {
-        SiteSettings::put('contact', [...SiteSettings::DEFAULTS['contact'], 'email' => 'hello@alcosolutions.ng']);
+        SiteSettings::put('contact', [...SiteSettings::DEFAULTS['contact'], 'emails' => ['hello@alcosolutions.ng']]);
         SiteSettings::all();
 
         // A group added in a later release has no saved row yet but must still work.
-        $this->assertSame(['info@alcosolutions.ng'], SiteSettings::notificationEmails());
+        $this->assertSame(['alcosolutionsng@gmail.com', 'info@alcosolutions.ng'], SiteSettings::notificationEmails());
         $this->assertTrue(SiteSettings::formsEnabled());
-        $this->assertSame('hello@alcosolutions.ng', SiteSettings::publicPayload()['email']);
+        $this->assertSame(['hello@alcosolutions.ng'], SiteSettings::publicPayload()['emails']);
+    }
+
+    public function test_saved_single_email_settings_gain_the_gmail_address_first(): void
+    {
+        SiteSetting::create(['group' => 'contact', 'data' => [...SiteSettings::DEFAULTS['contact'], 'email' => 'info@alcosolutions.ng']]);
+        SiteSetting::create(['group' => 'forms', 'data' => ['forms_enabled' => true, 'notification_emails' => ['info@alcosolutions.ng', 'alcosolutionsng@gmail.com']]]);
+
+        $migration = require database_path('migrations/2026_10_15_100000_add_gmail_contact_address_to_site_settings.php');
+        $migration->up();
+
+        $contact = SiteSetting::where('group', 'contact')->sole()->data;
+        $this->assertArrayNotHasKey('email', $contact);
+        $this->assertSame(['alcosolutionsng@gmail.com', 'info@alcosolutions.ng'], $contact['emails']);
+        $this->assertSame(['alcosolutionsng@gmail.com', 'info@alcosolutions.ng'], SiteSettings::notificationEmails());
+        $this->assertSame(['alcosolutionsng@gmail.com', 'info@alcosolutions.ng'], SiteSettings::publicPayload()['emails']);
     }
 
     public function test_only_admins_can_open_site_settings(): void

@@ -50,7 +50,7 @@ export interface SiteInfo {
         country: string;
         summary: string;
     };
-    email: string;
+    emails: string[];
     phones: { tel: string; display: string; whatsapp: string | null }[];
     social: { label: string; url: string }[];
 }

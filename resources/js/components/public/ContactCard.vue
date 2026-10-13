@@ -25,11 +25,12 @@ const site = useSite();
         </p>
         <div class="mt-7 grid gap-4">
             <a
-                v-if="site.email"
-                :href="`mailto:${site.email}`"
+                v-for="email in site.emails"
+                :key="email"
+                :href="`mailto:${email}`"
                 class="inline-flex w-fit items-center gap-3 text-lg font-semibold break-all text-aqua-700 hover:underline"
                 ><Mail :size="19" class="shrink-0" aria-hidden="true" />{{
-                    site.email
+                    email
                 }}</a
             >
             <a

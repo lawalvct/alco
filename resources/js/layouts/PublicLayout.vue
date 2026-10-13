@@ -4,6 +4,7 @@ import { ArrowUpRight, MapPin, Menu, Phone, X } from '@lucide/vue';
 import { computed, ref } from 'vue';
 import BrandLockup from '@/components/public/BrandLockup.vue';
 import MenuAnchor from '@/components/public/MenuAnchor.vue';
+import SocialIcon from '@/components/public/SocialIcon.vue';
 import { useSite } from '@/composables/useSite';
 import type { MenuLink } from '@/types/publicContent';
 
@@ -37,40 +38,62 @@ function isActive(link: MenuLink): boolean {
 
         <div class="bg-aqua-50 text-navy-900">
             <div
-                class="site-container flex items-center justify-between gap-4 py-2.5 text-xs font-semibold"
+                class="site-container flex items-center justify-between gap-3 py-2.5 text-xs font-semibold"
             >
-                <span class="inline-flex items-center gap-2">
-                    <MapPin :size="14" aria-hidden="true" />
-                    {{ site.address.summary }}
+                <span class="inline-flex min-w-0 items-center gap-2">
+                    <MapPin class="shrink-0" :size="14" aria-hidden="true" />
+                    <span class="truncate">{{ site.address.summary }}</span>
                 </span>
-                <div
-                    v-if="site.phones.length"
-                    class="hidden items-center gap-3 sm:flex"
-                >
-                    <Phone :size="14" aria-hidden="true" />
-                    <template
-                        v-for="(phone, index) in site.phones"
-                        :key="phone.tel"
+                <div class="flex shrink-0 items-center gap-2 sm:gap-4">
+                    <div
+                        v-if="site.phones.length"
+                        class="hidden items-center gap-3 sm:flex"
                     >
-                        <span
-                            v-if="index > 0"
-                            aria-hidden="true"
-                            class="text-navy-400"
-                            >|</span
+                        <Phone :size="14" aria-hidden="true" />
+                        <template
+                            v-for="(phone, index) in site.phones"
+                            :key="phone.tel"
                         >
-                        <a class="hover:underline" :href="`tel:${phone.tel}`">{{
-                            phone.display
-                        }}</a>
-                    </template>
+                            <span
+                                v-if="index > 0"
+                                aria-hidden="true"
+                                class="text-navy-400"
+                                >|</span
+                            >
+                            <a
+                                class="hover:underline"
+                                :href="`tel:${phone.tel}`"
+                                >{{ phone.display }}</a
+                            >
+                        </template>
+                    </div>
+                    <a
+                        v-if="site.phones[0]"
+                        class="inline-flex min-h-8 min-w-8 items-center justify-center rounded-full hover:bg-aqua-100 sm:hidden"
+                        :href="`tel:${site.phones[0].tel}`"
+                        :aria-label="`Call ALCO on ${site.phones[0].display}`"
+                    >
+                        <Phone :size="16" aria-hidden="true" />
+                    </a>
+                    <nav
+                        v-if="site.social.length"
+                        class="flex items-center gap-1"
+                        aria-label="ALCO social media"
+                    >
+                        <a
+                            v-for="link in site.social"
+                            :key="link.url"
+                            :href="link.url"
+                            class="inline-flex min-h-8 min-w-8 items-center justify-center rounded-full text-navy-900 transition-colors hover:bg-aqua-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-aqua-700"
+                            :aria-label="`Visit ALCO on ${link.label}`"
+                            :title="link.label"
+                            rel="noopener noreferrer"
+                            target="_blank"
+                        >
+                            <SocialIcon :network="link.label" :size="18" />
+                        </a>
+                    </nav>
                 </div>
-                <a
-                    v-if="site.phones[0]"
-                    class="inline-flex min-h-6 min-w-6 items-center justify-center sm:hidden"
-                    :href="`tel:${site.phones[0].tel}`"
-                    :aria-label="`Call ALCO on ${site.phones[0].display}`"
-                >
-                    <Phone :size="16" aria-hidden="true" />
-                </a>
             </div>
         </div>
 
@@ -220,10 +243,11 @@ function isActive(link: MenuLink): boolean {
                     </address>
                     <div class="mt-3 grid gap-1 text-sm">
                         <a
-                            v-if="site.email"
-                            :href="`mailto:${site.email}`"
-                            class="w-fit hover:text-aqua-400"
-                            >{{ site.email }}</a
+                            v-for="email in site.emails"
+                            :key="email"
+                            :href="`mailto:${email}`"
+                            class="w-fit break-all hover:text-aqua-400"
+                            >{{ email }}</a
                         >
                         <a
                             v-for="phone in site.phones"

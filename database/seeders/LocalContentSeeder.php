@@ -152,7 +152,7 @@ class LocalContentSeeder extends Seeder
         $faqs = [
             ['question' => 'Where is ALCO based?', 'answer' => '18, Lagos Street, Ebute-Metta, Lagos State, Nigeria.'],
             ['question' => 'Which services can I ask about?', 'answer' => 'Bookkeeping, financial reporting, tax filings and business solutions are the four core areas listed by ALCO.'],
-            ['question' => 'How do I request a consultation?', 'answer' => 'Call either listed phone number or email info@alcosolutions.ng. Availability is confirmed directly.'],
+            ['question' => 'How do I request a consultation?', 'answer' => 'Call either listed phone number, or email alcosolutionsng@gmail.com or info@alcosolutions.ng. Availability is confirmed directly.'],
         ];
 
         $ids = [];

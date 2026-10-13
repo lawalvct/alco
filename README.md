@@ -4,7 +4,7 @@ Laravel 13 application for ALCO Associate Solutions. The public site uses Inerti
 
 The client selected design **Option 2** in `docs/design-options/`. Its responsive public homepage is implemented with the navy and cyan visual style, consultation imagery, service navigation, and desktop/mobile menus. The project specification is `docs/ALCO_WEBSITE_DEVELOPMENT_PLAN.md`.
 
-The owner has confirmed `https://alcosolutions.ng` as the intended production domain and `info@alcosolutions.ng` as the public enquiries address. The local `alco.test` address remains separate; production DNS, hosting, SSL and SMTP have not yet been configured here.
+The owner has confirmed `https://alcosolutions.ng` as the intended production domain. Public enquiries go to `alcosolutionsng@gmail.com` (listed first) and `info@alcosolutions.ng`; both are editable in Admin → Site settings. The local `alco.test` address remains separate; production DNS, hosting, SSL and SMTP have not yet been configured here.
 
 ## Local setup (Laragon on Windows)
 

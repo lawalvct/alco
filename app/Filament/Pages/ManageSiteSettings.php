@@ -87,11 +87,14 @@ class ManageSiteSettings extends Page
                                         ->required()
                                         ->maxLength(80)
                                         ->helperText('Shown in the strip at the top of every page.'),
-                                    TextInput::make('email')
-                                        ->label('Enquiries email')
-                                        ->email()
+                                    TagsInput::make('emails')
+                                        ->label('Email addresses')
+                                        ->placeholder('Add an email address')
                                         ->required()
-                                        ->maxLength(120),
+                                        ->reorderable()
+                                        ->nestedRecursiveRules(['email', 'max:120'])
+                                        ->helperText('Shown on the website in this order; the first is the main address. Drag to reorder.')
+                                        ->columnSpanFull(),
                                     Repeater::make('phones')
                                         ->label('Phone numbers')
                                         ->columnSpanFull()
@@ -131,8 +134,9 @@ class ManageSiteSettings extends Page
                                     TagsInput::make('notification_emails')
                                         ->label('Send new-enquiry emails to')
                                         ->placeholder('Add an email address')
+                                        ->reorderable()
                                         ->nestedRecursiveRules(['email'])
-                                        ->helperText('Every new enquiry is emailed to these addresses and saved under Enquiries, even if the email fails.'),
+                                        ->helperText('Every new enquiry is emailed to all of these addresses and saved under Enquiries, even if the email fails.'),
                                 ]),
                             ]),
                         Tab::make('Homepage slider')

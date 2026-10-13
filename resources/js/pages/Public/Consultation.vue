@@ -182,7 +182,7 @@ const chosen = computed(
 
                     <ContactCard
                         title="Prefer to call or email?"
-                        description="Use either number or our email address to request a consultation."
+                        description="Call or email us using any of these details to request a consultation."
                     />
                 </div>
             </div>

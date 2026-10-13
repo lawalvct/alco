@@ -85,7 +85,7 @@ class LeadSubmissionTest extends TestCase
             new AnonymousNotifiable,
             NewLeadReceived::class,
             fn (NewLeadReceived $notification, array $channels, AnonymousNotifiable $notifiable): bool => $notification->lead->is($lead)
-                && $notifiable->routes['mail'] === ['info@alcosolutions.ng'],
+                && $notifiable->routes['mail'] === ['alcosolutionsng@gmail.com', 'info@alcosolutions.ng'],
         );
     }
 

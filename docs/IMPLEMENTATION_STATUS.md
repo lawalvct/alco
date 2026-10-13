@@ -6,7 +6,7 @@ Updated: 5 October 2026. This checklist tracks `ALCO_WEBSITE_DEVELOPMENT_PLAN.md
 
 - Laravel 13, Inertia/Vue/TypeScript/Tailwind public site, Filament 5 admin, MySQL and local SSR foundation.
 - Selected Option 2 responsive theme, navigation, hero and core service presentation.
-- Confirmed domain `alcosolutions.ng` and enquiries address `info@alcosolutions.ng` recorded in the project.
+- Confirmed domain `alcosolutions.ng`; enquiry addresses `alcosolutionsng@gmail.com` (first, per owner on 13 Oct 2026) and `info@alcosolutions.ng` recorded in the project.
 - First CMS slice: homepage and Service models/resources, draft content separate from published snapshots, publication history, admin-only policies and public service detail routes.
 - Provisional local-only homepage and four-service content set for visual review. No production seed data or admin account is created by this seed.
 

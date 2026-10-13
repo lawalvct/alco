@@ -84,7 +84,7 @@ const submitted = computed(() => page.flash.leadSubmitted);
                 <div class="grid gap-6">
                     <ContactCard
                         title="Prefer to call or email?"
-                        description="Use either number or our email address."
+                        description="Call or email us using any of these details."
                     />
                     <VisitCard />
                 </div>

@@ -28,7 +28,8 @@ final class SiteSettings
             'region' => 'Lagos State',
             'country' => 'Nigeria',
             'location_summary' => 'Ebute-Metta, Lagos, Nigeria',
-            'email' => 'info@alcosolutions.ng',
+            // Shown in this order; the first is the main address (owner instruction, 13 Oct 2026).
+            'emails' => ['alcosolutionsng@gmail.com', 'info@alcosolutions.ng'],
             'phones' => [
                 ['number' => '+2348140824230', 'whatsapp' => false],
                 ['number' => '+2348148484955', 'whatsapp' => false],
@@ -45,7 +46,7 @@ final class SiteSettings
         ],
         'forms' => [
             'forms_enabled' => true,
-            'notification_emails' => ['info@alcosolutions.ng'],
+            'notification_emails' => ['alcosolutionsng@gmail.com', 'info@alcosolutions.ng'],
         ],
     ];
 
@@ -96,7 +97,7 @@ final class SiteSettings
     /**
      * Only the fields visitors may see, shaped for the Vue layout.
      *
-     * @return array{name: string, positioning: string, category: string, address: array{street: string, locality: string, region: string, country: string, summary: string}, email: string, phones: list<array{tel: string, display: string, whatsapp: string|null}>, social: list<array{label: string, url: string}>}
+     * @return array{name: string, positioning: string, category: string, address: array{street: string, locality: string, region: string, country: string, summary: string}, emails: list<string>, phones: list<array{tel: string, display: string, whatsapp: string|null}>, social: list<array{label: string, url: string}>}
      */
     public static function publicPayload(): array
     {
@@ -141,7 +142,7 @@ final class SiteSettings
                 'country' => self::string($contact, 'country'),
                 'summary' => self::string($contact, 'location_summary'),
             ],
-            'email' => self::string($contact, 'email'),
+            'emails' => self::emailList($contact['emails'] ?? []),
             'phones' => $phones,
             'social' => $links,
         ];
@@ -169,12 +170,21 @@ final class SiteSettings
     /** @return list<string> Staff addresses that receive new-enquiry emails. */
     public static function notificationEmails(): array
     {
-        $emails = self::get('forms')['notification_emails'] ?? [];
+        return self::emailList(self::get('forms')['notification_emails'] ?? []);
+    }
 
-        return array_values(array_filter(
-            is_array($emails) ? $emails : [],
-            fn (mixed $email): bool => is_string($email) && filter_var($email, FILTER_VALIDATE_EMAIL) !== false,
-        ));
+    /** @return list<string> Valid, distinct addresses in their saved order. */
+    private static function emailList(mixed $emails): array
+    {
+        $valid = [];
+
+        foreach (is_array($emails) ? $emails : [] as $email) {
+            if (is_string($email) && filter_var(trim($email), FILTER_VALIDATE_EMAIL) !== false) {
+                $valid[] = strtolower(trim($email));
+            }
+        }
+
+        return array_values(array_unique($valid));
     }
 
     /** Formats Nigerian numbers as "+234 814 082 4230"; other numbers are left as entered. */
