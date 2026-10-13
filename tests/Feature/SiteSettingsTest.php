@@ -31,6 +31,8 @@ class SiteSettingsTest extends TestCase
             ->where('site.phones.0.tel', '+2348140824230')
             ->where('site.phones.0.display', '+234 814 082 4230')
             ->where('site.phones.0.whatsapp', null)
+            ->where('site.whatsappWidget.number', '+2348140824230')
+            ->where('site.whatsappWidget.url', 'https://wa.me/2348140824230')
             ->where('site.social', [])
             ->etc());
     }
@@ -45,6 +47,7 @@ class SiteSettingsTest extends TestCase
         $state['contact']['phones'] = [
             ['number' => '+2348140824230', 'whatsapp' => true],
         ];
+        $state['contact']['whatsapp_widget_number'] = '+2348148484955';
         $state['social']['linkedin_url'] = 'https://www.linkedin.com/company/alco-solutions-ng';
         $state['homepage']['hero_interval_seconds'] = 9;
 
@@ -60,6 +63,7 @@ class SiteSettingsTest extends TestCase
             ->where('site.emails', ['info@alcosolutions.ng', 'alcosolutionsng@gmail.com'])
             ->has('site.phones', 1)
             ->where('site.phones.0.whatsapp', 'https://wa.me/2348140824230')
+            ->where('site.whatsappWidget.url', 'https://wa.me/2348148484955')
             ->where('site.social.0.label', 'LinkedIn')
             ->where('site.social.0.url', 'https://www.linkedin.com/company/alco-solutions-ng')
             ->etc());
@@ -76,6 +80,7 @@ class SiteSettingsTest extends TestCase
         $state = SiteSettings::DEFAULTS;
         $state['social']['facebook_url'] = 'http://facebook.com/alco';
         $state['contact']['phones'] = [['number' => '0814 082 4230', 'whatsapp' => false]];
+        $state['contact']['whatsapp_widget_number'] = '0814 082 4230';
         $state['homepage']['hero_interval_seconds'] = 3;
 
         Livewire::test(ManageSiteSettings::class)
@@ -83,10 +88,20 @@ class SiteSettingsTest extends TestCase
             ->call('save')
             ->assertHasFormErrors([
                 'social.facebook_url',
+                'contact.whatsapp_widget_number',
                 'homepage.hero_interval_seconds',
             ]);
 
         $this->assertDatabaseCount('site_settings', 0);
+    }
+
+    public function test_clearing_the_widget_number_hides_the_chat_button_from_public_pages(): void
+    {
+        SiteSettings::put('contact', [...SiteSettings::DEFAULTS['contact'], 'whatsapp_widget_number' => null]);
+
+        $this->get('/contact')->assertOk()->assertInertia(fn (Assert $page) => $page
+            ->where('site.whatsappWidget', null)
+            ->etc());
     }
 
     public function test_new_setting_defaults_apply_even_when_saved_settings_are_cached(): void

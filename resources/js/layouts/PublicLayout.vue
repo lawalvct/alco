@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Head, Link, usePage } from '@inertiajs/vue3';
-import { ArrowUpRight, MapPin, Menu, Phone, X } from '@lucide/vue';
-import { computed, ref } from 'vue';
+import { ArrowUp, ArrowUpRight, MapPin, Menu, MessageCircle, Phone, X } from '@lucide/vue';
+import { computed, onMounted, onUnmounted, ref } from 'vue';
 import BrandLockup from '@/components/public/BrandLockup.vue';
 import MenuAnchor from '@/components/public/MenuAnchor.vue';
 import SocialIcon from '@/components/public/SocialIcon.vue';
@@ -14,9 +14,26 @@ const headerLinks = computed(() => page.props.navigation.header);
 const footerLinks = computed(() => page.props.navigation.footer);
 const legalLinks = computed(() => page.props.legalLinks);
 const menuOpen = ref(false);
+const showScrollTop = ref(false);
 const whatsappPhones = computed(() =>
     site.value.phones.filter((phone) => phone.whatsapp),
 );
+
+function updateScrollTop(): void {
+    showScrollTop.value = window.scrollY > 500;
+}
+
+function scrollToTop(): void {
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
+}
+
+onMounted(() => {
+    updateScrollTop();
+    window.addEventListener('scroll', updateScrollTop, { passive: true });
+});
+
+onUnmounted(() => window.removeEventListener('scroll', updateScrollTop));
 
 function isActive(link: MenuLink): boolean {
     if (link.external) {
@@ -284,7 +301,8 @@ function isActive(link: MenuLink): boolean {
             </div>
             <div class="border-t border-white/10">
                 <div
-                    class="site-container flex flex-col gap-3 py-5 text-xs text-white/60 sm:flex-row sm:items-center sm:justify-between"
+                    class="site-container flex flex-col gap-3 pt-5 text-xs text-white/60 sm:flex-row sm:items-center sm:justify-between"
+                    :class="site.whatsappWidget ? 'pb-24 sm:pb-5' : 'pb-5'"
                 >
                     <p>© {{ new Date().getFullYear() }} {{ site.name }}</p>
                     <ul
@@ -302,5 +320,36 @@ function isActive(link: MenuLink): boolean {
                 </div>
             </div>
         </footer>
+
+        <div
+            class="pointer-events-none fixed right-4 z-40 flex flex-col items-end gap-2.5 print:hidden sm:right-6"
+            style="bottom: calc(1rem + env(safe-area-inset-bottom))"
+        >
+            <button
+                v-if="showScrollTop"
+                type="button"
+                class="pointer-events-auto inline-flex min-h-12 min-w-12 items-center justify-center rounded-full border border-navy-900/10 bg-white text-navy-900 shadow-lg transition-transform hover:-translate-y-0.5 hover:bg-aqua-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-aqua-700"
+                aria-label="Scroll to top"
+                title="Scroll to top"
+                @click="scrollToTop"
+            >
+                <ArrowUp :size="21" aria-hidden="true" />
+            </button>
+            <a
+                v-if="site.whatsappWidget"
+                :href="site.whatsappWidget.url"
+                class="pointer-events-auto inline-flex min-h-14 min-w-14 items-center justify-center gap-2.5 rounded-full bg-[#168b52] px-4 text-white shadow-lg shadow-navy-950/20 transition-transform hover:-translate-y-0.5 hover:bg-[#117746] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#168b52] sm:px-5"
+                :aria-label="`Chat with ALCO on WhatsApp at ${site.whatsappWidget.display} (opens in a new tab)`"
+                title="Chat on WhatsApp"
+                target="_blank"
+                rel="noopener noreferrer"
+            >
+                <span class="relative inline-flex" aria-hidden="true">
+                    <MessageCircle :size="27" :stroke-width="2.1" />
+                    <Phone class="absolute top-2 left-2" :size="11" :stroke-width="2.5" />
+                </span>
+                <span class="hidden text-sm font-bold sm:inline">WhatsApp</span>
+            </a>
+        </div>
     </div>
 </template>

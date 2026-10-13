@@ -68,6 +68,7 @@ export interface SiteInfo {
     };
     emails: string[];
     phones: { tel: string; display: string; whatsapp: string | null }[];
+    whatsappWidget: { number: string; display: string; url: string } | null;
     social: { label: string; url: string }[];
 }
 

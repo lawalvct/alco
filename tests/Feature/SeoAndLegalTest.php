@@ -174,6 +174,41 @@ class SeoAndLegalTest extends TestCase
         $this->assertSame('WebSite', $graph[1]['@type']);
     }
 
+    public function test_public_pages_render_social_previews_in_the_initial_html(): void
+    {
+        $home = $this->get('/')->assertOk()->getContent();
+
+        $this->assertStringContainsString('<meta property="og:title" content="ALCO Associate Solutions">', $home);
+        $this->assertStringContainsString('<meta property="og:site_name" content="ALCO Associate Solutions">', $home);
+        $this->assertStringContainsString('<meta property="og:url" content="https://alcosolutions.ng/">', $home);
+        $this->assertStringContainsString('<meta property="og:image" content="https://alcosolutions.ng/images/alco-social-share.png">', $home);
+        $this->assertStringContainsString('<meta property="og:image:width" content="1200">', $home);
+        $this->assertStringContainsString('<meta name="twitter:card" content="summary_large_image">', $home);
+        $this->assertFileExists(public_path('images/alco-social-share.png'));
+
+        $contact = $this->get('/contact?utm_source=whatsapp')->assertOk()->getContent();
+        $this->assertStringContainsString('<meta property="og:title" content="Contact us | ALCO Associate Solutions">', $contact);
+        $this->assertStringContainsString('<meta property="og:url" content="https://alcosolutions.ng/contact">', $contact);
+
+        $this->get('/login')->assertOk()->assertDontSee('og:image', false);
+    }
+
+    public function test_article_social_preview_uses_published_title_and_description(): void
+    {
+        Post::create(['slug' => 'vat-basics', 'title' => 'VAT basics', 'draft_data' => ['excerpt' => 'Draft text', 'body' => '<p>Body</p>']])
+            ->forceFill([
+                'publication_status' => 'published',
+                'published_data' => ['title' => 'VAT basics', 'excerpt' => 'Clear VAT guidance for business owners.', 'body' => '<p>Body</p>'],
+                'published_at' => now(),
+            ])->save();
+
+        $html = $this->get('/insights/vat-basics')->assertOk()->getContent();
+
+        $this->assertStringContainsString('<meta property="og:type" content="article">', $html);
+        $this->assertStringContainsString('<meta property="og:title" content="VAT basics | ALCO Associate Solutions">', $html);
+        $this->assertStringContainsString('<meta property="og:description" content="Clear VAT guidance for business owners.">', $html);
+    }
+
     public function test_service_pages_add_a_breadcrumb_trail_and_articles_a_blog_posting(): void
     {
         Service::factory()->create(['slug' => 'bookkeeping', 'title' => 'Bookkeeping'])->publish();

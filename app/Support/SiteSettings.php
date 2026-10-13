@@ -34,6 +34,7 @@ final class SiteSettings
                 ['number' => '+2348140824230', 'whatsapp' => false],
                 ['number' => '+2348148484955', 'whatsapp' => false],
             ],
+            'whatsapp_widget_number' => '+2348140824230',
         ],
         'social' => [
             'facebook_url' => null,
@@ -97,13 +98,17 @@ final class SiteSettings
     /**
      * Only the fields visitors may see, shaped for the Vue layout.
      *
-     * @return array{name: string, positioning: string, category: string, address: array{street: string, locality: string, region: string, country: string, summary: string}, emails: list<string>, phones: list<array{tel: string, display: string, whatsapp: string|null}>, social: list<array{label: string, url: string}>}
+     * @return array{name: string, positioning: string, category: string, address: array{street: string, locality: string, region: string, country: string, summary: string}, emails: list<string>, phones: list<array{tel: string, display: string, whatsapp: string|null}>, whatsappWidget: array{number: string, display: string, url: string}|null, social: list<array{label: string, url: string}>}
      */
     public static function publicPayload(): array
     {
         $identity = self::get('identity');
         $contact = self::get('contact');
         $social = self::get('social');
+        $widgetNumber = $contact['whatsapp_widget_number'] ?? null;
+        $widgetNumber = is_string($widgetNumber) && preg_match('/^\+[1-9]\d{7,14}$/', $widgetNumber)
+            ? $widgetNumber
+            : null;
 
         $phones = [];
 
@@ -144,6 +149,11 @@ final class SiteSettings
             ],
             'emails' => self::emailList($contact['emails'] ?? []),
             'phones' => $phones,
+            'whatsappWidget' => $widgetNumber ? [
+                'number' => $widgetNumber,
+                'display' => self::formatPhone($widgetNumber),
+                'url' => 'https://wa.me/'.substr($widgetNumber, 1),
+            ] : null,
             'social' => $links,
         ];
     }

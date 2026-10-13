@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Head, Link, usePage } from '@inertiajs/vue3';
+import { Head, Link } from '@inertiajs/vue3';
 import {
     ArrowLeft,
     ArrowUpRight,
@@ -68,7 +68,6 @@ const props = defineProps<{
         version: number;
     }[];
 }>();
-const page = usePage();
 
 const initialValues = () =>
     Object.fromEntries(
@@ -284,10 +283,6 @@ async function calculate(): Promise<void> {
 <template>
     <Head :title="tool.seoTitle">
         <meta name="description" :content="tool.seoDescription" />
-        <meta property="og:type" content="website" />
-        <meta property="og:title" :content="tool.seoTitle" />
-        <meta property="og:description" :content="tool.seoDescription" />
-        <meta property="og:url" :content="page.props.canonical" />
     </Head>
     <PublicLayout>
         <PageHero

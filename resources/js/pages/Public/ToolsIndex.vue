@@ -15,15 +15,6 @@ defineProps<{
             name="description"
             content="Use ALCO’s free accounting calculators for VAT, withholding tax, profit margins, break-even, loans, depreciation, liquidity and cash collection."
         />
-        <meta property="og:type" content="website" />
-        <meta
-            property="og:title"
-            content="Free accounting calculators for business"
-        />
-        <meta
-            property="og:description"
-            content="Explore free accounting and business calculators from ALCO Associate Solutions."
-        />
     </Head>
 
     <PublicLayout>

@@ -37,9 +37,25 @@
         @fonts
 
         @vite(['resources/css/app.css', 'resources/js/app.ts', "resources/js/pages/{$page['component']}.vue"])
-        @unless (request()->is('login', 'register', 'forgot-password', 'reset-password/*', 'two-factor-challenge', 'user/*', 'settings/*', 'dashboard'))
+        @if ($page['component'] === 'Welcome' || str_starts_with($page['component'], 'Public/'))
+            @php($share = \App\Support\ShareMetadata::forPage($page))
+            <meta property="og:locale" content="en_NG">
+            <meta property="og:type" content="{{ $share['type'] }}">
+            <meta property="og:site_name" content="{{ $page['props']['site']['name'] }}">
+            <meta property="og:title" content="{{ $share['title'] }}">
+            <meta property="og:description" content="{{ $share['description'] }}">
+            <meta property="og:url" content="{{ $share['url'] }}">
+            <meta property="og:image" content="{{ $share['image'] }}">
+            <meta property="og:image:type" content="image/png">
+            <meta property="og:image:width" content="1200">
+            <meta property="og:image:height" content="630">
+            <meta property="og:image:alt" content="{{ $share['imageAlt'] }}">
+            <meta name="twitter:card" content="summary_large_image">
+            <meta name="twitter:title" content="{{ $share['title'] }}">
+            <meta name="twitter:description" content="{{ $share['description'] }}">
+            <meta name="twitter:image" content="{{ $share['image'] }}">
             <script type="application/ld+json">{!! app(\App\Support\StructuredData::class)->json(request()->path() === '/') !!}</script>
-        @endunless
+        @endif
 
         <x-inertia::head>
             <title>{{ config('app.name', 'Laravel') }}</title>

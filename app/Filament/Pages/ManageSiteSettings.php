@@ -113,6 +113,13 @@ class ManageSiteSettings extends Page
                                                 ->helperText('Turn on only after confirming the number uses WhatsApp.')
                                                 ->inline(false),
                                         ]),
+                                    TextInput::make('whatsapp_widget_number')
+                                        ->label('Floating WhatsApp button number')
+                                        ->regex('/^\+[1-9]\d{7,14}$/')
+                                        ->validationMessages(['regex' => 'Use international format with no spaces, for example +2348140824230.'])
+                                        ->placeholder('+2348140824230')
+                                        ->helperText('The direct WhatsApp number used by the floating chat button. Leave blank to hide the button. This is separate from the phone list above.')
+                                        ->columnSpanFull(),
                                 ]),
                             ]),
                         Tab::make('Social links')
