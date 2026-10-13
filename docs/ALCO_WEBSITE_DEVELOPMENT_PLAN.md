@@ -1,6 +1,6 @@
 # ALCO Associate Solutions — Website Development Plan
 
-Version: 1.0 • Prepared: 4 October 2026 • Status: initial Codex development specification
+Version: 1.2 • Prepared: 13 October 2026 • Status: revised development specification
 
 ## 1. Project purpose and scope
 
@@ -8,7 +8,7 @@ Build a polished, mobile-first professional services website and a complete Lara
 
 The agreed architecture is one Laravel application: an Inertia/Vue public site with server-rendered first visits and SPA navigation, plus a Filament admin panel. The website is not a bookkeeping ledger, filing portal, or client document vault. Those may become separate future modules.
 
-Launch scope includes all eleven calculator families listed below, the blog/Insights system, service pages, contact and consultation forms, configurable tax parameters, and staff training. AI features are a later phase and must not block launch.
+Launch scope includes all eleven calculator families listed below, the blog/Insights system, service pages, a CMS-managed homepage hero image slider, customer-selectable engagement packages, contact and consultation forms, configurable tax parameters, and staff training. AI features are a later phase and must not block launch.
 
 ### Business information supplied by the owner
 
@@ -22,7 +22,7 @@ Launch scope includes all eleven calculator families listed below, the blog/Insi
 | Telephone 1           | +2348140824230                                                                                            |
 | Telephone 2           | +2348148484955                                                                                            |
 | Enquiries email       | info@alcosolutions.ng (owner-confirmed)                                                                   |
-| Leadership            | Abdulsalam Latifat Damilola; Abdulazeez Azeez Olaitan                                                     |
+| Leadership            | Abdulsalam Latifah Damilola; Abdulazeez Azeez Olaitan                                                     |
 | Facebook handle       | alco_solutions.ng                                                                                         |
 | TikTok handle         | alco_solutions.ng                                                                                         |
 | LinkedIn handle       | alco_solutions.ng                                                                                         |
@@ -33,7 +33,7 @@ Use these exact names and contact details in seed content. Keep social handles a
 
 The previous conversation establishes the stack and the expanded blog/tools scope. Foremost Consulting is a reference for useful professional-services functionality, not a theme to clone. Its local project brief at `C:\laragon\www\foremost-consulting\docs\SIMILAR_PROFESSIONAL_SERVICES_PROJECT_BRIEF.md` was unavailable during initial preparation and has since been reviewed for reusable structure and content requirements. Do not copy its company-specific facts or claims.
 
-The two images from the original conversation have not been visually assessed for this specification. Before design approval, inspect the original logo/brand files, confirm usage rights, and extract approved colors. The owner has confirmed `alcosolutions.ng` as the production domain and `info@alcosolutions.ng` as the enquiries address. Outstanding inputs: logo files, verified social URLs, service descriptions, leadership bios/photos/titles, brand palette, tax reviewer, privacy wording, hosting access, and SMTP provider. Development can proceed with clearly marked placeholders; public launch requires their resolution.
+The two images from the original conversation have not been visually assessed for this specification. Before design approval, inspect the original logo/brand files, confirm usage rights, and extract approved colors. The owner has confirmed `alcosolutions.ng` as the production domain and `info@alcosolutions.ng` as the enquiries address. A client-provided service-packages document supplies the initial Essentials, Growth and Strategic package copy in this plan; its `alcosolutionsng@gmail.com` address does not replace the owner-confirmed public enquiries address without explicit approval. Outstanding inputs: logo files, up to ten approved hero images with usage rights, verified social URLs, service descriptions, package pricing/billing cadence/contract terms, package availability and scope boundaries, leadership bios/photos/titles, brand palette, tax reviewer, privacy wording, hosting access, and SMTP provider. Development can proceed with clearly marked placeholders; public launch requires their resolution.
 
 ## 2. Technology and application architecture
 
@@ -76,8 +76,8 @@ Public pages must render meaningful text, headings, links, and metadata on a dir
 | `/`                                            | Homepage                                       |
 | `/about`                                       | Business story, approach, leadership           |
 | `/team/{slug}`                                 | Optional detailed approved leadership profiles |
-| `/services`                                    | Service overview                               |
-| `/services/{slug}`                             | Individual service, deliverables, FAQs and CTA |
+| `/services`                                    | Service overview, package comparison and selection |
+| `/services/{slug}`                             | Individual service, deliverables, package fit, FAQs and CTA |
 | `/insights`                                    | Searchable, paginated blog listing             |
 | `/insights/category/{slug}`                    | Editorial category archive                     |
 | `/insights/topic/vat`                          | Curated VAT content hub                        |
@@ -104,19 +104,28 @@ Create an original, professional accounting theme with readable typography, rest
 Homepage order:
 
 1. Compact contact strip and responsive navigation.
-2. Hero with the supplied positioning statement, a short approved benefit statement, Book a Consultation CTA, and Explore Services link.
+2. Hero image slider with the supplied positioning statement, a short approved benefit statement, Book a Consultation CTA, and Explore Services link.
 3. Trust introduction: CAC business category, Lagos location and documented approach; only verified credentials or statistics.
 4. Core service cards: bookkeeping, financial reporting, tax filings, business solutions.
-5. Who we help: small businesses, growing companies and professionals, subject to owner approval.
-6. How engagement works: enquire, discovery, scope/proposal, delivery and ongoing support.
-7. Featured Insights, including a VAT guide linking to its content hub and calculator.
-8. Featured Accounting Tools with a link to all eleven tools.
-9. Leadership introduction with approved bios and photos.
-10. Testimonials or case studies only when authentic and consented; omit the section until available.
-11. Selected FAQs and consultation CTA.
-12. Footer with address, both phone numbers, verified social links, legal links and navigation.
+5. Compact engagement-package introduction: Essentials, Growth and Strategic with a one-line fit statement, a link to compare packages on the Services page, and no price or billing claim until approved.
+6. Who we help: small businesses, growing companies and professionals, subject to owner approval.
+7. How engagement works: choose a starting package or request a tailored discussion, then enquire, discovery, scope/proposal, delivery and ongoing support.
+8. Featured Insights, including a VAT guide linking to its content hub and calculator.
+9. Featured Accounting Tools with a link to all eleven tools.
+10. Leadership introduction with approved bios and photos.
+11. Testimonials or case studies only when authentic and consented; omit the section until available.
+12. Selected FAQs and consultation CTA.
+13. Footer with address, both phone numbers, verified social links, legal links and navigation.
 
 Every section has editable content and visibility/order controls through typed CMS blocks. Use a curated block library rather than unrestricted HTML or arbitrary page scripts. Respect reduced-motion preferences. Provide accessible mobile menus, visible focus, sufficient contrast and useful empty/error states. Use WCAG 2.2 AA as the design and QA target.
+
+### Homepage hero image slider
+
+The homepage hero uses one stable text and CTA layer over a CMS-managed slider of approved ALCO images. Administrators can add, reorder, replace, enable or hide slides in Filament, with a hard maximum of ten published slides. Each slide uses a `MediaAsset`, desktop focal point, optional mobile-specific image or focal point, display order and visibility state; it does not accept arbitrary HTML, scripts or unreviewed overlay copy. When no slide is published, display a branded static fallback so the homepage never has an empty hero.
+
+Provide hero source images at **2560 × 1440 px (16:9)** where possible; accept no image smaller than **1920 × 1080 px**. Images must have enough uncluttered space for the fixed text layer on the approved side of the composition, a clear focal subject that can be cropped on narrow screens, no text baked into the image, and confirmed usage rights. The CMS displays this guidance at upload and validates aspect ratio, dimensions, file type and a sensible upload-size limit. It records alt text when the image conveys information; decorative image treatment uses an empty alternative while the visible hero copy remains in the page HTML.
+
+Use visible previous, next, slide-picker and pause/play controls with accessible names and keyboard operation. Autoplay may advance at a configurable interval of no less than seven seconds only when reduced motion is not requested; it pauses on user command, focus or interaction and remains paused for that visitor session. Do not use abrupt flashes, parallax or motion-dependent text. The hero heading, supporting copy and CTAs must remain readable and available in SSR HTML regardless of the active slide, with an approved contrast overlay applied per image.
 
 ## 5. Service content
 
@@ -130,7 +139,21 @@ Proposed launch services, requiring ALCO approval:
 - Accounting systems setup and training: optional service, subject to confirmation.
 - Audit preparation and accounting review support: describe the verified service accurately; statutory audit claims require confirmation of qualifications and authorization.
 
-Each service page contains title, summary, audience, common problems, deliverables, process, scope exclusions, related FAQs/articles/tools, SEO fields and consultation CTA. Prices or turnaround promises are published only when approved. Do not add unverified tax deadlines or guarantees.
+### Engagement packages and selection
+
+The launch package hierarchy is an editable customer-facing starting point for recurring or ongoing engagements, not a self-serve payment subscription. The public site must not imply that scope, capacity, fees, contract duration, tax outcomes or service commencement are automatically confirmed by a selection. A visitor chooses a preferred package and submits a consultation request; ALCO confirms suitability, scope and commercial terms before engagement.
+
+| Package | Best for | Included starting scope |
+| ------- | -------- | ---------------------- |
+| Essentials | Startups, freelancers and small businesses that need clean records, accurate reporting and peace of mind at tax time. | Bookkeeping and accounting; reconciliation and account management; tax preparation and filing. |
+| Growth | Scaling companies seeking visibility into profit leaks, margins and operational performance. | Everything in Essentials; financial performance analysis; financial health and profitability reviews; cash-flow planning. |
+| Strategic | Mature mid-market companies navigating complex growth and structural shifts that need forward planning and high-level financial guidance. | Everything in Growth; budgeting and forecasting; advanced scenario planning; business decision support. |
+
+Seed this content as editable package drafts, preserving the hierarchy and the supplied audience statements. Before publication, ALCO must approve the wording, confirm which services are recurring versus project-based, and supply any applicable price, billing cadence, minimum term, availability, exclusions and contract terms. Do not show a price, “per month”, “subscription”, savings comparison or checkout until those inputs and the related payment/legal scope have been approved.
+
+The `/services` page presents an accessible three-package comparison with audience, concise inclusions, inherited inclusions made clear, and a `Choose this package` action for each package. The action opens `/book-consultation` with that published package preselected; visitors may change or clear their choice and still request a tailored engagement. Individual service pages show the published packages that may include or suit that service, then offer the same preselected-package action alongside the general consultation CTA. On mobile, comparison rows must remain readable without horizontal information loss. Package content must be meaningful in SSR HTML, keyboard-accessible and manageable in Filament.
+
+Each service page contains title, summary, audience, common problems, deliverables, process, scope exclusions, relevant package fit, related FAQs/articles/tools, SEO fields and consultation CTA. Prices or turnaround promises are published only when approved. Do not add unverified tax deadlines or guarantees.
 
 ## 6. CMS models, resources and relationships
 
@@ -139,7 +162,9 @@ All editable public content should be manageable in Filament. Prefer normalized 
 | Model/resource                  | Main fields and relationships                                                                                                            |
 | ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
 | Page                            | Unique slug, template key, title, summary, typed blocks, status, publish time, SEO, revisions                                            |
+| HomepageHeroSlide               | MediaAsset, optional mobile MediaAsset, desktop/mobile focal points, display order, visibility and author/editor attribution; maximum ten published slides, managed through typed homepage settings |
 | Service                         | Slug, title, summary, body/blocks, icon/media, ordering, status; related FAQs, posts, tools                                              |
+| EngagementPackage               | Unique slug, name, short summary, audience statement, ordered inclusions, optional parent package for inherited inclusions, related services, display order, selection availability, status and revisions; pricing/billing fields remain absent until separately approved |
 | Post                            | Slug, title, excerpt, structured body, hero media, author, reviewer, categories, tags, publish/update/review dates, status, SEO, sources |
 | Category / Tag                  | Unique slug, name, description, SEO; many posts; archive visibility                                                                      |
 | TopicHub                        | Slug, title, intro, featured post and ordered related posts/tools; VAT hub is first seed                                                 |
@@ -154,7 +179,7 @@ All editable public content should be manageable in Filament. Prefer normalized 
 | Calculator                      | Stable engine key, public slug/title, description, input/output presentation, related content, visibility, SEO                           |
 | CalculatorConfigVersion         | Validated settings, jurisdiction, currency, effective interval, sources, reviewer, status and immutable published version                |
 | TaxRateRule                     | Config version, tax type, transaction/person classifications, rate/bands, base definition, exemptions, applicability                     |
-| Lead                            | Contact, service, source, message, consent record, status, assignee, follow-up date, UTM/referrer summary                                |
+| Lead                            | Contact, service, requested engagement package and submitted package snapshot, source, message, consent record, status, assignee, follow-up date, UTM/referrer summary |
 | LeadActivity                    | Lead, staff member, note/action/status transition, timestamp; private                                                                    |
 | User / Role / Permission        | Staff accounts, roles and policy permissions                                                                                             |
 | ContentRevision / AuditEvent    | Entity, actor, timestamp, change summary, revision snapshot; restricted access                                                           |
@@ -162,7 +187,7 @@ All editable public content should be manageable in Filament. Prefer normalized 
 
 Pages/posts use draft, in-review, approved/scheduled, published and archived states. Publication scopes exclude drafts, archived records and future publish dates. Changes to published content should use revisions so drafts do not immediately replace approved content. Use a consistent timezone policy: store instants in UTC, display/edit publication schedules in Africa/Lagos.
 
-Use unique slugs, foreign keys, explicit decimal precision, and indexes on publication dates/status, category relations, lead status/assignee and effective config dates. Sanitize rich text, validate links and restrict embedded components to an allowlist. Secrets such as SMTP passwords and API keys remain environment secrets, never general CMS settings.
+Use unique slugs, foreign keys, explicit decimal precision, and indexes on publication dates/status, category relations, package display/selection status, lead package/status/assignee and effective config dates. A lead package selection references a published selectable package and retains the submitted package name/slug snapshot so later package edits cannot rewrite lead history; referenced packages are archived rather than deleted. Sanitize rich text, validate links and restrict embedded components to an allowlist. Secrets such as SMTP passwords and API keys remain environment secrets, never general CMS settings.
 
 Dashboard widgets: enquiries needing action, overdue follow-ups, recent published articles, scheduled content, review-due tax articles/configurations, failed jobs and media conversion issues. Dashboard aggregates must respect each user's permissions.
 
@@ -260,9 +285,9 @@ Provide image alt text, readable URLs, internal links between services/articles/
 
 ## 10. Leads and consultation management
 
-Contact and consultation forms collect name, email or phone, service interest, short message and explicit relevant consent. Consultation requests also capture preferred contact method and availability; this is a request, not a confirmed appointment. Do not require confidential financial records. Disable file uploads initially.
+Contact and consultation forms collect name, email or phone, service interest, an optional preferred engagement package, short message and explicit relevant consent. A package CTA preselects its published package on the consultation form, but the visitor can choose another option, clear it or request a tailored engagement. Consultation requests also capture preferred contact method and availability; this is a request, not a confirmed appointment, subscription purchase or contractual acceptance. Do not require confidential financial records. Disable file uploads initially.
 
-Server validates inputs, checks Turnstile, applies rate limits and honeypot defenses, creates the lead transactionally and queues staff notifications. Record notification failures separately; an email failure must not discard a saved lead. Provide a clear success state and duplicate-submit protection. Show genuine contact options when form submission is unavailable.
+Server validates inputs, checks Turnstile, applies rate limits and honeypot defenses, confirms that any selected package is currently published and selectable, creates the lead transactionally and queues staff notifications. Store the selected package reference and its submitted snapshot with the lead. Record notification failures separately; an email failure must not discard a saved lead. Provide a clear success state and duplicate-submit protection. Show genuine contact options when form submission is unavailable.
 
 Lead stages: new, contacted, qualified, consultation requested/scheduled, proposal sent, won, lost and spam/closed. Store assigned staff, next action, follow-up time, internal notes and history. Restrict exports and log them. Retention/deletion rules, privacy notice and marketing consent wording need owner/legal review. Marketing consent must be optional and separate from handling the enquiry.
 
@@ -280,13 +305,13 @@ CMS dashboard highlights unassigned leads and overdue follow-ups. Capture permit
 | Publisher               | Publish approved content/configurations and manage scheduling                             |
 | Lead manager            | View assigned/permitted leads, update stages and follow-ups                               |
 
-Use Laravel policies for both UI visibility and server-side enforcement. Define permissions such as `posts.create`, `posts.review`, `posts.publish`, `calculator-configs.edit`, `calculator-configs.approve`, `leads.view`, `leads.export`, `users.manage`, and `settings.manage`. Deny by default; test direct endpoint access and cross-user draft/lead access. A vetted permissions package is optional after compatibility checks. Require MFA for privileged staff, disable public registration, and avoid shared accounts.
+Use Laravel policies for both UI visibility and server-side enforcement. Define permissions such as `posts.create`, `posts.review`, `posts.publish`, `homepage-hero.manage`, `engagement-packages.manage`, `engagement-packages.publish`, `calculator-configs.edit`, `calculator-configs.approve`, `leads.view`, `leads.export`, `users.manage`, and `settings.manage`. Deny by default; test direct endpoint access and cross-user draft/lead access. A vetted permissions package is optional after compatibility checks. Require MFA for privileged staff, disable public registration, and avoid shared accounts.
 
 ## 12. Media and content optimization
 
-Use a managed media library with MIME/size/dimension validation, randomized storage names, ownership/rights metadata and accessible alt text. Produce appropriately sized responsive variants, including WebP/AVIF where supported, with fallback originals. Maintain explicit width/height to prevent layout shift, lazy-load below-the-fold images and prioritize the hero image. Strip unnecessary metadata and cap upload size.
+Use a managed media library with MIME/size/dimension validation, randomized storage names, ownership/rights metadata and accessible alt text. Produce appropriately sized responsive variants, including WebP/AVIF where supported, with fallback originals. Maintain explicit width/height to prevent layout shift, lazy-load below-the-fold images and prioritize only the first visible hero slide. For hero images, show administrators the required 16:9 source guidance: 2560 × 1440 px preferred and 1920 × 1080 px minimum; validate crop/focal-point data so the subject remains visible on mobile. Strip unnecessary metadata and cap upload size.
 
-Queue expensive conversions and expose processing/error states in CMS. Never serve executable uploads. Sanitize or reject SVGs unless a trusted sanitization workflow is implemented. Keep private media on private storage with authorized signed delivery. Prevent deleting assets used by published content; show usages and allow replacement. Store PDFs/downloads with correct content type and safe disposition; verify accessibility and file rights before publication.
+Queue expensive conversions and expose processing/error states in CMS. The server renders only the active first slide as high priority, may prefetch the next slide at low priority, and lazy-loads all remaining slides after initial render; it must not download ten full-resolution images on first load. Never serve executable uploads. Sanitize or reject SVGs unless a trusted sanitization workflow is implemented. Keep private media on private storage with authorized signed delivery. Prevent deleting assets used by published content; show usages and allow replacement. Store PDFs/downloads with correct content type and safe disposition; verify accessibility and file rights before publication.
 
 ## 13. Security, privacy and operational protection
 
@@ -298,7 +323,7 @@ Privacy documentation must describe enquiry handling, retention, analytics and e
 
 ## 14. Analytics and performance
 
-Choose a privacy-conscious analytics platform or GA4 with approved consent behavior. Track page views, service interest, tool opened/completed, consultation CTA and successful lead submission. Events may contain tool identifier/config version, never financial amounts, email, phone or message. Do not send contact information through URLs or session-replay tools.
+Choose a privacy-conscious analytics platform or GA4 with approved consent behavior. Track page views, manual hero slider navigation by slide position, service interest, package comparison viewed, package selected, tool opened/completed, consultation CTA and successful lead submission. Do not track every automatic slide rotation. Events may contain a package slug, slide position or tool identifier/config version, never financial amounts, email, phone or message. Do not send contact information through URLs or session-replay tools.
 
 Public performance targets: fast mobile loads, no unnecessary admin code, responsive media, route-level code splitting, modest third-party scripts, optimized fonts, paginated listings, eager-loaded relationships and indexed queries. Cache public settings/navigation and published content with reliable invalidation. Do not cache authenticated responses or draft previews at the CDN.
 
@@ -309,6 +334,8 @@ Use Core Web Vitals targets as launch benchmarks: LCP ≤2.5s, INP ≤200ms and 
 Use PHPUnit/Pest for meaningful domain and feature tests, Vitest for isolated frontend behavior where needed, and browser tests for critical workflows. Required coverage:
 
 - Publication states, schedules, preview access, revisions and slug redirects.
+- Hero-slider limit enforcement, ordering/visibility, fallback state, upload dimensions and focal-point cropping, responsive image loading, SSR text availability, contrast, keyboard controls, pause behavior and reduced-motion behavior.
+- Package publication controls, inherited-inclusion presentation, service-to-package relationships, package CTA preselection, stale/unavailable package rejection, lead package snapshots and tailored-engagement fallback.
 - Every calculator fixture, edge case and approved configuration/date selection.
 - Role/policy enforcement, unauthorized exports and admin access.
 - Contact submission, anti-spam rejection, duplicate submit, queue notification failure and lead persistence.
@@ -321,7 +348,7 @@ Use PHPUnit/Pest for meaningful domain and feature tests, Vitest for isolated fr
 
 Test representative Android/iOS viewport sizes and current Chrome, Firefox, Edge and Safari. No unresolved critical/high security or data-integrity defects at release. ALCO must review public copy, tax content, calculator parameters, contact delivery and CMS workflows. Do not replace professional formula review with software tests.
 
-Launch is accepted when all eleven tools work, staff can safely publish an article and update an approved setting, draft data remains private, a lead reaches the CMS and notification destination, SSR works, backups restore, and the business details/brand/legal pages are approved.
+Launch is accepted when all eleven tools work, staff can safely publish an article, engagement package and compliant hero slide set, update an approved setting, draft data remains private, a package-selected or tailored lead reaches the CMS and notification destination with its selection intact, SSR works, backups restore, and the business details/brand/legal pages are approved.
 
 ## 16. aaPanel / Nginx deployment and recovery
 
@@ -344,10 +371,10 @@ Handover includes environment variable inventory without secrets, release steps,
 | ---------------------------- | ----------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
 | 0 — Discovery                | Inspect Foremost brief/assets; confirm brand, services, domain, content owners and tax reviewer | Approved scope, inputs register, wireframes and decision log                |
 | 1 — Foundation               | Laravel/Inertia/Vue/TS/Tailwind/Filament setup; auth, policies, migrations, environments and CI | Compatible locked dependencies, admin login and public SSR smoke test       |
-| 2 — Design and core CMS      | Theme, layouts, Pages, Services, Team, FAQs, menus/settings and media                           | Responsive approved public pages editable in CMS                            |
+| 2 — Design and core CMS      | Theme, layouts, Pages, homepage hero slider, Services, Engagement Packages, Team, FAQs, menus/settings and media | Responsive approved public pages, accessible hero slider and package comparison editable in CMS |
 | 3 — Insights                 | Posts/taxonomies/authors, revisions, review/scheduling, VAT hub, search and related content     | Draft-to-publication workflow and VAT article/tool linking validated        |
 | 4 — Tools platform           | Calculator registry/contracts/config approval; VAT/WHT/gross-net first, then remaining eight    | All eleven engines, edge tests and approved configuration workflow complete |
-| 5 — Conversion and discovery | Forms/leads, notifications, resources, SEO/schema, analytics                                    | Enquiry lifecycle, privacy-aware events and public discovery validated      |
+| 5 — Conversion and discovery | Package-selection lead flow, forms/leads, notifications, resources, SEO/schema, analytics       | Package/tailored enquiry lifecycle, privacy-aware events and discovery validated |
 | 6 — Hardening and launch     | Content approval, accessibility/performance/security QA, staging deployment, restore drill      | Launch acceptance completed and trained staff can operate CMS               |
 | 7 — Post-launch              | Monitor errors/leads/performance, resolve issues, refine content                                | Stable operations and prioritized improvement backlog                       |
 | 8 — Future AI                | Optional reviewed content assistance and bounded knowledge assistant                            | Separate approved scope, privacy controls and evaluation gates              |
@@ -366,11 +393,11 @@ AI implementation requires a separate provider/model decision, secure credential
 
 Treat this document as the initial specification. Before coding, inspect applicable repository instructions and existing code, read the referenced Foremost brief if available, confirm dependency compatibility and record decisions. Preserve the agreed stack. Do not scaffold a second public frontend framework or an unrestricted page-builder engine.
 
-Implement one complete vertical slice first: editable service/page, public SSR presentation, an article with review/publication, one configurable calculator, and a lead form. Then extend the established contracts to the remaining resources/tools. Commit migrations, factories/fixtures, policies, meaningful tests and operational documentation with each feature.
+Implement one complete vertical slice first: editable service/page and engagement package, public SSR presentation with package selection, an article with review/publication, one configurable calculator, and a package-aware lead form. Then extend the established contracts to the remaining resources/tools. Commit migrations, factories/fixtures, policies, meaningful tests and operational documentation with each feature.
 
 Seed verified business details and draft sample content. Mark unapproved copy/configurations clearly. Do not publish invented profiles, endorsements, legal tax settings or credentials. Keep rate/formula review separate from visual design approval. Maintain a task checklist traceable to this specification and a decision log for changes.
 
-Recommended initial backlog: project initialization → publication/policy foundation → public design shell → CMS core resources → blog/VAT hub → calculator registry/config workflow → all eleven engines → leads/notifications → SEO/media/performance → QA/deployment/handover.
+Recommended initial backlog: project initialization → publication/policy foundation → public design shell → CMS core resources and engagement packages → blog/VAT hub → calculator registry/config workflow → all eleven engines → package-aware leads/notifications → SEO/media/performance → QA/deployment/handover.
 
 ## 20. Sources and verification boundaries
 

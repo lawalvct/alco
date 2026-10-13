@@ -2,6 +2,7 @@
 import { Link, usePage } from '@inertiajs/vue3';
 import { ArrowUpRight, MapPin, Menu, Phone, X } from '@lucide/vue';
 import { ref } from 'vue';
+import BrandLockup from '@/components/public/BrandLockup.vue';
 import { contactEmail, navigation } from '@/lib/publicSite';
 
 const page = usePage();
@@ -13,10 +14,16 @@ function isActive(href: string): boolean {
 </script>
 
 <template>
-    <div class="min-h-screen bg-[#f6f8fa] text-[#0b2b4c]">
-        <div class="bg-[#eaf6fb] text-[#0b2b4c]">
+    <div class="theme-light min-h-screen bg-background text-foreground">
+        <a
+            href="#main-content"
+            class="sr-only rounded-md bg-white px-4 py-2.5 text-sm font-semibold text-navy-900 shadow-float focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:outline-2 focus:outline-aqua-600"
+            >Skip to content</a
+        >
+
+        <div class="bg-aqua-50 text-navy-900">
             <div
-                class="mx-auto flex max-w-[1512px] items-center justify-between gap-4 px-5 py-2.5 text-xs font-semibold sm:px-8 lg:px-12"
+                class="site-container flex items-center justify-between gap-4 py-2.5 text-xs font-semibold"
             >
                 <span class="inline-flex items-center gap-2">
                     <MapPin :size="14" aria-hidden="true" />
@@ -27,49 +34,33 @@ function isActive(href: string): boolean {
                     <a class="hover:underline" href="tel:+2348140824230"
                         >+234 814 082 4230</a
                     >
-                    <span aria-hidden="true" class="text-[#8198a8]">|</span>
+                    <span aria-hidden="true" class="text-navy-400">|</span>
                     <a class="hover:underline" href="tel:+2348148484955"
                         >+234 814 848 4955</a
                     >
                 </div>
                 <a
-                    class="sm:hidden"
+                    class="inline-flex min-h-6 min-w-6 items-center justify-center sm:hidden"
                     href="tel:+2348140824230"
-                    aria-label="Call ALCO"
+                    aria-label="Call ALCO on +234 814 082 4230"
                 >
                     <Phone :size="16" aria-hidden="true" />
                 </a>
             </div>
         </div>
 
-        <div class="bg-[#062849] text-white">
-            <header
-                class="relative z-30 mx-auto max-w-[1512px] px-5 sm:px-8 lg:px-12"
-            >
+        <div class="bg-navy-900 text-white">
+            <header class="relative z-30 site-container">
                 <div
                     class="flex min-h-20 items-center justify-between gap-5 border-b border-white/15 lg:min-h-24"
                 >
                     <Link
                         href="/"
-                        class="flex shrink-0 items-center gap-2.5 rounded-sm focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#53d7ef]"
+                        class="shrink-0 rounded-sm focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-aqua-400"
                         aria-label="ALCO Associate Solutions — Home"
                         @click="menuOpen = false"
                     >
-                        <img
-                            src="/brand/alco-mark-white.svg"
-                            alt=""
-                            width="58"
-                            height="55"
-                            class="h-12 w-[52px] shrink-0 sm:h-14 sm:w-[59px]"
-                        />
-                        <span
-                            class="text-[1.7rem] font-semibold tracking-[0.09em] sm:text-[2rem]"
-                            >ALCO</span
-                        >
-                        <span
-                            class="ml-1 hidden border-l border-white/40 pl-3 text-xs leading-[1.1] font-medium tracking-[0.02em] sm:block"
-                            >Associate<br />Solutions</span
-                        >
+                        <BrandLockup size="lg" />
                     </Link>
 
                     <nav
@@ -80,10 +71,10 @@ function isActive(href: string): boolean {
                             v-for="item in navigation"
                             :key="item.href"
                             :href="item.href"
-                            class="relative py-3 text-sm font-medium transition-colors hover:text-[#58d8ef] focus-visible:rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#58d8ef]"
+                            class="relative py-3 text-sm font-medium transition-colors hover:text-aqua-400 focus-visible:rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-aqua-400"
                             :class="
                                 isActive(item.href)
-                                    ? 'text-[#58d8ef]'
+                                    ? 'text-aqua-400'
                                     : 'text-white/90'
                             "
                             :aria-current="
@@ -93,7 +84,7 @@ function isActive(href: string): boolean {
                             {{ item.label }}
                             <span
                                 v-if="isActive(item.href)"
-                                class="absolute right-0 bottom-0 left-0 h-0.5 bg-[#58d8ef]"
+                                class="absolute right-0 bottom-0 left-0 h-0.5 bg-aqua-400"
                                 aria-hidden="true"
                             />
                         </Link>
@@ -101,7 +92,7 @@ function isActive(href: string): boolean {
 
                     <Link
                         href="/book-consultation"
-                        class="hidden shrink-0 items-center gap-2 rounded-md border border-white/85 px-5 py-3 text-sm font-semibold transition-colors hover:bg-white hover:text-[#062849] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#58d8ef] lg:inline-flex"
+                        class="hidden shrink-0 items-center gap-2 rounded-md border border-white/85 px-5 py-3 text-sm font-semibold transition-colors hover:bg-white hover:text-navy-900 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-aqua-400 lg:inline-flex"
                     >
                         Let's Talk
                         <ArrowUpRight :size="16" aria-hidden="true" />
@@ -109,7 +100,7 @@ function isActive(href: string): boolean {
 
                     <button
                         type="button"
-                        class="inline-flex min-h-11 min-w-11 items-center justify-center rounded-md border border-white/50 lg:hidden"
+                        class="inline-flex min-h-11 min-w-11 items-center justify-center rounded-md border border-white/50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-aqua-400 lg:hidden"
                         :aria-expanded="menuOpen"
                         aria-controls="mobile-navigation"
                         :aria-label="
@@ -134,9 +125,7 @@ function isActive(href: string): boolean {
                         :href="item.href"
                         class="rounded-md px-3 py-3 text-sm font-medium hover:bg-white/10"
                         :class="
-                            isActive(item.href)
-                                ? 'text-[#58d8ef]'
-                                : 'text-white'
+                            isActive(item.href) ? 'text-aqua-400' : 'text-white'
                         "
                         :aria-current="isActive(item.href) ? 'page' : undefined"
                         @click="menuOpen = false"
@@ -145,7 +134,7 @@ function isActive(href: string): boolean {
                     </Link>
                     <Link
                         href="/book-consultation"
-                        class="mt-2 rounded-md bg-[#58d8ef] px-3 py-3 text-center text-sm font-semibold text-[#062849]"
+                        class="mt-2 rounded-md bg-aqua-400 px-3 py-3 text-center text-sm font-bold text-navy-900 hover:bg-aqua-300"
                         @click="menuOpen = false"
                     >
                         Book a Consultation
@@ -154,21 +143,19 @@ function isActive(href: string): boolean {
             </header>
         </div>
 
-        <slot />
+        <main id="main-content" tabindex="-1" class="focus:outline-none">
+            <slot />
+        </main>
 
-        <footer class="bg-[#062849] text-white/80">
+        <footer class="bg-navy-950 text-white/75">
             <div
-                class="mx-auto grid max-w-[1512px] gap-8 px-5 py-12 sm:px-8 md:grid-cols-2 lg:grid-cols-3 lg:px-12"
+                class="site-container grid gap-10 py-14 md:grid-cols-2 lg:grid-cols-[1.2fr_1fr_1fr]"
             >
                 <div>
-                    <p
-                        class="text-xl font-semibold tracking-[0.08em] text-white"
-                    >
-                        ALCO
-                    </p>
-                    <p class="mt-2 text-sm">Associate Solutions</p>
-                    <p class="mt-4 max-w-xs text-sm leading-6">
-                        Professional Accounting Services.
+                    <BrandLockup class="text-white" />
+                    <p class="mt-5 max-w-xs text-sm leading-6">
+                        Professional Accounting Services. Bookkeeping, financial
+                        reporting, tax filings and business solutions.
                     </p>
                 </div>
                 <div>
@@ -178,7 +165,7 @@ function isActive(href: string): boolean {
                             v-for="item in navigation"
                             :key="item.href"
                             :href="item.href"
-                            class="hover:text-[#58d8ef]"
+                            class="w-fit hover:text-aqua-400"
                         >
                             {{ item.label }}
                         </Link>
@@ -192,26 +179,26 @@ function isActive(href: string): boolean {
                     <div class="mt-3 grid gap-1 text-sm">
                         <a
                             :href="`mailto:${contactEmail}`"
-                            class="hover:text-[#58d8ef]"
+                            class="w-fit hover:text-aqua-400"
                             >{{ contactEmail }}</a
                         >
                         <a
                             href="tel:+2348140824230"
-                            class="hover:text-[#58d8ef]"
+                            class="w-fit hover:text-aqua-400"
                             >+234 814 082 4230</a
                         >
                         <a
                             href="tel:+2348148484955"
-                            class="hover:text-[#58d8ef]"
+                            class="w-fit hover:text-aqua-400"
                             >+234 814 848 4955</a
                         >
                     </div>
                 </div>
             </div>
-            <div
-                class="border-t border-white/15 py-5 text-center text-xs text-white/60"
-            >
-                © {{ new Date().getFullYear() }} ALCO Associate Solutions
+            <div class="border-t border-white/10">
+                <p class="site-container py-5 text-xs text-white/60">
+                    © {{ new Date().getFullYear() }} ALCO Associate Solutions
+                </p>
             </div>
         </footer>
     </div>

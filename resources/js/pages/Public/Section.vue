@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import { Head, Link } from '@inertiajs/vue3';
-import { ArrowRight, ArrowUpRight, Mail, MapPin, Phone } from '@lucide/vue';
+import { Head } from '@inertiajs/vue3';
+import { Mail, MapPin, Phone } from '@lucide/vue';
 import { computed } from 'vue';
+import CtaLink from '@/components/public/CtaLink.vue';
+import PageHero from '@/components/public/PageHero.vue';
 import PublicLayout from '@/layouts/PublicLayout.vue';
 import {
     contactEmail,
@@ -83,181 +85,163 @@ const content = computed(() => pageContent[props.kind]);
     </Head>
 
     <PublicLayout>
-        <main>
-            <section
-                class="bg-[#062849] px-5 py-16 text-white sm:px-8 sm:py-20 lg:px-12"
-            >
-                <div class="mx-auto max-w-[1370px]">
-                    <p
-                        class="text-xs font-bold tracking-[0.2em] text-[#52d7f0] uppercase"
+        <PageHero
+            :eyebrow="content.eyebrow"
+            :title="content.title"
+            :intro="content.intro"
+        />
+
+        <section class="site-container py-16 sm:py-20">
+            <template v-if="kind === 'services'">
+                <div class="grid gap-5 md:grid-cols-2">
+                    <article
+                        v-for="(service, index) in serviceCards"
+                        :id="service.slug"
+                        :key="service.slug"
+                        class="scroll-mt-7 rounded-xl border border-border bg-card p-7 shadow-card"
                     >
-                        {{ content.eyebrow }}
+                        <p class="text-sm font-bold text-aqua-700">
+                            0{{ index + 1 }}
+                        </p>
+                        <h2 class="mt-5 text-2xl font-semibold">
+                            {{ service.title }}
+                        </h2>
+                        <p
+                            class="mt-3 max-w-md text-base leading-7 text-muted-foreground"
+                        >
+                            {{ service.description }}
+                        </p>
+                        <CtaLink
+                            :href="service.href"
+                            variant="link"
+                            class="mt-7"
+                        >
+                            Explore this service
+                        </CtaLink>
+                    </article>
+                </div>
+            </template>
+
+            <template v-else-if="kind === 'about'">
+                <div class="grid gap-10 lg:grid-cols-[1.2fr_0.8fr]">
+                    <div>
+                        <h2 class="text-2xl font-semibold">
+                            Professional Accounting Services.
+                        </h2>
+                        <p
+                            class="mt-4 max-w-2xl text-base leading-7 text-muted-foreground"
+                        >
+                            Bookkeeping, financial reporting, tax filings and
+                            business solutions are the focus of our work.
+                        </p>
+                        <CtaLink
+                            href="/services"
+                            variant="link"
+                            icon="arrow-right"
+                            class="mt-7"
+                        >
+                            Explore our services
+                        </CtaLink>
+                    </div>
+                    <div class="rounded-xl bg-aqua-50 p-7">
+                        <h2 class="text-xl font-semibold">Leadership</h2>
+                        <ul class="mt-5 grid gap-4 text-base">
+                            <li>Abdulsalam Latifah Damilola</li>
+                            <li>Abdulazeez Azeez Olaitan</li>
+                        </ul>
+                    </div>
+                </div>
+            </template>
+
+            <template v-else-if="kind === 'tools'">
+                <h2 class="text-2xl font-semibold">Planned tools</h2>
+                <p
+                    class="mt-3 max-w-2xl text-base leading-7 text-muted-foreground"
+                >
+                    These tools will become available after their settings and
+                    calculations have been reviewed.
+                </p>
+                <ul class="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                    <li
+                        v-for="tool in plannedTools"
+                        :key="tool"
+                        class="rounded-lg border border-border bg-card px-5 py-4 text-sm font-medium"
+                    >
+                        {{ tool }}
+                    </li>
+                </ul>
+            </template>
+
+            <template v-else-if="kind === 'insights'">
+                <div
+                    class="max-w-3xl rounded-xl border border-border bg-card p-8 shadow-card"
+                >
+                    <p class="eyebrow text-aqua-700">
+                        Editorial review in progress
                     </p>
-                    <h1
-                        class="mt-5 max-w-4xl text-4xl leading-tight font-semibold tracking-tight sm:text-5xl"
-                    >
-                        {{ content.title }}
-                    </h1>
-                    <p
-                        class="mt-5 max-w-2xl text-base leading-7 text-white/80 sm:text-lg"
-                    >
-                        {{ content.intro }}
+                    <h2 class="mt-4 text-2xl font-semibold">
+                        Guides grounded in useful, reviewed information.
+                    </h2>
+                    <p class="mt-4 text-base leading-7 text-muted-foreground">
+                        The first articles will cover accounting and business
+                        topics, including a VAT guide linked to its calculator.
+                        We will publish them after professional review.
                     </p>
                 </div>
-            </section>
+            </template>
 
-            <section
-                class="mx-auto max-w-[1370px] px-5 py-16 sm:px-8 sm:py-20 lg:px-12"
-            >
-                <template v-if="kind === 'services'">
-                    <div class="grid gap-5 md:grid-cols-2">
-                        <article
-                            v-for="(service, index) in serviceCards"
-                            :id="service.slug"
-                            :key="service.slug"
-                            class="scroll-mt-7 rounded-xl border border-[#dbe6ec] bg-white p-7 shadow-sm"
-                        >
-                            <p class="text-sm font-bold text-[#168bae]">
-                                0{{ index + 1 }}
-                            </p>
-                            <h2 class="mt-5 text-2xl font-semibold">
-                                {{ service.title }}
-                            </h2>
-                            <p
-                                class="mt-3 max-w-md text-base leading-7 text-[#4d6273]"
-                            >
-                                {{ service.description }}
-                            </p>
-                            <Link
-                                :href="service.href"
-                                class="mt-7 inline-flex items-center gap-2 text-sm font-semibold text-[#087c9e] hover:underline"
-                            >
-                                Explore this service
-                                <ArrowUpRight :size="17" aria-hidden="true" />
-                            </Link>
-                        </article>
-                    </div>
-                </template>
-
-                <template v-else-if="kind === 'about'">
-                    <div class="grid gap-10 lg:grid-cols-[1.2fr_0.8fr]">
-                        <div>
-                            <h2 class="text-2xl font-semibold">
-                                Professional Accounting Services.
-                            </h2>
-                            <p
-                                class="mt-4 max-w-2xl text-base leading-7 text-[#4d6273]"
-                            >
-                                Bookkeeping, financial reporting, tax filings
-                                and business solutions are the focus of our
-                                work.
-                            </p>
-                            <Link
-                                href="/services"
-                                class="mt-7 inline-flex items-center gap-2 text-sm font-semibold text-[#087c9e] hover:underline"
-                                >Explore our services
-                                <ArrowRight :size="17" aria-hidden="true"
-                            /></Link>
-                        </div>
-                        <div class="rounded-xl bg-[#eaf6fb] p-7">
-                            <h2 class="text-xl font-semibold">Leadership</h2>
-                            <ul class="mt-5 grid gap-4 text-base">
-                                <li>Abdulsalam Latifat Damilola</li>
-                                <li>Abdulazeez Azeez Olaitan</li>
-                            </ul>
-                        </div>
-                    </div>
-                </template>
-
-                <template v-else-if="kind === 'tools'">
-                    <h2 class="text-2xl font-semibold">Planned tools</h2>
-                    <p
-                        class="mt-3 max-w-2xl text-base leading-7 text-[#4d6273]"
-                    >
-                        These tools will become available after their settings
-                        and calculations have been reviewed.
-                    </p>
-                    <ul class="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                        <li
-                            v-for="tool in plannedTools"
-                            :key="tool"
-                            class="rounded-lg border border-[#dbe6ec] bg-white px-5 py-4 text-sm font-medium"
-                        >
-                            {{ tool }}
-                        </li>
-                    </ul>
-                </template>
-
-                <template v-else-if="kind === 'insights'">
+            <template v-else>
+                <div class="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
                     <div
-                        class="max-w-3xl rounded-xl border border-[#dbe6ec] bg-white p-8 shadow-sm"
+                        class="rounded-xl border border-border bg-card p-8 shadow-card"
                     >
+                        <h2 class="text-2xl font-semibold">Contact ALCO</h2>
                         <p
-                            class="text-xs font-bold tracking-[0.18em] text-[#168bae] uppercase"
+                            class="mt-3 text-base leading-7 text-muted-foreground"
                         >
-                            Editorial review in progress
+                            Call either number or send an email to start a
+                            conversation or request a consultation.
                         </p>
-                        <h2 class="mt-4 text-2xl font-semibold">
-                            Guides grounded in useful, reviewed information.
-                        </h2>
-                        <p class="mt-4 text-base leading-7 text-[#4d6273]">
-                            The first articles will cover accounting and
-                            business topics, including a VAT guide linked to its
-                            calculator. We will publish them after professional
-                            review.
-                        </p>
-                    </div>
-                </template>
-
-                <template v-else>
-                    <div class="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
-                        <div
-                            class="rounded-xl border border-[#dbe6ec] bg-white p-8 shadow-sm"
-                        >
-                            <h2 class="text-2xl font-semibold">Contact ALCO</h2>
-                            <p class="mt-3 text-base leading-7 text-[#4d6273]">
-                                Call either number or send an email to start a
-                                conversation or request a consultation.
-                            </p>
-                            <div class="mt-7 grid gap-4">
-                                <a
-                                    :href="`mailto:${contactEmail}`"
-                                    class="inline-flex items-center gap-3 text-lg font-semibold text-[#087c9e] hover:underline"
-                                    ><Mail :size="19" aria-hidden="true" />{{
-                                        contactEmail
-                                    }}</a
-                                >
-                                <a
-                                    href="tel:+2348140824230"
-                                    class="inline-flex items-center gap-3 text-lg font-semibold text-[#087c9e] hover:underline"
-                                    ><Phone :size="19" aria-hidden="true" />+234
-                                    814 082 4230</a
-                                >
-                                <a
-                                    href="tel:+2348148484955"
-                                    class="inline-flex items-center gap-3 text-lg font-semibold text-[#087c9e] hover:underline"
-                                    ><Phone :size="19" aria-hidden="true" />+234
-                                    814 848 4955</a
-                                >
-                            </div>
-                        </div>
-                        <div class="rounded-xl bg-[#eaf6fb] p-8">
-                            <MapPin
-                                :size="26"
-                                class="text-[#168bae]"
-                                aria-hidden="true"
-                            />
-                            <h2 class="mt-5 text-xl font-semibold">Visit us</h2>
-                            <address
-                                class="mt-3 text-base leading-7 text-[#4d6273] not-italic"
+                        <div class="mt-7 grid gap-4">
+                            <a
+                                :href="`mailto:${contactEmail}`"
+                                class="inline-flex w-fit items-center gap-3 text-lg font-semibold break-all text-aqua-700 hover:underline"
+                                ><Mail
+                                    :size="19"
+                                    class="shrink-0"
+                                    aria-hidden="true"
+                                />{{ contactEmail }}</a
                             >
-                                18, Lagos Street,<br />Ebute-Metta, Lagos State,
-                                Nigeria
-                            </address>
+                            <a
+                                href="tel:+2348140824230"
+                                class="inline-flex w-fit items-center gap-3 text-lg font-semibold text-aqua-700 hover:underline"
+                                ><Phone :size="19" aria-hidden="true" />+234 814
+                                082 4230</a
+                            >
+                            <a
+                                href="tel:+2348148484955"
+                                class="inline-flex w-fit items-center gap-3 text-lg font-semibold text-aqua-700 hover:underline"
+                                ><Phone :size="19" aria-hidden="true" />+234 814
+                                848 4955</a
+                            >
                         </div>
                     </div>
-                </template>
-            </section>
-        </main>
+                    <div class="rounded-xl bg-aqua-50 p-8">
+                        <MapPin
+                            :size="26"
+                            class="text-aqua-600"
+                            aria-hidden="true"
+                        />
+                        <h2 class="mt-5 text-xl font-semibold">Visit us</h2>
+                        <address
+                            class="mt-3 text-base leading-7 text-muted-foreground not-italic"
+                        >
+                            18, Lagos Street,<br />Ebute-Metta, Lagos State,
+                            Nigeria
+                        </address>
+                    </div>
+                </div>
+            </template>
+        </section>
     </PublicLayout>
 </template>
