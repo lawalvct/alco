@@ -7,6 +7,7 @@ use App\Filament\Resources\HomepageHeroSlides\Pages\EditHomepageHeroSlide;
 use App\Filament\Resources\HomepageHeroSlides\Pages\ListHomepageHeroSlides;
 use App\Models\HomepageHeroSlide;
 use App\Models\MediaAsset;
+use App\Models\Page;
 use App\Models\User;
 use Filament\Actions\Testing\TestAction;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -61,6 +62,19 @@ class HomepageHeroSliderTest extends TestCase
             ->where('heroSlides.1.alt', '')
             ->where('heroSlides.1.position', '30% 60%')
             ->where('heroSlides.1.mobile', null)
+            ->etc());
+    }
+
+    public function test_the_line_above_the_slider_comes_from_homepage_content(): void
+    {
+        $home = Page::factory()->create([
+            'slug' => 'home',
+            'draft_data' => ['hero_line_one' => 'Heading', 'hero_tagline' => 'Numbers you can rely on.', 'blocks' => []],
+        ]);
+        $home->publish();
+
+        $this->get('/')->assertOk()->assertInertia(fn (Assert $page) => $page
+            ->where('home.hero_tagline', 'Numbers you can rely on.')
             ->etc());
     }
 

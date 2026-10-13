@@ -57,6 +57,11 @@ class PageForm
                                 TextInput::make('hero_line_two')->required()->maxLength(120),
                                 TextInput::make('hero_accent')->required()->maxLength(120),
                                 Textarea::make('hero_description')->required()->maxLength(400),
+                                TextInput::make('hero_tagline')
+                                    ->label('Line above the slider')
+                                    ->maxLength(120)
+                                    ->placeholder('Clarity today. Confidence for what comes next.')
+                                    ->helperText('Short line shown just above the homepage slider. Leave empty to hide it.'),
                                 Textarea::make('seo_description')->maxLength(160),
                             ])
                             ->columns(2),

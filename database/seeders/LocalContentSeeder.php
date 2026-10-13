@@ -35,6 +35,7 @@ class LocalContentSeeder extends Seeder
                     'hero_line_two' => 'Your business,',
                     'hero_accent' => 'moving forward.',
                     'hero_description' => 'Professional accounting, clear reporting and practical business support.',
+                    'hero_tagline' => 'Clarity today. Confidence for what comes next.',
                     'seo_description' => 'ALCO Associate Solutions offers bookkeeping, financial reporting, tax filings and business solutions in Lagos, Nigeria.',
                     'blocks' => [
                         [
@@ -185,11 +186,12 @@ class LocalContentSeeder extends Seeder
     private function seedHeroSlides(): void
     {
         $images = [
+            ['file' => 'hero-consultation.webp', 'title' => 'Homepage slider – document review', 'alt' => 'Three professionals reviewing financial documents together at a conference table.'],
             ['file' => 'hero-slider1.png', 'title' => 'Homepage slider – team meeting', 'alt' => 'Four professionals talking around a boardroom table, with a city skyline and a growth chart on a screen behind them.'],
             ['file' => 'hero-slider2.png', 'title' => 'Homepage slider – reviewing reports', 'alt' => 'A professional reviewing financial documents at a desk with a calculator and laptop, with a city skyline and bridge through the window.'],
         ];
 
-        foreach ($images as $position => $image) {
+        foreach ($images as $image) {
             $source = public_path('images/'.$image['file']);
             $path = 'media/sample-'.$image['file'];
 
@@ -210,7 +212,7 @@ class LocalContentSeeder extends Seeder
 
             HomepageHeroSlide::create([
                 'media_asset_id' => $asset->id,
-                'sort_order' => $position + 1,
+                'sort_order' => (int) HomepageHeroSlide::query()->max('sort_order') + 1,
                 'is_visible' => false,
             ]);
         }

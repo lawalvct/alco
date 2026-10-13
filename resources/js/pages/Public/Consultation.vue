@@ -1,20 +1,44 @@
 <script setup lang="ts">
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, usePage } from '@inertiajs/vue3';
 import { Check } from '@lucide/vue';
+import { computed, ref } from 'vue';
+import ConsultationController from '@/actions/App/Http/Controllers/Public/ConsultationController';
 import ContactCard from '@/components/public/ContactCard.vue';
 import CtaLink from '@/components/public/CtaLink.vue';
+import EnquiryForm from '@/components/public/EnquiryForm.vue';
+import EnquirySuccess from '@/components/public/EnquirySuccess.vue';
 import PageHero from '@/components/public/PageHero.vue';
-import VisitCard from '@/components/public/VisitCard.vue';
 import PublicLayout from '@/layouts/PublicLayout.vue';
-import type { PackageSummary } from '@/types/publicContent';
+import type { PackageSummary, ServiceOption } from '@/types/publicContent';
 
-withDefaults(
+const props = withDefaults(
     defineProps<{
         packages?: PackageSummary[];
         selectedPackage?: PackageSummary | null;
         packageUnavailable?: boolean;
+        services?: ServiceOption[];
+        contactMethods?: Record<string, string>;
+        formsEnabled?: boolean;
+        turnstileSiteKey?: string | null;
+        consentText: string;
     }>(),
-    { packages: () => [], selectedPackage: null, packageUnavailable: false },
+    {
+        packages: () => [],
+        selectedPackage: null,
+        packageUnavailable: false,
+        services: () => [],
+        contactMethods: () => ({}),
+        formsEnabled: true,
+        turnstileSiteKey: null,
+    },
+);
+
+const page = usePage();
+const submitted = computed(() => page.flash.leadSubmitted);
+const chosenPackage = ref<string | null>(props.selectedPackage?.slug ?? null);
+const chosen = computed(
+    () =>
+        props.packages.find((pkg) => pkg.slug === chosenPackage.value) ?? null,
 );
 </script>
 
@@ -31,34 +55,89 @@ withDefaults(
         <PageHero
             eyebrow="Book a consultation"
             title="Let’s talk through what your business needs."
-            intro="Call or email us to request a consultation. We will confirm availability directly with you."
+            intro="Send a request below, or call or email us. We will confirm availability directly with you."
         />
 
-        <section class="site-container py-16 sm:py-20">
-            <div class="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
-                <div class="grid content-start gap-6">
+        <section class="bg-muted py-16 sm:py-20">
+            <div
+                class="site-container grid gap-8 lg:grid-cols-[1.3fr_0.7fr] lg:items-start"
+            >
+                <EnquirySuccess
+                    v-if="submitted"
+                    title="Thank you, your request has been sent."
+                    :reference="submitted.reference"
+                    again-href="/book-consultation"
+                    again-label="Send another request"
+                >
+                    This is a request, not a confirmed appointment. We will
+                    contact you to agree a time and to confirm which support
+                    suits your business.
+                </EnquirySuccess>
+
+                <div
+                    v-else
+                    class="rounded-xl border border-border bg-card p-6 shadow-card sm:p-8"
+                >
+                    <h2 class="text-2xl font-semibold">
+                        Request a consultation
+                    </h2>
+
                     <div
-                        v-if="selectedPackage"
+                        v-if="packageUnavailable && formsEnabled"
+                        role="status"
+                        class="mt-5 rounded-lg border border-border bg-muted p-4 text-sm leading-6 text-muted-foreground"
+                    >
+                        The package in your link can’t be selected right now.
+                        Choose another option below, or ask for a tailored
+                        engagement.
+                    </div>
+
+                    <template v-if="formsEnabled">
+                        <p
+                            class="mt-2 mb-8 text-base leading-7 text-muted-foreground"
+                        >
+                            This is a request, not a confirmed appointment. We
+                            will contact you to agree a time.
+                        </p>
+                        <EnquiryForm
+                            v-model:package="chosenPackage"
+                            :submit="ConsultationController.store.form()"
+                            variant="consultation"
+                            :services="services"
+                            :packages="packages"
+                            :contact-methods="contactMethods"
+                            :consent-text="consentText"
+                            :turnstile-site-key="turnstileSiteKey"
+                            submit-label="Send request"
+                        />
+                    </template>
+                    <p
+                        v-else
+                        class="mt-3 text-base leading-7 text-muted-foreground"
+                    >
+                        Our online form is paused at the moment. Please call or
+                        email us to request a consultation.
+                    </p>
+                </div>
+
+                <div class="grid gap-6 lg:sticky lg:top-8">
+                    <div
+                        v-if="chosen && !submitted"
                         class="rounded-xl border-2 border-aqua-400 bg-aqua-50 p-7"
                     >
-                        <p class="eyebrow text-aqua-700">
-                            Your preferred package
-                        </p>
+                        <p class="eyebrow text-aqua-700">Your chosen package</p>
                         <h2 class="mt-3 text-2xl font-semibold">
-                            {{ selectedPackage.name }}
+                            {{ chosen.name }}
                         </h2>
                         <p
-                            v-if="selectedPackage.summary"
+                            v-if="chosen.summary"
                             class="mt-1 text-sm font-semibold text-aqua-700"
                         >
-                            {{ selectedPackage.summary }}
+                            {{ chosen.summary }}
                         </p>
-                        <ul
-                            v-if="selectedPackage.inclusions.length"
-                            class="mt-5 grid gap-2"
-                        >
+                        <ul class="mt-5 grid gap-2">
                             <li
-                                v-if="selectedPackage.includes"
+                                v-if="chosen.includes"
                                 class="flex gap-3 text-sm leading-6 text-muted-foreground"
                             >
                                 <Check
@@ -66,11 +145,10 @@ withDefaults(
                                     class="mt-0.5 shrink-0 text-aqua-600"
                                     aria-hidden="true"
                                 />
-                                Everything in
-                                {{ selectedPackage.includes.name }}
+                                Everything in {{ chosen.includes.name }}
                             </li>
                             <li
-                                v-for="item in selectedPackage.inclusions"
+                                v-for="item in chosen.inclusions"
                                 :key="item"
                                 class="flex gap-3 text-sm leading-6 text-muted-foreground"
                             >
@@ -82,97 +160,31 @@ withDefaults(
                                 {{ item }}
                             </li>
                         </ul>
-                        <p class="mt-5 text-sm leading-6 text-muted-foreground">
-                            Mention this package when you call or email. We
-                            confirm whether it suits your business, and agree
-                            the scope and terms with you, before any work
-                            begins.
-                        </p>
-                        <div class="mt-5 flex flex-wrap gap-x-6 gap-y-2">
-                            <CtaLink
-                                href="/services#packages"
-                                variant="link"
-                                icon="none"
-                            >
-                                Compare packages
-                            </CtaLink>
-                            <CtaLink
-                                href="/book-consultation"
-                                variant="link"
-                                icon="none"
-                            >
-                                Clear selection
-                            </CtaLink>
-                        </div>
+                        <CtaLink
+                            href="/services#packages"
+                            variant="link"
+                            icon="arrow-right"
+                            class="mt-5"
+                        >
+                            Compare packages
+                        </CtaLink>
                     </div>
-
                     <div
-                        v-else-if="packageUnavailable"
-                        role="status"
-                        class="rounded-xl border border-border bg-muted p-7"
+                        v-else-if="chosenPackage === 'tailored' && !submitted"
+                        class="rounded-xl border-2 border-aqua-400 bg-aqua-50 p-7"
                     >
-                        <h2 class="text-lg font-semibold">
-                            That package can’t be selected right now
-                        </h2>
-                        <p class="mt-2 text-sm leading-6 text-muted-foreground">
-                            You can still ask for a tailored engagement
-                            {{
-                                packages.length
-                                    ? 'or choose one of the packages below'
-                                    : ''
-                            }}.
+                        <p class="eyebrow text-aqua-700">Tailored engagement</p>
+                        <p class="mt-3 text-sm leading-6 text-muted-foreground">
+                            Tell us about your business in the form and we will
+                            suggest the support that fits.
                         </p>
                     </div>
 
                     <ContactCard
-                        title="Request your consultation"
-                        description="Call either number or send an email. This is a request, not a confirmed appointment; we will reply to agree a time."
+                        title="Prefer to call or email?"
+                        description="Use either number or our email address to request a consultation."
                     />
-
-                    <nav
-                        v-if="packages.length"
-                        class="rounded-xl border border-border bg-card p-7"
-                        aria-labelledby="package-choice-title"
-                    >
-                        <h2
-                            id="package-choice-title"
-                            class="text-lg font-semibold"
-                        >
-                            {{
-                                selectedPackage
-                                    ? 'Prefer a different package?'
-                                    : 'Have a package in mind?'
-                            }}
-                        </h2>
-                        <p class="mt-2 text-sm leading-6 text-muted-foreground">
-                            Choosing one is optional. We can also shape a
-                            tailored engagement with you.
-                        </p>
-                        <ul class="mt-5 flex flex-wrap gap-2">
-                            <li v-for="pkg in packages" :key="pkg.slug">
-                                <Link
-                                    :href="`/book-consultation?package=${encodeURIComponent(pkg.slug)}`"
-                                    preserve-scroll
-                                    class="inline-flex min-h-10 items-center rounded-full border px-4 text-sm font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-aqua-600"
-                                    :class="
-                                        selectedPackage?.slug === pkg.slug
-                                            ? 'border-navy-900 bg-navy-900 text-white'
-                                            : 'border-border bg-white text-navy-900 hover:border-aqua-400 hover:bg-aqua-50'
-                                    "
-                                    :aria-current="
-                                        selectedPackage?.slug === pkg.slug
-                                            ? 'true'
-                                            : undefined
-                                    "
-                                >
-                                    {{ pkg.name }}
-                                </Link>
-                            </li>
-                        </ul>
-                    </nav>
                 </div>
-
-                <VisitCard class="self-start" />
             </div>
         </section>
     </PublicLayout>

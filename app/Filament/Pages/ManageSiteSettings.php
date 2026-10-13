@@ -8,6 +8,7 @@ use App\Support\SiteSettings;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
@@ -118,6 +119,20 @@ class ManageSiteSettings extends Page
                                     self::socialUrl('facebook_url', 'Facebook page URL'),
                                     self::socialUrl('linkedin_url', 'LinkedIn page URL'),
                                     self::socialUrl('tiktok_url', 'TikTok profile URL'),
+                                ]),
+                            ]),
+                        Tab::make('Enquiries')
+                            ->icon(Heroicon::OutlinedInbox)
+                            ->schema([
+                                Group::make()->statePath('forms')->schema([
+                                    Toggle::make('forms_enabled')
+                                        ->label('Accept enquiries through the website forms')
+                                        ->helperText('Turn off to pause the contact and consultation forms, for example during a spam attack. Visitors still see the phone numbers and email address.'),
+                                    TagsInput::make('notification_emails')
+                                        ->label('Send new-enquiry emails to')
+                                        ->placeholder('Add an email address')
+                                        ->nestedRecursiveRules(['email'])
+                                        ->helperText('Every new enquiry is emailed to these addresses and saved under Enquiries, even if the email fails.'),
                                 ]),
                             ]),
                         Tab::make('Homepage slider')

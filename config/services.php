@@ -14,6 +14,13 @@ return [
     |
     */
 
+    // Cloudflare Turnstile spam protection for the public enquiry forms.
+    // Leave both keys empty to switch it off (for example in local development).
+    'turnstile' => [
+        'site_key' => env('TURNSTILE_SITE_KEY'),
+        'secret_key' => env('TURNSTILE_SECRET_KEY'),
+    ],
+
     'postmark' => [
         'key' => env('POSTMARK_API_KEY'),
     ],

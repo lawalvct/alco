@@ -89,6 +89,17 @@ class SiteSettingsTest extends TestCase
         $this->assertDatabaseCount('site_settings', 0);
     }
 
+    public function test_new_setting_defaults_apply_even_when_saved_settings_are_cached(): void
+    {
+        SiteSettings::put('contact', [...SiteSettings::DEFAULTS['contact'], 'email' => 'hello@alcosolutions.ng']);
+        SiteSettings::all();
+
+        // A group added in a later release has no saved row yet but must still work.
+        $this->assertSame(['info@alcosolutions.ng'], SiteSettings::notificationEmails());
+        $this->assertTrue(SiteSettings::formsEnabled());
+        $this->assertSame('hello@alcosolutions.ng', SiteSettings::publicPayload()['email']);
+    }
+
     public function test_only_admins_can_open_site_settings(): void
     {
         $this->actingAs(User::factory()->create())->get('/admin/site-settings')->assertForbidden();

@@ -1,12 +1,10 @@
 <script setup lang="ts">
 import { Head } from '@inertiajs/vue3';
 import { computed } from 'vue';
-import ContactCard from '@/components/public/ContactCard.vue';
 import CtaLink from '@/components/public/CtaLink.vue';
 import PackageCard from '@/components/public/PackageCard.vue';
 import PageHero from '@/components/public/PageHero.vue';
 import SectionHeading from '@/components/public/SectionHeading.vue';
-import VisitCard from '@/components/public/VisitCard.vue';
 import PublicLayout from '@/layouts/PublicLayout.vue';
 import { plannedTools, services as fallbackServices } from '@/lib/publicSite';
 import type {
@@ -15,7 +13,7 @@ import type {
     TeamProfile,
 } from '@/types/publicContent';
 
-type SectionKind = 'about' | 'services' | 'insights' | 'tools' | 'contact';
+type SectionKind = 'about' | 'services' | 'insights' | 'tools';
 
 const props = withDefaults(
     defineProps<{
@@ -64,11 +62,6 @@ const pageContent: Record<
         eyebrow: 'Accounting tools',
         title: 'Practical calculators are on the way.',
         intro: 'We are preparing accounting tools with reviewed formulas and configurable tax settings.',
-    },
-    contact: {
-        eyebrow: 'Contact',
-        title: 'Start a conversation with ALCO.',
-        intro: 'Call or email us about bookkeeping, reporting, tax filings or a business question.',
     },
 };
 
@@ -238,7 +231,7 @@ const content = computed(() => pageContent[props.kind]);
                 </ul>
             </template>
 
-            <template v-else-if="kind === 'insights'">
+            <template v-else>
                 <div
                     class="max-w-3xl rounded-xl border border-border bg-card p-8 shadow-card"
                 >
@@ -255,11 +248,6 @@ const content = computed(() => pageContent[props.kind]);
                     </p>
                 </div>
             </template>
-
-            <div v-else class="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
-                <ContactCard />
-                <VisitCard />
-            </div>
         </section>
     </PublicLayout>
 </template>

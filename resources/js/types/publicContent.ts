@@ -34,6 +34,7 @@ export interface HomeContent {
     hero_line_two: string;
     hero_accent: string;
     hero_description: string;
+    hero_tagline?: string | null;
     seo_description?: string;
     blocks: HomeBlock[];
 }
@@ -112,4 +113,13 @@ export interface MenuLink {
 export interface SiteNavigation {
     header: MenuLink[];
     footer: MenuLink[];
+}
+
+export interface ServiceOption {
+    id: number;
+    title: string;
+}
+
+export interface LeadSubmittedFlash {
+    reference: string | null;
 }

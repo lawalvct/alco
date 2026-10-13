@@ -13,7 +13,8 @@ use Illuminate\Support\Facades\Cache;
  */
 final class SiteSettings
 {
-    private const CACHE_KEY = 'site-settings';
+    /** Only saved values are cached; defaults are applied on read so new groups work at once. */
+    private const CACHE_KEY = 'site-settings.stored';
 
     public const DEFAULTS = [
         'identity' => [
@@ -42,6 +43,10 @@ final class SiteSettings
             'hero_autoplay' => true,
             'hero_interval_seconds' => 8,
         ],
+        'forms' => [
+            'forms_enabled' => true,
+            'notification_emails' => ['info@alcosolutions.ng'],
+        ],
     ];
 
     private const SOCIAL_NETWORKS = [
@@ -59,18 +64,20 @@ final class SiteSettings
     /** @return array<string, array<string, mixed>> */
     public static function all(): array
     {
-        /** @var array<string, array<string, mixed>> */
-        return Cache::rememberForever(self::CACHE_KEY, function (): array {
-            $stored = SiteSetting::query()->pluck('data', 'group');
-            $settings = [];
+        /** @var array<string, mixed> $stored */
+        $stored = Cache::rememberForever(
+            self::CACHE_KEY,
+            fn (): array => SiteSetting::query()->pluck('data', 'group')->all(),
+        );
 
-            foreach (self::DEFAULTS as $group => $defaults) {
-                $values = $stored->get($group);
-                $settings[$group] = array_replace($defaults, is_array($values) ? $values : []);
-            }
+        $settings = [];
 
-            return $settings;
-        });
+        foreach (self::DEFAULTS as $group => $defaults) {
+            $values = $stored[$group] ?? null;
+            $settings[$group] = array_replace($defaults, is_array($values) ? $values : []);
+        }
+
+        return $settings;
     }
 
     /** @param  array<string, mixed>  $data */
@@ -152,6 +159,22 @@ final class SiteSettings
                 (int) ($homepage['hero_interval_seconds'] ?? 8),
             ),
         ];
+    }
+
+    public static function formsEnabled(): bool
+    {
+        return (bool) (self::get('forms')['forms_enabled'] ?? true);
+    }
+
+    /** @return list<string> Staff addresses that receive new-enquiry emails. */
+    public static function notificationEmails(): array
+    {
+        $emails = self::get('forms')['notification_emails'] ?? [];
+
+        return array_values(array_filter(
+            is_array($emails) ? $emails : [],
+            fn (mixed $email): bool => is_string($email) && filter_var($email, FILTER_VALIDATE_EMAIL) !== false,
+        ));
     }
 
     /** Formats Nigerian numbers as "+234 814 082 4230"; other numbers are left as entered. */

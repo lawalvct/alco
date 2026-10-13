@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Public\AboutController;
 use App\Http\Controllers\Public\ConsultationController;
+use App\Http\Controllers\Public\ContactController;
 use App\Http\Controllers\Public\FaqController;
 use App\Http\Controllers\Public\HomeController;
 use App\Http\Controllers\Public\ServiceController;
@@ -15,8 +16,11 @@ Route::get('/services/{slug}', [ServiceController::class, 'show'])->name('servic
 Route::inertia('/insights', 'Public/Section', ['kind' => 'insights'])->name('insights.index');
 Route::inertia('/tools', 'Public/Section', ['kind' => 'tools'])->name('tools.index');
 Route::get('/faq', FaqController::class)->name('faq');
-Route::inertia('/contact', 'Public/Section', ['kind' => 'contact'])->name('contact');
-Route::get('/book-consultation', ConsultationController::class)->name('consultation');
+
+Route::get('/contact', [ContactController::class, 'show'])->name('contact');
+Route::post('/contact', [ContactController::class, 'store'])->middleware('throttle:leads')->name('contact.store');
+Route::get('/book-consultation', [ConsultationController::class, 'show'])->name('consultation');
+Route::post('/book-consultation', [ConsultationController::class, 'store'])->middleware('throttle:leads')->name('consultation.store');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('dashboard', 'Dashboard')->name('dashboard');

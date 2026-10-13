@@ -70,12 +70,19 @@ const defaultHome: HomeContent = {
     hero_accent: 'moving forward.',
     hero_description:
         'Professional accounting, clear reporting and practical business support.',
+    hero_tagline: 'Clarity today. Confidence for what comes next.',
     seo_description:
         'ALCO Associate Solutions offers bookkeeping, financial reporting, tax filings and business solutions in Lagos, Nigeria.',
     blocks: [],
 };
 
 const homeContent = computed(() => props.home ?? defaultHome);
+// Homepages saved before the field existed keep the original line; an emptied field hides it.
+const heroTagline = computed(() =>
+    homeContent.value.hero_tagline === undefined
+        ? defaultHome.hero_tagline
+        : homeContent.value.hero_tagline,
+);
 const serviceCards = computed(() =>
     props.publishedServices?.length
         ? props.publishedServices.map((service) => ({
@@ -160,9 +167,10 @@ const serviceCards = computed(() =>
 
                 <div class="mt-11 sm:mt-14">
                     <p
+                        v-if="heroTagline"
                         class="mb-3 text-xs font-semibold tracking-widest text-white/85"
                     >
-                        Clarity today. Confidence for what comes next.
+                        {{ heroTagline }}
                     </p>
                     <HeroSlider
                         :slides="heroSlides"
