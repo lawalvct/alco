@@ -34,8 +34,19 @@ class MediaAssetForm
                     ->schema(self::rightsFields()),
                 Section::make('File details')
                     ->visibleOn('edit')
-                    ->columns(3)
+                    ->columns(2)
                     ->schema([
+                        TextEntry::make('optimisation')
+                            ->label('Web copies')
+                            ->state(fn (MediaAsset $record): string => match ($record->variants_status) {
+                                'ready' => sprintf(
+                                    '%d WebP sizes, up to %s smaller',
+                                    count($record->variants ?? []),
+                                    self::largestSaving($record),
+                                ),
+                                'failed' => 'Could not be optimised; the original is used',
+                                default => 'Processing; the original is used until ready',
+                            }),
                         TextEntry::make('dimensions')
                             ->state(fn (MediaAsset $record): string => $record->dimensionsLabel()),
                         TextEntry::make('size')
@@ -64,6 +75,17 @@ class MediaAssetForm
             self::altTextInput(),
             ...self::rightsFields(),
         ];
+    }
+
+    private static function largestSaving(MediaAsset $record): string
+    {
+        $smallest = collect($record->variants ?? [])->min('size');
+
+        if (! $record->size || ! is_int($smallest) || $smallest >= $record->size) {
+            return '0%';
+        }
+
+        return round((1 - $smallest / $record->size) * 100).'%';
     }
 
     private static function fileUpload(): FileUpload

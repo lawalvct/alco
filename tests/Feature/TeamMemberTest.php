@@ -62,6 +62,7 @@ class TeamMemberTest extends TestCase
             '/admin', '/admin/media', '/admin/media/create', '/admin/homepage-slider',
             '/admin/homepage-slider/create', '/admin/packages', '/admin/packages/create',
             '/admin/team', '/admin/team/create', '/admin/site-settings',
+            '/admin/faqs', '/admin/faqs/create', '/admin/menus', '/admin/menus/create',
         ] as $path) {
             $this->get($path)->assertOk();
         }

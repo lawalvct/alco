@@ -56,6 +56,7 @@ export interface SiteInfo {
 
 export interface ImageSource {
     src: string;
+    srcset?: string | null;
     width: number | null;
     height: number | null;
 }
@@ -89,4 +90,26 @@ export interface TeamProfile {
     role: string | null;
     bio: string | null;
     portrait: ImageSource | null;
+}
+
+export interface FaqItem {
+    id?: number;
+    question: string;
+    answer: string;
+}
+
+export interface FaqGroup {
+    name: string;
+    items: FaqItem[];
+}
+
+export interface MenuLink {
+    label: string;
+    href: string;
+    external: boolean;
+}
+
+export interface SiteNavigation {
+    header: MenuLink[];
+    footer: MenuLink[];
 }

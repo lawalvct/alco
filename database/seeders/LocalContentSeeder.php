@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\EngagementPackage;
+use App\Models\Faq;
 use App\Models\HomepageHeroSlide;
 use App\Models\MediaAsset;
 use App\Models\Page;
@@ -19,6 +20,8 @@ class LocalContentSeeder extends Seeder
         if (! app()->environment('local')) {
             throw new RuntimeException('Provisional content can only be seeded in the local environment.');
         }
+
+        $faqIds = $this->seedFaqs();
 
         $home = Page::firstOrCreate(
             ['slug' => 'home'],
@@ -80,11 +83,7 @@ class LocalContentSeeder extends Seeder
                             'data' => [
                                 'eyebrow' => 'Common questions',
                                 'title' => 'Start with the essentials.',
-                                'items' => [
-                                    ['question' => 'Where is ALCO based?', 'answer' => '18, Lagos Street, Ebute-Metta, Lagos State, Nigeria.'],
-                                    ['question' => 'Which services can I ask about?', 'answer' => 'Bookkeeping, financial reporting, tax filings and business solutions are the four core areas listed by ALCO.'],
-                                    ['question' => 'How do I request a consultation?', 'answer' => 'Call either listed phone number or email info@alcosolutions.ng. Availability is confirmed directly.'],
-                                ],
+                                'faq_ids' => $faqIds,
                             ],
                         ],
                     ],
@@ -144,6 +143,27 @@ class LocalContentSeeder extends Seeder
 
             $parent = $package;
         }
+    }
+
+    /** @return list<string> FAQ ids in homepage order */
+    private function seedFaqs(): array
+    {
+        $faqs = [
+            ['question' => 'Where is ALCO based?', 'answer' => '18, Lagos Street, Ebute-Metta, Lagos State, Nigeria.'],
+            ['question' => 'Which services can I ask about?', 'answer' => 'Bookkeeping, financial reporting, tax filings and business solutions are the four core areas listed by ALCO.'],
+            ['question' => 'How do I request a consultation?', 'answer' => 'Call either listed phone number or email info@alcosolutions.ng. Availability is confirmed directly.'],
+        ];
+
+        $ids = [];
+
+        foreach ($faqs as $position => $faq) {
+            $ids[] = (string) Faq::firstOrCreate(
+                ['question' => $faq['question']],
+                ['answer' => $faq['answer'], 'group' => 'General', 'sort_order' => $position + 1, 'is_published' => true],
+            )->id;
+        }
+
+        return $ids;
     }
 
     /** Names are owner-supplied; roles, biographies and photos await approval. */

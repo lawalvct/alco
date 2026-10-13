@@ -6,6 +6,7 @@ use App\Models\Concerns\HasPublishedContent;
 use Database\Factories\ServiceFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Carbon;
 
 /**
@@ -31,6 +32,12 @@ class Service extends Model
             'published_data' => 'array',
             'published_at' => 'datetime',
         ];
+    }
+
+    /** @return BelongsToMany<Faq, $this> */
+    public function faqs(): BelongsToMany
+    {
+        return $this->belongsToMany(Faq::class);
     }
 
     /** @return array{slug: string, title: string, summary: string} */

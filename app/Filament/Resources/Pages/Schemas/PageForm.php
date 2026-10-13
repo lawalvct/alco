@@ -2,6 +2,9 @@
 
 namespace App\Filament\Resources\Pages\Schemas;
 
+use App\Filament\Resources\HomepageHeroSlides\HomepageHeroSlideResource;
+use App\Models\Faq;
+use Filament\Actions\Action;
 use Filament\Forms\Components\Builder;
 use Filament\Forms\Components\Builder\Block;
 use Filament\Forms\Components\Repeater;
@@ -12,6 +15,7 @@ use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Text;
 use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
 
 class PageForm
 {
@@ -39,7 +43,14 @@ class PageForm
                     ->statePath('draft_data')
                     ->schema([
                         Section::make('Draft hero copy')
-                            ->description('Save changes first. The visitor site changes only when you publish the saved draft.')
+                            ->description('Save changes first. The visitor site changes only when you publish the saved draft. The banner images under this text are managed in Website → Homepage slider and go live as soon as a slide is shown.')
+                            ->headerActions([
+                                Action::make('manageSlider')
+                                    ->label('Manage homepage slider')
+                                    ->icon(Heroicon::OutlinedFilm)
+                                    ->link()
+                                    ->url(fn (): string => HomepageHeroSlideResource::getUrl('index')),
+                            ])
                             ->schema([
                                 TextInput::make('hero_eyebrow')->required()->maxLength(100),
                                 TextInput::make('hero_line_one')->required()->maxLength(120),
@@ -101,13 +112,20 @@ class PageForm
                                             ->schema([
                                                 TextInput::make('eyebrow')->required()->maxLength(80),
                                                 TextInput::make('title')->required()->maxLength(160),
-                                                Repeater::make('items')
-                                                    ->schema([
-                                                        TextInput::make('question')->required()->maxLength(200),
-                                                        Textarea::make('answer')->required()->maxLength(700),
-                                                    ])
-                                                    ->minItems(1)
-                                                    ->maxItems(10),
+                                                Select::make('faq_ids')
+                                                    ->label('Questions')
+                                                    ->multiple()
+                                                    ->required()
+                                                    ->maxItems(10)
+                                                    ->options(fn (): array => Faq::query()
+                                                        ->orderBy('sort_order')
+                                                        ->get()
+                                                        ->mapWithKeys(fn (Faq $faq): array => [
+                                                            $faq->id => $faq->is_published ? $faq->question : "{$faq->question} (not published)",
+                                                        ])
+                                                        ->all())
+                                                    ->searchable()
+                                                    ->helperText('Shown in the order selected. Only published questions appear on the site; manage them in Website → FAQs.'),
                                             ]),
                                     ])
                                     ->default([]),

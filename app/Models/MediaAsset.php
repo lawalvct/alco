@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Jobs\GenerateMediaVariants;
 use Database\Factories\MediaAssetFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -24,6 +25,8 @@ use Illuminate\Support\Facades\Storage;
  * @property string|null $credit
  * @property string|null $usage_rights
  * @property bool $rights_confirmed
+ * @property list<array{width: int, height: int, path: string, size: int}>|null $variants
+ * @property string|null $variants_status pending, ready or failed
  * @property Carbon|null $created_at
  */
 class MediaAsset extends Model
@@ -59,6 +62,7 @@ class MediaAsset extends Model
             'width' => 'integer',
             'height' => 'integer',
             'rights_confirmed' => 'boolean',
+            'variants' => 'array',
         ];
     }
 
@@ -67,6 +71,14 @@ class MediaAsset extends Model
         static::saving(function (MediaAsset $asset): void {
             if ($asset->isDirty('path')) {
                 $asset->readFileMetadata();
+                $asset->variants = null;
+                $asset->variants_status = 'pending';
+            }
+        });
+
+        static::saved(function (MediaAsset $asset): void {
+            if ($asset->wasRecentlyCreated || $asset->wasChanged('path')) {
+                GenerateMediaVariants::dispatch($asset->id);
             }
         });
 
@@ -80,6 +92,7 @@ class MediaAsset extends Model
 
         static::deleted(function (MediaAsset $asset): void {
             Storage::disk($asset->disk)->delete($asset->path);
+            Storage::disk($asset->disk)->deleteDirectory($asset->variantsDirectory());
         });
     }
 
@@ -104,6 +117,36 @@ class MediaAsset extends Model
     public function url(): string
     {
         return Storage::disk($this->disk)->url($this->path);
+    }
+
+    /** Responsive WebP sources once optimisation has finished, otherwise null. */
+    public function srcset(): ?string
+    {
+        if ($this->variants_status !== 'ready' || empty($this->variants)) {
+            return null;
+        }
+
+        $disk = Storage::disk($this->disk);
+
+        return collect($this->variants)
+            ->map(fn (array $variant): string => $disk->url($variant['path']).' '.$variant['width'].'w')
+            ->implode(', ');
+    }
+
+    /** @return array{src: string, srcset: string|null, width: int|null, height: int|null} */
+    public function imageSource(): array
+    {
+        return [
+            'src' => $this->url(),
+            'srcset' => $this->srcset(),
+            'width' => $this->width,
+            'height' => $this->height,
+        ];
+    }
+
+    public function variantsDirectory(): string
+    {
+        return "media/variants/{$this->id}";
     }
 
     /** Count of records that display this asset; in-use assets cannot be deleted. */

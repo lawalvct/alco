@@ -19,7 +19,7 @@ class HomeController extends Controller
         $home = Page::published()->where('slug', 'home')->first();
 
         return Inertia::render('Welcome', [
-            'home' => $home?->published_data,
+            'home' => $home?->publicContent(),
             'publishedServices' => Service::published()
                 ->orderBy('sort_order')
                 ->get()

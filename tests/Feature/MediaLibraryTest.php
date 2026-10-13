@@ -10,6 +10,7 @@ use App\Models\User;
 use Filament\Actions\DeleteAction;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
@@ -49,6 +50,49 @@ class MediaLibraryTest extends TestCase
         $this->assertFalse($asset->rights_confirmed);
         $this->assertStringStartsWith('media/', $asset->path);
         Storage::disk('public')->assertExists($asset->path);
+    }
+
+    public function test_uploads_get_resized_webp_copies_that_the_homepage_uses(): void
+    {
+        Storage::disk('public')->put('media/banner.png', UploadedFile::fake()->image('banner.png', 1800, 600)->getContent());
+        $asset = MediaAsset::factory()->create(['path' => 'media/banner.png']);
+
+        $asset->refresh();
+        $this->assertSame('ready', $asset->variants_status);
+        $this->assertSame([640, 1024, 1600, 1800], array_column($asset->variants ?? [], 'width'));
+        $this->assertSame(213, $asset->variants[0]['height']);
+
+        foreach ($asset->variants as $variant) {
+            Storage::disk('public')->assertExists($variant['path']);
+            $this->assertStringEndsWith('.webp', $variant['path']);
+        }
+
+        HomepageHeroSlide::factory()->visible()->create(['media_asset_id' => $asset->id]);
+
+        $this->withoutVite()->get('/')->assertOk()->assertInertia(fn ($page) => $page
+            ->where('heroSlides.0.srcset', fn (string $srcset): bool => str_contains($srcset, "/storage/media/variants/{$asset->id}/640.webp 640w")
+                && str_contains($srcset, '1800.webp 1800w'))
+            ->etc());
+
+        $asset->heroSlides()->delete();
+        $asset->delete();
+        Storage::disk('public')->assertMissing("media/variants/{$asset->id}/640.webp");
+    }
+
+    public function test_optimise_command_processes_images_that_are_not_ready(): void
+    {
+        Storage::disk('public')->put('media/team.jpg', UploadedFile::fake()->image('team.jpg', 800, 800)->getContent());
+        $asset = MediaAsset::factory()->create(['path' => 'media/team.jpg']);
+        MediaAsset::whereKey($asset->id)->update(['variants' => null, 'variants_status' => 'failed']);
+
+        $exitCode = Artisan::call('alco:optimise-media');
+        $output = Artisan::output();
+
+        $this->assertSame(0, $exitCode, $output);
+        $this->assertStringContainsString('Optimised 1 of 1 images.', $output);
+
+        $this->assertSame('ready', $asset->refresh()->variants_status);
+        $this->assertSame([640, 800], array_column($asset->variants ?? [], 'width'));
     }
 
     public function test_svg_and_other_non_photo_files_are_rejected(): void

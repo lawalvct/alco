@@ -117,24 +117,16 @@ class HomepageHeroSlide extends Model
     }
 
     /**
-     * @return array{id: int, src: string, width: int|null, height: int|null, alt: string, position: string, mobile: array{src: string, width: int|null, height: int|null}|null, mobile_position: string}
+     * @return array{id: int, src: string, srcset: string|null, width: int|null, height: int|null, alt: string, position: string, mobile: array{src: string, srcset: string|null, width: int|null, height: int|null}|null, mobile_position: string}
      */
     public function publicPayload(): array
     {
-        $mobile = $this->mobileMediaAsset;
-
         return [
             'id' => $this->id,
-            'src' => $this->mediaAsset->url(),
-            'width' => $this->mediaAsset->width,
-            'height' => $this->mediaAsset->height,
+            ...$this->mediaAsset->imageSource(),
             'alt' => $this->is_decorative ? '' : (string) $this->mediaAsset->alt_text,
             'position' => "{$this->focal_x}% {$this->focal_y}%",
-            'mobile' => $mobile ? [
-                'src' => $mobile->url(),
-                'width' => $mobile->width,
-                'height' => $mobile->height,
-            ] : null,
+            'mobile' => $this->mobileMediaAsset?->imageSource(),
             'mobile_position' => sprintf(
                 '%d%% %d%%',
                 $this->mobile_focal_x ?? $this->focal_x,

@@ -3,18 +3,27 @@ import { Link, usePage } from '@inertiajs/vue3';
 import { ArrowUpRight, MapPin, Menu, Phone, X } from '@lucide/vue';
 import { computed, ref } from 'vue';
 import BrandLockup from '@/components/public/BrandLockup.vue';
+import MenuAnchor from '@/components/public/MenuAnchor.vue';
 import { useSite } from '@/composables/useSite';
-import { navigation } from '@/lib/publicSite';
+import type { MenuLink } from '@/types/publicContent';
 
 const page = usePage();
 const site = useSite();
+const headerLinks = computed(() => page.props.navigation.header);
+const footerLinks = computed(() => page.props.navigation.footer);
 const menuOpen = ref(false);
 const whatsappPhones = computed(() =>
     site.value.phones.filter((phone) => phone.whatsapp),
 );
 
-function isActive(href: string): boolean {
-    return href === '/' ? page.url === '/' : page.url.startsWith(href);
+function isActive(link: MenuLink): boolean {
+    if (link.external) {
+        return false;
+    }
+
+    return link.href === '/'
+        ? page.url === '/'
+        : page.url.startsWith(link.href);
 }
 </script>
 
@@ -83,27 +92,25 @@ function isActive(href: string): boolean {
                         class="hidden items-center gap-7 lg:flex xl:gap-9"
                         aria-label="Primary navigation"
                     >
-                        <Link
-                            v-for="item in navigation"
-                            :key="item.href"
-                            :href="item.href"
+                        <MenuAnchor
+                            v-for="item in headerLinks"
+                            :key="`${item.label}-${item.href}`"
+                            :link="item"
                             class="relative py-3 text-sm font-medium transition-colors hover:text-aqua-400 focus-visible:rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-aqua-400"
                             :class="
-                                isActive(item.href)
+                                isActive(item)
                                     ? 'text-aqua-400'
                                     : 'text-white/90'
                             "
-                            :aria-current="
-                                isActive(item.href) ? 'page' : undefined
-                            "
+                            :aria-current="isActive(item) ? 'page' : undefined"
                         >
                             {{ item.label }}
                             <span
-                                v-if="isActive(item.href)"
+                                v-if="isActive(item)"
                                 class="absolute right-0 bottom-0 left-0 h-0.5 bg-aqua-400"
                                 aria-hidden="true"
                             />
-                        </Link>
+                        </MenuAnchor>
                     </nav>
 
                     <Link
@@ -135,19 +142,17 @@ function isActive(href: string): boolean {
                     class="grid gap-1 border-b border-white/15 py-3 lg:hidden"
                     aria-label="Mobile navigation"
                 >
-                    <Link
-                        v-for="item in navigation"
-                        :key="item.href"
-                        :href="item.href"
+                    <MenuAnchor
+                        v-for="item in headerLinks"
+                        :key="`${item.label}-${item.href}`"
+                        :link="item"
                         class="rounded-md px-3 py-3 text-sm font-medium hover:bg-white/10"
-                        :class="
-                            isActive(item.href) ? 'text-aqua-400' : 'text-white'
-                        "
-                        :aria-current="isActive(item.href) ? 'page' : undefined"
+                        :class="isActive(item) ? 'text-aqua-400' : 'text-white'"
+                        :aria-current="isActive(item) ? 'page' : undefined"
                         @click="menuOpen = false"
                     >
                         {{ item.label }}
-                    </Link>
+                    </MenuAnchor>
                     <Link
                         href="/book-consultation"
                         class="mt-2 rounded-md bg-aqua-400 px-3 py-3 text-center text-sm font-bold text-navy-900 hover:bg-aqua-300"
@@ -196,14 +201,12 @@ function isActive(href: string): boolean {
                 <div>
                     <p class="font-semibold text-white">Explore</p>
                     <div class="mt-4 grid grid-cols-2 gap-x-5 gap-y-3 text-sm">
-                        <Link
-                            v-for="item in navigation"
-                            :key="item.href"
-                            :href="item.href"
+                        <MenuAnchor
+                            v-for="item in footerLinks"
+                            :key="`${item.label}-${item.href}`"
+                            :link="item"
                             class="w-fit hover:text-aqua-400"
-                        >
-                            {{ item.label }}
-                        </Link>
+                        />
                     </div>
                 </div>
                 <div>

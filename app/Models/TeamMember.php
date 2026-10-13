@@ -48,21 +48,15 @@ class TeamMember extends Model
         return $query->where('is_published', true)->orderBy('sort_order')->orderBy('id');
     }
 
-    /** @return array{id: int, name: string, role: string|null, bio: string|null, portrait: array{src: string, width: int|null, height: int|null}|null} */
+    /** @return array{id: int, name: string, role: string|null, bio: string|null, portrait: array{src: string, srcset: string|null, width: int|null, height: int|null}|null} */
     public function publicProfile(): array
     {
-        $portrait = $this->portrait;
-
         return [
             'id' => $this->id,
             'name' => $this->name,
             'role' => $this->role,
             'bio' => $this->bio,
-            'portrait' => $portrait ? [
-                'src' => $portrait->url(),
-                'width' => $portrait->width,
-                'height' => $portrait->height,
-            ] : null,
+            'portrait' => $this->portrait?->imageSource(),
         ];
     }
 }

@@ -2,13 +2,22 @@
 import { Link } from '@inertiajs/vue3';
 import { ArrowRight } from '@lucide/vue';
 import CtaLink from '@/components/public/CtaLink.vue';
+import FaqList from '@/components/public/FaqList.vue';
 import SectionHeading from '@/components/public/SectionHeading.vue';
-import type { HomeBlock, PackageSummary } from '@/types/publicContent';
+import type { FaqItem, HomeBlock, PackageSummary } from '@/types/publicContent';
 
 withDefaults(
     defineProps<{ blocks: HomeBlock[]; packages?: PackageSummary[] }>(),
     { packages: () => [] },
 );
+
+function faqItems(block: HomeBlock): FaqItem[] {
+    return (block.data.items ?? []).flatMap((item) =>
+        item.question && item.answer
+            ? [{ question: item.question, answer: item.answer }]
+            : [],
+    );
+}
 </script>
 
 <template>
@@ -172,32 +181,24 @@ withDefaults(
         </section>
 
         <section
-            v-else-if="block.type === 'faq'"
+            v-else-if="block.type === 'faq' && faqItems(block).length"
             class="bg-aqua-50 py-20 sm:py-24"
             :aria-labelledby="`home-block-${index}`"
         >
             <div class="site-container max-w-4xl">
-                <SectionHeading
-                    :id="`home-block-${index}`"
-                    :eyebrow="block.data.eyebrow"
-                    :title="block.data.title"
-                />
-                <div class="mt-9 grid gap-3">
-                    <details
-                        v-for="item in block.data.items ?? []"
-                        :key="item.question"
-                        class="group rounded-xl bg-white px-6 py-5 shadow-card"
-                    >
-                        <summary
-                            class="cursor-pointer rounded-sm text-base font-semibold marker:text-aqua-600 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-aqua-600"
-                        >
-                            {{ item.question }}
-                        </summary>
-                        <p class="mt-4 leading-7 text-muted-foreground">
-                            {{ item.answer }}
-                        </p>
-                    </details>
+                <div
+                    class="flex flex-col justify-between gap-6 md:flex-row md:items-end"
+                >
+                    <SectionHeading
+                        :id="`home-block-${index}`"
+                        :eyebrow="block.data.eyebrow"
+                        :title="block.data.title"
+                    />
+                    <CtaLink href="/faq" variant="link" icon="arrow-right">
+                        All questions
+                    </CtaLink>
                 </div>
+                <FaqList class="mt-9" :items="faqItems(block)" />
             </div>
         </section>
     </template>

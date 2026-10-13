@@ -37,6 +37,24 @@ class MediaAssetsTable
                 IconColumn::make('rights_confirmed')
                     ->label('Rights')
                     ->boolean(),
+                TextColumn::make('variants_status')
+                    ->label('Web copies')
+                    ->badge()
+                    ->formatStateUsing(fn (?string $state): string => match ($state) {
+                        'ready' => 'Optimised',
+                        'failed' => 'Failed',
+                        default => 'Processing',
+                    })
+                    ->color(fn (?string $state): string => match ($state) {
+                        'ready' => 'success',
+                        'failed' => 'danger',
+                        default => 'gray',
+                    })
+                    ->tooltip(fn (?string $state): ?string => match ($state) {
+                        'failed' => 'The original image is still used. Try uploading it again as JPEG or WebP.',
+                        'ready' => null,
+                        default => 'Resized copies are being made. The original is used until they are ready.',
+                    }),
                 TextColumn::make('usage')
                     ->label('In use')
                     ->state(fn (MediaAsset $record): int => (int) $record->getAttribute('hero_slides_count')

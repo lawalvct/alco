@@ -31,4 +31,38 @@ class Page extends Model
             'published_at' => 'datetime',
         ];
     }
+
+    /**
+     * The published snapshot with library references resolved, so blocks
+     * reflect the current published FAQs.
+     *
+     * @return array<string, mixed>|null
+     */
+    public function publicContent(): ?array
+    {
+        $content = $this->published_data;
+
+        if (! is_array($content)) {
+            return null;
+        }
+
+        $blocks = [];
+
+        foreach (is_array($content['blocks'] ?? null) ? $content['blocks'] : [] as $block) {
+            if (! is_array($block)) {
+                continue;
+            }
+
+            if (($block['type'] ?? null) === 'faq' && is_array($block['data']['faq_ids'] ?? null)) {
+                $block['data']['items'] = Faq::publishedItems($block['data']['faq_ids']);
+                unset($block['data']['faq_ids']);
+            }
+
+            $blocks[] = $block;
+        }
+
+        $content['blocks'] = $blocks;
+
+        return $content;
+    }
 }

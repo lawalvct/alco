@@ -14,6 +14,9 @@ const props = defineProps<{
 }>();
 
 const PAUSE_KEY = 'alco-hero-paused';
+// Rendered banner width at each breakpoint (site-container minus gutters).
+const BANNER_SIZES =
+    '(min-width: 1370px) 1274px, (min-width: 1024px) calc(100vw - 6rem), (min-width: 640px) calc(100vw - 4rem), calc(100vw - 2.5rem)';
 
 const active = ref(0);
 // Only the first slide loads on the server render; the rest load on demand.
@@ -161,12 +164,15 @@ onBeforeUnmount(() => clearTimeout(timer));
                     <source
                         v-if="slide.mobile"
                         media="(max-width: 639px)"
-                        :srcset="slide.mobile.src"
+                        :srcset="slide.mobile.srcset || slide.mobile.src"
+                        sizes="calc(100vw - 2.5rem)"
                         :width="slide.mobile.width ?? undefined"
                         :height="slide.mobile.height ?? undefined"
                     />
                     <img
                         :src="slide.src"
+                        :srcset="slide.srcset ?? undefined"
+                        :sizes="slide.srcset ? BANNER_SIZES : undefined"
                         :alt="slide.alt"
                         :width="slide.width ?? undefined"
                         :height="slide.height ?? undefined"

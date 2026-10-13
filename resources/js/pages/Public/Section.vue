@@ -184,6 +184,10 @@ const content = computed(() => pageContent[props.kind]);
                                 <img
                                     v-if="member.portrait"
                                     :src="member.portrait.src"
+                                    :srcset="
+                                        member.portrait.srcset ?? undefined
+                                    "
+                                    sizes="64px"
                                     alt=""
                                     :width="member.portrait.width ?? undefined"
                                     :height="

@@ -1,12 +1,3 @@
-export const navigation = [
-    { label: 'Home', href: '/' },
-    { label: 'About', href: '/about' },
-    { label: 'Services', href: '/services' },
-    { label: 'Insights', href: '/insights' },
-    { label: 'Tools', href: '/tools' },
-    { label: 'Contact', href: '/contact' },
-] as const;
-
 export const services = [
     {
         slug: 'bookkeeping',

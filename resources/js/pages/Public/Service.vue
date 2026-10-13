@@ -2,15 +2,24 @@
 import { Head, Link } from '@inertiajs/vue3';
 import { ArrowLeft, Check } from '@lucide/vue';
 import CtaLink from '@/components/public/CtaLink.vue';
+import FaqList from '@/components/public/FaqList.vue';
 import PackageCard from '@/components/public/PackageCard.vue';
 import PageHero from '@/components/public/PageHero.vue';
 import SectionHeading from '@/components/public/SectionHeading.vue';
 import PublicLayout from '@/layouts/PublicLayout.vue';
-import type { PackageSummary, ServiceDetail } from '@/types/publicContent';
+import type {
+    FaqItem,
+    PackageSummary,
+    ServiceDetail,
+} from '@/types/publicContent';
 
 withDefaults(
-    defineProps<{ service: ServiceDetail; packages?: PackageSummary[] }>(),
-    { packages: () => [] },
+    defineProps<{
+        service: ServiceDetail;
+        packages?: PackageSummary[];
+        faqs?: FaqItem[];
+    }>(),
+    { packages: () => [], faqs: () => [] },
 );
 </script>
 
@@ -115,6 +124,28 @@ withDefaults(
                         <PackageCard :pkg="pkg" :show-inclusions="false" />
                     </li>
                 </ul>
+            </div>
+        </section>
+
+        <section
+            v-if="faqs.length"
+            class="bg-aqua-50 py-16 sm:py-20"
+            aria-labelledby="service-faqs-title"
+        >
+            <div class="site-container max-w-4xl">
+                <div
+                    class="flex flex-col justify-between gap-6 md:flex-row md:items-end"
+                >
+                    <SectionHeading
+                        id="service-faqs-title"
+                        eyebrow="Questions"
+                        :title="`Common questions about ${service.title.toLowerCase()}.`"
+                    />
+                    <CtaLink href="/faq" variant="link" icon="arrow-right">
+                        All questions
+                    </CtaLink>
+                </div>
+                <FaqList class="mt-9" :items="faqs" />
             </div>
         </section>
     </PublicLayout>
