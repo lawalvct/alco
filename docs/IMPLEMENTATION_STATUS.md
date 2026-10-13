@@ -10,14 +10,15 @@ Updated: 13 October 2026. This checklist tracks `ALCO_WEBSITE_DEVELOPMENT_PLAN.m
 - First CMS slice: homepage and Service models/resources, draft content separate from published snapshots, publication history, admin-only policies and public service detail routes.
 - Insights foundation: CMS-managed articles, categories, tags and topic hubs; a review state; publication snapshots; public search, pagination, category archives, related content and a VAT hub route.
 - Local draft seeds for the VAT guide and its planned companion articles. Tax & Compliance articles require an approved editorial state, reviewer name and review date before publication.
+- Tools phase: public index and eleven individual calculators with server-side formulas, input validation, result explanations and schedules where relevant. Each tool has a distinct search title/description, visible usage guide, worked example, questions, related links and WebApplication structured data. Filament manages tool and search copy, visibility and currency. VAT/WHT use explicit manual estimates until dated, sourced and reviewed tax rule versions are approved in the CMS; no statutory rates are preloaded. SSR must run in production for crawlable rendered HTML.
 - Provisional local-only homepage and four-service content set for visual review. No production seed data or admin account is created by this seed.
 
 ## Next implementation work
 
 1. Review and refine the provisional homepage, service scope and FAQ copy with ALCO. Fill About and leadership content only from approved facts.
 2. Complete Phase 2 resources: remaining Pages/templates, Team, FAQs, menus/site settings and media. Add granular editor/reviewer/publisher permissions and draft previews before production publication.
-3. Assign ALCO's reviewer, complete the VAT sources and review dates, then publish the approved VAT articles and the VAT topic hub. Build the configurable VAT calculator as the first tool.
-4. Extend the tools platform to all eleven calculators; build lead forms, notifications and management after the first end-to-end slice is verified.
+3. Assign ALCO's reviewer, complete the VAT sources and review dates, then publish the approved VAT articles and the VAT topic hub. Review calculator formulas and configure applicable VAT/WHT rule versions before presenting tax results as approved.
+4. Complete the remaining tools workflow: granular reviewer/publisher roles, calculator content review, scheduling/configuration previews and additional edge-case QA.
 5. Complete SEO/schema, analytics, accessibility, security, staging, deployment and handover checks in the plan.
 
 ## Client review still needed

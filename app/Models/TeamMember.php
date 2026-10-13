@@ -48,6 +48,20 @@ class TeamMember extends Model
         return $query->where('is_published', true)->orderBy('sort_order')->orderBy('id');
     }
 
+    /**
+     * Published people in display order, shaped for the public site.
+     *
+     * @return list<array{id: int, name: string, role: string|null, bio: string|null, portrait: array{src: string, srcset: string|null, width: int|null, height: int|null}|null}>
+     */
+    public static function publicProfiles(): array
+    {
+        return array_values(static::published()
+            ->with('portrait')
+            ->get()
+            ->map(fn (TeamMember $member): array => $member->publicProfile())
+            ->all());
+    }
+
     /** @return array{id: int, name: string, role: string|null, bio: string|null, portrait: array{src: string, srcset: string|null, width: int|null, height: int|null}|null} */
     public function publicProfile(): array
     {

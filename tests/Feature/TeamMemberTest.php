@@ -28,8 +28,7 @@ class TeamMemberTest extends TestCase
         TeamMember::factory()->create(['name' => 'Unpublished Person', 'is_published' => false]);
 
         $this->get('/about')->assertOk()->assertInertia(fn (Assert $page) => $page
-            ->component('Public/Section')
-            ->where('kind', 'about')
+            ->component('Public/About')
             ->has('team', 2)
             ->where('team.0.name', 'First Leader')
             ->where('team.0.role', null)

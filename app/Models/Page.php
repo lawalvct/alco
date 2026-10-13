@@ -11,6 +11,7 @@ use Illuminate\Support\Carbon;
 /**
  * @property string $slug
  * @property string $title
+ * @property string $template_key
  * @property array<string, mixed> $draft_data
  * @property array<string, mixed>|null $published_data
  * @property string $publication_status

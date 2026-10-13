@@ -26,7 +26,6 @@ withDefaults(
 <template>
     <Head :title="service.title">
         <meta name="description" :content="service.seo_description" />
-        <meta name="robots" content="noindex,follow" />
     </Head>
 
     <PublicLayout>

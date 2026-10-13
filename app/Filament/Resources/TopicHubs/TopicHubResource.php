@@ -25,6 +25,9 @@ class TopicHubResource extends Resource
     protected static ?string $modelLabel = 'insight topic';
     protected static ?string $slug = 'insight-topics';
     protected static ?string $recordTitleAttribute = 'title';
+    // Hidden from the admin menu until the VAT topic has reviewed articles and public links.
+    // The screen still works at /admin/insight-topics; set to true to show it again.
+    protected static bool $shouldRegisterNavigation = false;
 
     public static function form(Schema $schema): Schema { return TopicHubForm::configure($schema); }
     public static function table(Table $table): Table { return TopicHubsTable::configure($table); }

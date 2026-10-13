@@ -3,6 +3,7 @@
 namespace App\Support;
 
 use App\Models\NavigationItem;
+use App\Models\Page;
 use Illuminate\Support\Facades\Cache;
 
 /**
@@ -69,6 +70,29 @@ final class Navigation
         }
 
         return $menus;
+    }
+
+    /**
+     * Footer links to the legal pages that have actually been published, so
+     * a visitor is never sent to a page that does not exist.
+     *
+     * @return list<array{label: string, href: string}>
+     */
+    public static function legalLinks(): array
+    {
+        $titles = Page::published()
+            ->where('template_key', 'legal')
+            ->pluck('title', 'slug');
+
+        $links = [];
+
+        foreach (['privacy', 'terms', 'calculator-disclaimer'] as $slug) {
+            if ($titles->has($slug)) {
+                $links[] = ['label' => (string) $titles->get($slug), 'href' => "/{$slug}"];
+            }
+        }
+
+        return $links;
     }
 
     /** True for an internal path such as /about or a full https:// address. */

@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Support\StructuredData;
 use Carbon\CarbonImmutable;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
@@ -18,7 +19,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // One collector per request (and per queue job), filled by controllers and read by the page head.
+        $this->app->scoped(StructuredData::class);
     }
 
     /**
@@ -36,6 +38,8 @@ class AppServiceProvider extends ServiceProvider
      */
     protected function configureRateLimits(): void
     {
+        RateLimiter::for('calculators', fn (Request $request): Limit => Limit::perMinute(30)->by($request->ip()));
+
         RateLimiter::for('leads', fn (Request $request): Limit => Limit::perMinutes(10, 8)
             ->by($request->ip())
             ->response(fn () => back()->withErrors([

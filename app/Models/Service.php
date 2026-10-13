@@ -40,6 +40,20 @@ class Service extends Model
         return $this->belongsToMany(Faq::class);
     }
 
+    /**
+     * Published services in display order, shaped for public cards.
+     *
+     * @return list<array{slug: string, title: string, summary: string}>
+     */
+    public static function publicSummaries(): array
+    {
+        return array_values(static::published()
+            ->orderBy('sort_order')
+            ->get()
+            ->map(fn (Service $service): array => $service->publicSummary())
+            ->all());
+    }
+
     /** @return array{slug: string, title: string, summary: string} */
     public function publicSummary(): array
     {

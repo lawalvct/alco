@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { Form } from '@inertiajs/vue3';
-import { nextTick, ref } from 'vue';
+import { Form, Link, usePage } from '@inertiajs/vue3';
+import { computed, nextTick, ref } from 'vue';
 import FormField from '@/components/public/FormField.vue';
 import TurnstileWidget from '@/components/public/TurnstileWidget.vue';
 import type { PackageSummary, ServiceOption } from '@/types/publicContent';
@@ -29,6 +29,10 @@ const props = withDefaults(
 const chosenPackage = defineModel<string | null>('package', { default: null });
 
 const summary = ref<HTMLElement | null>(null);
+const page = usePage();
+const privacyLink = computed(() =>
+    page.props.legalLinks.find((link) => link.href === '/privacy'),
+);
 
 const fieldClass =
     'block w-full rounded-md border border-input bg-white px-3.5 py-2.5 text-base text-foreground placeholder:text-navy-400 focus-visible:border-aqua-600 focus-visible:ring-3 focus-visible:ring-aqua-600/25 focus-visible:outline-none aria-invalid:border-destructive';
@@ -324,7 +328,15 @@ function errorCount(errors: Record<string, string | undefined>): number {
                         errors.consent ? 'consent-error' : undefined
                     "
                 />
-                <span>{{ consentText }}</span>
+                <span
+                    >{{ consentText }}
+                    <Link
+                        v-if="privacyLink"
+                        :href="privacyLink.href"
+                        class="font-semibold text-aqua-700 underline-offset-4 hover:underline"
+                        >{{ privacyLink.label }}</Link
+                    ></span
+                >
             </label>
             <p
                 v-if="errors.consent"

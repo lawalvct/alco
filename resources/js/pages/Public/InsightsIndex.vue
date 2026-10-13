@@ -5,10 +5,7 @@ import { computed, ref } from 'vue';
 import ArticleCard from '@/components/public/ArticleCard.vue';
 import PageHero from '@/components/public/PageHero.vue';
 import PublicLayout from '@/layouts/PublicLayout.vue';
-import type {
-    InsightCategory,
-    PaginatedArticles,
-} from '@/types/publicContent';
+import type { InsightCategory, PaginatedArticles } from '@/types/publicContent';
 
 const props = defineProps<{
     articles: PaginatedArticles;
@@ -47,13 +44,22 @@ function submitSearch(): void {
     <PublicLayout>
         <PageHero
             eyebrow="ALCO Insights"
-            :title="selectedCategory ? `${selectedCategory.name} insights` : 'Clearer thinking for your business.'"
-            :intro="selectedCategory?.description || 'Practical articles on accounting, reporting, tax preparation and business finance. We publish only content that has completed ALCO’s editorial review.'"
+            :title="
+                selectedCategory
+                    ? `${selectedCategory.name} insights`
+                    : 'Clearer thinking for your business.'
+            "
+            :intro="
+                selectedCategory?.description ||
+                'Practical articles on accounting, reporting, tax preparation and business finance. We publish only content that has completed ALCO’s editorial review.'
+            "
         />
 
         <main class="bg-muted py-14 sm:py-20">
             <div class="site-container">
-                <div class="flex flex-col justify-between gap-6 lg:flex-row lg:items-center">
+                <div
+                    class="flex flex-col justify-between gap-6 lg:flex-row lg:items-center"
+                >
                     <nav
                         v-if="categories.length"
                         class="flex flex-wrap gap-2"
@@ -62,7 +68,11 @@ function submitSearch(): void {
                         <Link
                             href="/insights"
                             class="rounded-full border px-4 py-2 text-sm font-semibold transition-colors"
-                            :class="!selectedCategory ? 'border-navy-900 bg-navy-900 text-white' : 'border-border bg-white text-navy-900 hover:border-aqua-600'"
+                            :class="
+                                !selectedCategory
+                                    ? 'border-navy-900 bg-navy-900 text-white'
+                                    : 'border-border bg-white text-navy-900 hover:border-aqua-600'
+                            "
                             >All insights</Link
                         >
                         <Link
@@ -70,7 +80,11 @@ function submitSearch(): void {
                             :key="category.slug"
                             :href="`/insights/category/${category.slug}`"
                             class="rounded-full border px-4 py-2 text-sm font-semibold transition-colors"
-                            :class="selectedCategory?.slug === category.slug ? 'border-navy-900 bg-navy-900 text-white' : 'border-border bg-white text-navy-900 hover:border-aqua-600'"
+                            :class="
+                                selectedCategory?.slug === category.slug
+                                    ? 'border-navy-900 bg-navy-900 text-white'
+                                    : 'border-border bg-white text-navy-900 hover:border-aqua-600'
+                            "
                             >{{ category.name }}</Link
                         >
                     </nav>
@@ -88,7 +102,7 @@ function submitSearch(): void {
                             type="search"
                             maxlength="100"
                             placeholder="Search insights"
-                            class="min-h-11 min-w-0 flex-1 rounded-md border border-border bg-white px-4 text-sm outline-none ring-aqua-600 focus:ring-2"
+                            class="min-h-11 min-w-0 flex-1 rounded-md border border-border bg-white px-4 text-sm ring-aqua-600 outline-none focus:ring-2"
                         />
                         <button
                             type="submit"
@@ -100,11 +114,10 @@ function submitSearch(): void {
                     </form>
                 </div>
 
-                <p
-                    v-if="filters.q"
-                    class="mt-8 text-sm text-muted-foreground"
-                >
-                    {{ articles.total }} article{{ articles.total === 1 ? '' : 's' }}
+                <p v-if="filters.q" class="mt-8 text-sm text-muted-foreground">
+                    {{ articles.total }} article{{
+                        articles.total === 1 ? '' : 's'
+                    }}
                     found for “{{ filters.q }}”.
                 </p>
 
@@ -125,8 +138,12 @@ function submitSearch(): void {
                     <h2 class="text-2xl font-semibold text-navy-900">
                         Insights are being prepared.
                     </h2>
-                    <p class="mx-auto mt-3 max-w-xl leading-7 text-muted-foreground">
-                        ALCO is reviewing articles before publication. Please return soon or contact us to discuss your question directly.
+                    <p
+                        class="mx-auto mt-3 max-w-xl leading-7 text-muted-foreground"
+                    >
+                        ALCO is reviewing articles before publication. Please
+                        return soon or contact us to discuss your question
+                        directly.
                     </p>
                     <Link
                         href="/contact"
@@ -145,7 +162,11 @@ function submitSearch(): void {
                             v-if="link.url"
                             :href="link.url"
                             class="inline-flex min-h-10 min-w-10 items-center justify-center rounded-md border px-3 text-sm font-semibold"
-                            :class="link.active ? 'border-navy-900 bg-navy-900 text-white' : 'border-border bg-white text-navy-900 hover:border-aqua-600'"
+                            :class="
+                                link.active
+                                    ? 'border-navy-900 bg-navy-900 text-white'
+                                    : 'border-border bg-white text-navy-900 hover:border-aqua-600'
+                            "
                             v-html="link.label"
                         />
                         <span

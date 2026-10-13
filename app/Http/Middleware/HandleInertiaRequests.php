@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use App\Support\Navigation;
 use App\Support\SiteSettings;
+use App\Support\StructuredData;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -46,6 +47,21 @@ class HandleInertiaRequests extends Middleware
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
             'site' => fn (): array => SiteSettings::publicPayload(),
             'navigation' => fn (): array => Navigation::menus(),
+            'legalLinks' => fn (): array => Navigation::legalLinks(),
+            'canonical' => fn (): string => $this->canonicalUrl($request),
         ];
+    }
+
+    /**
+     * The one address search engines should index for this page: the configured
+     * site address plus the path, without tracking or filter parameters. Only the
+     * page number is kept, so paginated lists stay distinct.
+     */
+    private function canonicalUrl(Request $request): string
+    {
+        $url = StructuredData::absolute($request->path() === '/' ? '/' : $request->path());
+        $page = (int) $request->query('page', 1);
+
+        return $page > 1 ? "{$url}?page={$page}" : $url;
     }
 }

@@ -9,12 +9,16 @@ use App\Models\Post;
 use App\Models\Service;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
+use Illuminate\Support\Str;
 
 class PostForm
 {
@@ -24,13 +28,25 @@ class PostForm
             Section::make('Article identity')
                 ->columns(2)
                 ->schema([
-                    TextInput::make('title')->required()->maxLength(180),
+                    TextInput::make('title')
+                        ->required()
+                        ->maxLength(180)
+                        ->live(debounce: 500)
+                        ->afterStateUpdated(function (Set $set, Get $get, ?string $state, ?string $old): void {
+                            $currentSlug = $get('slug');
+
+                            // Keep a manually edited slug intact, while continuing
+                            // to update the generated one as the title changes.
+                            if (blank($currentSlug) || $currentSlug === Str::slug($old ?? '')) {
+                                $set('slug', Str::slug($state ?? ''));
+                            }
+                        }),
                     TextInput::make('slug')
                         ->required()
                         ->regex('/^[a-z0-9]+(?:-[a-z0-9]+)*$/')
                         ->unique(ignoreRecord: true)
                         ->disabledOn('edit')
-                        ->helperText('Used in the public URL. It is locked after the article is created.'),
+                        ->helperText('Generated from the title while creating. You may edit it before saving; it is locked afterwards.'),
                     Select::make('review_status')
                         ->label('Editorial status')
                         ->options(Post::REVIEW_STATUSES)
@@ -45,7 +61,12 @@ class PostForm
                         ->description('Save changes first. Visitors see this version only after publication. Write plain text paragraphs; the public site renders it safely without raw HTML.')
                         ->columns(2)
                         ->schema([
-                            TextInput::make('author_name')->label('Author')->required()->maxLength(120),
+                            TextInput::make('author_name')
+                                ->label('Author')
+                                ->required()
+                                ->default(fn (): string => auth()->user()?->name ?? '')
+                                ->maxLength(120)
+                                ->helperText('Starts with the signed-in staff member’s name and can be edited for the article byline.'),
                             TextInput::make('reviewer_name')
                                 ->label('Accounting or tax reviewer')
                                 ->maxLength(120)
@@ -79,11 +100,18 @@ class PostForm
                                 ->rows(3)
                                 ->maxLength(350)
                                 ->columnSpanFull(),
-                            Textarea::make('body')
+                            RichEditor::make('body')
+                                ->toolbarButtons([
+                                    ['bold', 'italic', 'underline', 'link'],
+                                    ['h2', 'h3'],
+                                    ['bulletList', 'orderedList', 'blockquote'],
+                                    ['undo', 'redo'],
+                                ])
+                                ->linkProtocols(['https', 'mailto', 'tel'])
                                 ->required()
-                                ->rows(16)
+                                ->minHeight('24rem')
                                 ->maxLength(16000)
-                                ->helperText('Separate paragraphs with a blank line. Use clear heading-style opening sentences because rich HTML is intentionally not accepted here.')
+                                ->helperText('Use headings, emphasis, links, lists and block quotes. Pasted content is cleaned before it is displayed on the public website.')
                                 ->columnSpanFull(),
                             Textarea::make('seo_description')->maxLength(160)->columnSpanFull(),
                         ]),

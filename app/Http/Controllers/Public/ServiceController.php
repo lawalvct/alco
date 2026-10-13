@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\EngagementPackage;
 use App\Models\Faq;
 use App\Models\Service;
+use App\Support\StructuredData;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -24,9 +25,15 @@ class ServiceController extends Controller
         ]);
     }
 
-    public function show(string $slug): Response
+    public function show(string $slug, StructuredData $structuredData): Response
     {
         $service = Service::published()->where('slug', $slug)->firstOrFail();
+
+        $structuredData->breadcrumbs([
+            ['name' => 'Home', 'path' => '/'],
+            ['name' => 'Services', 'path' => '/services'],
+            ['name' => $service->publicSummary()['title'], 'path' => "/services/{$service->slug}"],
+        ]);
 
         return Inertia::render('Public/Service', [
             'service' => $service->publicDetail(),

@@ -1,15 +1,40 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
-import { ArrowRight } from '@lucide/vue';
+import {
+    ArrowRight,
+    BookOpen,
+    ChartNoAxesCombined,
+    FileText,
+    UsersRound,
+} from '@lucide/vue';
 import CtaLink from '@/components/public/CtaLink.vue';
 import FaqList from '@/components/public/FaqList.vue';
 import SectionHeading from '@/components/public/SectionHeading.vue';
-import type { FaqItem, HomeBlock, PackageSummary } from '@/types/publicContent';
+import ServiceCard from '@/components/public/ServiceCard.vue';
+import TeamMemberCard from '@/components/public/TeamMemberCard.vue';
+import type {
+    FaqItem,
+    HomeBlock,
+    PackageSummary,
+    ServiceSummary,
+    TeamProfile,
+} from '@/types/publicContent';
 
+/**
+ * Renders a page's CMS blocks in order. Shared by the homepage and the
+ * About page; blocks that list live data hide themselves when empty.
+ */
 withDefaults(
-    defineProps<{ blocks: HomeBlock[]; packages?: PackageSummary[] }>(),
-    { packages: () => [] },
+    defineProps<{
+        blocks: HomeBlock[];
+        packages?: PackageSummary[];
+        services?: ServiceSummary[];
+        team?: TeamProfile[];
+    }>(),
+    { packages: () => [], services: () => [], team: () => [] },
 );
+
+const serviceIcons = [BookOpen, ChartNoAxesCombined, FileText, UsersRound];
 
 function faqItems(block: HomeBlock): FaqItem[] {
     return (block.data.items ?? []).flatMap((item) =>
@@ -23,7 +48,77 @@ function faqItems(block: HomeBlock): FaqItem[] {
 <template>
     <template v-for="(block, index) in blocks" :key="`${block.type}-${index}`">
         <section
-            v-if="block.type === 'packages' && packages.length"
+            v-if="block.type === 'services' && services.length"
+            class="border-t border-border bg-white py-20 sm:py-24"
+            :aria-labelledby="`home-block-${index}`"
+        >
+            <div class="site-container">
+                <div
+                    class="flex flex-col justify-between gap-6 md:flex-row md:items-end"
+                >
+                    <SectionHeading
+                        :id="`home-block-${index}`"
+                        class="max-w-2xl"
+                        :eyebrow="block.data.eyebrow"
+                        :title="block.data.title"
+                        :description="block.data.body"
+                    />
+                    <CtaLink href="/services" variant="link" icon="arrow-right">
+                        View all services
+                    </CtaLink>
+                </div>
+                <ul class="mt-10 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+                    <li
+                        v-for="(service, serviceIndex) in services"
+                        :key="service.slug"
+                    >
+                        <ServiceCard
+                            class="h-full"
+                            :title="service.title"
+                            :description="service.summary"
+                            :href="`/services/${service.slug}`"
+                            :icon="
+                                serviceIcons[serviceIndex % serviceIcons.length]
+                            "
+                        />
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <section
+            v-else-if="block.type === 'team' && team.length"
+            class="bg-muted py-20 sm:py-24"
+            :aria-labelledby="`home-block-${index}`"
+        >
+            <div class="site-container">
+                <SectionHeading
+                    :id="`home-block-${index}`"
+                    class="max-w-2xl"
+                    :eyebrow="block.data.eyebrow"
+                    :title="block.data.title"
+                    :description="block.data.body"
+                />
+                <ul
+                    class="mt-12 grid gap-6"
+                    :class="
+                        team.length > 2
+                            ? 'md:grid-cols-2 lg:grid-cols-3'
+                            : 'lg:grid-cols-2'
+                    "
+                >
+                    <li v-for="member in team" :key="member.id">
+                        <TeamMemberCard
+                            :member="member"
+                            :stacked="team.length > 2"
+                        />
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <section
+            v-else-if="block.type === 'packages' && packages.length"
             class="border-t border-border bg-white py-20 sm:py-24"
             :aria-labelledby="`home-block-${index}`"
         >
@@ -150,7 +245,7 @@ function faqItems(block: HomeBlock): FaqItem[] {
 
         <section
             v-else-if="block.type === 'process'"
-            class="bg-white py-20 sm:py-24"
+            class="border-t border-border bg-white py-20 sm:py-24"
             :aria-labelledby="`home-block-${index}`"
         >
             <div class="site-container">

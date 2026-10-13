@@ -20,16 +20,31 @@ class PublicPagesTest extends TestCase
     public function test_homepage_navigation_destinations_render(): void
     {
         foreach ([
-            '/about' => 'about',
             '/services' => 'services',
-            '/insights' => 'insights',
-            '/tools' => 'tools',
         ] as $path => $kind) {
             $this->get($path)->assertOk()->assertInertia(fn (Assert $page) => $page
                 ->component('Public/Section')
                 ->where('kind', $kind)
                 ->etc());
         }
+
+        $this->get('/tools')->assertOk()->assertInertia(fn (Assert $page) => $page
+            ->component('Public/ToolsIndex')
+            ->has('tools', 11)
+            ->etc());
+
+        $this->get('/tools/vat')->assertOk()->assertInertia(fn (Assert $page) => $page
+            ->component('Public/Calculator')
+            ->where('tool.slug', 'vat')
+            ->etc());
+
+        $this->get('/insights')->assertOk()->assertInertia(fn (Assert $page) => $page
+            ->component('Public/InsightsIndex')
+            ->etc());
+
+        $this->get('/about')->assertOk()->assertInertia(fn (Assert $page) => $page
+            ->component('Public/About')
+            ->etc());
 
         $this->get('/contact')->assertOk()->assertInertia(fn (Assert $page) => $page
             ->component('Public/Contact')

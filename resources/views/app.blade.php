@@ -3,6 +3,7 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="csrf-token" content="{{ csrf_token() }}">
         <meta name="theme-color" content="#062849">
 
         {{-- Inline script to detect system dark mode preference and apply it immediately --}}
@@ -36,6 +37,10 @@
         @fonts
 
         @vite(['resources/css/app.css', 'resources/js/app.ts', "resources/js/pages/{$page['component']}.vue"])
+        @unless (request()->is('login', 'register', 'forgot-password', 'reset-password/*', 'two-factor-challenge', 'user/*', 'settings/*', 'dashboard'))
+            <script type="application/ld+json">{!! app(\App\Support\StructuredData::class)->json(request()->path() === '/') !!}</script>
+        @endunless
+
         <x-inertia::head>
             <title>{{ config('app.name', 'Laravel') }}</title>
         </x-inertia::head>

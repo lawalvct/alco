@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Concerns\HasPublishedContent;
+use App\Support\ArticleRichText;
 use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -95,14 +96,14 @@ class Post extends Model
         ];
     }
 
-    /** @return array{slug: string, title: string, excerpt: string, body: string, seo_description: string, author_name: string|null, reviewer_name: string|null, reviewed_at: string|null, categories: list<string>, tags: list<string>, published_at: string|null, reading_minutes: int, cover: array{src: string, srcset: string|null, width: int|null, height: int|null, alt: string}|null, sources: list<array{title: string, url: string, accessed_on: string|null}>, related_service_ids: list<int>, related_post_ids: list<int>} */
+    /** @return array{slug: string, title: string, excerpt: string, body_html: string, seo_description: string, author_name: string|null, reviewer_name: string|null, reviewed_at: string|null, categories: list<string>, tags: list<string>, published_at: string|null, reading_minutes: int, cover: array{src: string, srcset: string|null, width: int|null, height: int|null, alt: string}|null, sources: list<array{title: string, url: string, accessed_on: string|null}>, related_service_ids: list<int>, related_post_ids: list<int>} */
     public function publicDetail(): array
     {
         $content = $this->published_data ?? [];
 
         return [
             ...$this->publicSummary(),
-            'body' => is_string($content['body'] ?? null) ? $content['body'] : '',
+            'body_html' => ArticleRichText::toSafeHtml($content['body'] ?? null),
             'seo_description' => is_string($content['seo_description'] ?? null) && $content['seo_description'] !== ''
                 ? $content['seo_description']
                 : (is_string($content['excerpt'] ?? null) ? $content['excerpt'] : ''),
@@ -154,8 +155,29 @@ class Post extends Model
 
     public function canBePublished(): bool
     {
-        return $this->review_status === 'approved'
-            && (! $this->isTaxArticle() || (filled($this->draft_data['reviewer_name'] ?? null) && filled($this->draft_data['reviewed_at'] ?? null)));
+        return $this->publicationBlocker() === null;
+    }
+
+    /**
+     * Explain the saved-state requirement before an admin confirms a publish
+     * action. This is deliberately public to the Filament action so a failed
+     * publication never looks like a button that did nothing.
+     */
+    public function publicationBlocker(): ?string
+    {
+        if ($this->review_status !== 'approved') {
+            return 'Set Editorial status to “Approved for publication”, save the article, then publish it.';
+        }
+
+        if ($this->isTaxArticle() && blank($this->draft_data['reviewer_name'] ?? null)) {
+            return 'Tax & Compliance articles need the accounting or tax reviewer’s name before publication.';
+        }
+
+        if ($this->isTaxArticle() && blank($this->draft_data['reviewed_at'] ?? null)) {
+            return 'Tax & Compliance articles need a review date before publication.';
+        }
+
+        return null;
     }
 
     /**
@@ -165,9 +187,9 @@ class Post extends Model
      */
     public function publish(?CarbonInterface $when = null, ?User $publisher = null): void
     {
-        if (! $this->canBePublished()) {
+        if (($blocker = $this->publicationBlocker()) !== null) {
             throw ValidationException::withMessages([
-                'review_status' => 'Mark the article as approved before publishing. Tax & Compliance articles also need a reviewer name and review date.',
+                'review_status' => $blocker,
             ]);
         }
 

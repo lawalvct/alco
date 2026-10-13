@@ -2,6 +2,7 @@ import type { Directive } from 'vue';
 import type { Auth } from '@/types/auth';
 import type {
     LeadSubmittedFlash,
+    LegalLink,
     SiteInfo,
     SiteNavigation,
 } from '@/types/publicContent';
@@ -28,6 +29,8 @@ declare module '@inertiajs/core' {
             sidebarOpen: boolean;
             site: SiteInfo;
             navigation: SiteNavigation;
+            legalLinks: LegalLink[];
+            canonical: string;
             [key: string]: unknown;
         };
         flashDataType: {

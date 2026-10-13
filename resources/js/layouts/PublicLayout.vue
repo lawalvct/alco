@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Link, usePage } from '@inertiajs/vue3';
+import { Head, Link, usePage } from '@inertiajs/vue3';
 import { ArrowUpRight, MapPin, Menu, Phone, X } from '@lucide/vue';
 import { computed, ref } from 'vue';
 import BrandLockup from '@/components/public/BrandLockup.vue';
@@ -12,6 +12,7 @@ const page = usePage();
 const site = useSite();
 const headerLinks = computed(() => page.props.navigation.header);
 const footerLinks = computed(() => page.props.navigation.footer);
+const legalLinks = computed(() => page.props.legalLinks);
 const menuOpen = ref(false);
 const whatsappPhones = computed(() =>
     site.value.phones.filter((phone) => phone.whatsapp),
@@ -29,14 +30,24 @@ function isActive(link: MenuLink): boolean {
 </script>
 
 <template>
-    <div class="theme-light min-h-screen bg-background text-foreground">
+    <Head>
+        <link
+            head-key="canonical"
+            rel="canonical"
+            :href="page.props.canonical"
+        />
+    </Head>
+
+    <div
+        class="theme-light min-h-screen bg-background text-foreground print:min-h-0"
+    >
         <a
             href="#main-content"
             class="sr-only rounded-md bg-white px-4 py-2.5 text-sm font-semibold text-navy-900 shadow-float focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:outline-2 focus:outline-aqua-600"
             >Skip to content</a
         >
 
-        <div class="bg-aqua-50 text-navy-900">
+        <div class="bg-aqua-50 text-navy-900 print:hidden">
             <div
                 class="site-container flex items-center justify-between gap-3 py-2.5 text-xs font-semibold"
             >
@@ -97,7 +108,7 @@ function isActive(link: MenuLink): boolean {
             </div>
         </div>
 
-        <div class="bg-navy-900 text-white">
+        <div class="bg-navy-900 text-white print:hidden">
             <header class="relative z-30 site-container">
                 <div
                     class="flex min-h-20 items-center justify-between gap-5 border-b border-white/15 lg:min-h-24"
@@ -191,7 +202,7 @@ function isActive(link: MenuLink): boolean {
             <slot />
         </main>
 
-        <footer class="bg-navy-950 text-white/75">
+        <footer class="bg-navy-950 text-white/75 print:hidden">
             <div
                 class="site-container grid gap-10 py-14 md:grid-cols-2 lg:grid-cols-[1.2fr_1fr_1fr]"
             >
@@ -272,9 +283,23 @@ function isActive(link: MenuLink): boolean {
                 </div>
             </div>
             <div class="border-t border-white/10">
-                <p class="site-container py-5 text-xs text-white/60">
-                    © {{ new Date().getFullYear() }} {{ site.name }}
-                </p>
+                <div
+                    class="site-container flex flex-col gap-3 py-5 text-xs text-white/60 sm:flex-row sm:items-center sm:justify-between"
+                >
+                    <p>© {{ new Date().getFullYear() }} {{ site.name }}</p>
+                    <ul
+                        v-if="legalLinks.length"
+                        class="flex flex-wrap gap-x-5 gap-y-2"
+                    >
+                        <li v-for="link in legalLinks" :key="link.href">
+                            <Link
+                                :href="link.href"
+                                class="hover:text-aqua-400"
+                                >{{ link.label }}</Link
+                            >
+                        </li>
+                    </ul>
+                </div>
             </div>
         </footer>
     </div>

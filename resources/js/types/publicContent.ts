@@ -12,7 +12,14 @@ export interface ServiceDetail extends ServiceSummary {
 }
 
 export interface HomeBlock {
-    type: 'intro' | 'audience' | 'process' | 'faq' | 'packages';
+    type:
+        | 'intro'
+        | 'audience'
+        | 'process'
+        | 'faq'
+        | 'packages'
+        | 'services'
+        | 'team';
     data: {
         eyebrow: string;
         title: string;
@@ -25,6 +32,15 @@ export interface HomeBlock {
         }[];
         steps?: { title: string; detail: string }[];
     };
+}
+
+export interface AboutContent {
+    title: string;
+    hero_eyebrow: string;
+    hero_line_one: string;
+    hero_description: string;
+    seo_description?: string | null;
+    blocks: HomeBlock[];
 }
 
 export interface HomeContent {
@@ -130,7 +146,7 @@ export interface ArticleSummary {
 }
 
 export interface ArticleDetail extends ArticleSummary {
-    body: string;
+    body_html: string;
     seo_description: string;
     author_name: string | null;
     reviewer_name: string | null;
@@ -178,4 +194,18 @@ export interface ServiceOption {
 
 export interface LeadSubmittedFlash {
     reference: string | null;
+}
+
+export interface LegalContent {
+    title: string;
+    eyebrow: string;
+    intro: string | null;
+    effective_date: string | null;
+    seo_description: string | null;
+    sections: { heading: string; body: string }[];
+}
+
+export interface LegalLink {
+    label: string;
+    href: string;
 }

@@ -8,11 +8,13 @@ import {
     UsersRound,
 } from '@lucide/vue';
 import { computed } from 'vue';
-import HomeSections from '@/components/HomeSections.vue';
+import PageSections from '@/components/public/PageSections.vue';
 import BrandPattern from '@/components/public/BrandPattern.vue';
 import CtaLink from '@/components/public/CtaLink.vue';
+import CtaPanel from '@/components/public/CtaPanel.vue';
 import HeroSlider from '@/components/public/HeroSlider.vue';
 import SectionHeading from '@/components/public/SectionHeading.vue';
+import ServiceCard from '@/components/public/ServiceCard.vue';
 import PublicLayout from '@/layouts/PublicLayout.vue';
 import { services as fallbackServices } from '@/lib/publicSite';
 import type {
@@ -21,6 +23,7 @@ import type {
     HomeContent,
     PackageSummary,
     ServiceSummary,
+    TeamProfile,
 } from '@/types/publicContent';
 
 const serviceIcons = [BookOpen, ChartNoAxesCombined, FileText, UsersRound];
@@ -52,6 +55,7 @@ const props = withDefaults(
         heroSlides?: HeroSlide[];
         heroSlider?: HeroSliderSettings;
         packages?: PackageSummary[];
+        team?: TeamProfile[];
     }>(),
     {
         home: null,
@@ -59,6 +63,7 @@ const props = withDefaults(
         heroSlides: () => [],
         heroSlider: () => ({ autoplay: true, interval_seconds: 8 }),
         packages: () => [],
+        team: () => [],
     },
 );
 
@@ -229,42 +234,24 @@ const serviceCards = computed(() =>
                     </CtaLink>
                 </div>
                 <div class="mt-10 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-                    <Link
+                    <ServiceCard
                         v-for="(service, index) in serviceCards"
                         :key="service.slug"
+                        :title="service.title"
+                        :description="service.description"
                         :href="service.href"
-                        class="group flex min-h-62 flex-col rounded-xl border border-border bg-muted p-6 transition-colors hover:border-aqua-400 hover:bg-aqua-50 focus-visible:outline-2 focus-visible:outline-aqua-600"
-                    >
-                        <component
-                            :is="serviceIcons[index % serviceIcons.length]"
-                            :size="30"
-                            :stroke-width="1.7"
-                            class="text-aqua-600"
-                            aria-hidden="true"
-                        />
-                        <h3 class="mt-8 text-xl font-semibold">
-                            {{ service.title }}
-                        </h3>
-                        <p
-                            class="mt-3 flex-1 text-sm leading-6 text-muted-foreground"
-                        >
-                            {{ service.description }}
-                        </p>
-                        <span
-                            class="mt-6 inline-flex items-center gap-1.5 text-sm font-semibold text-aqua-700"
-                        >
-                            Learn more
-                            <ArrowUpRight :size="16" aria-hidden="true" />
-                        </span>
-                    </Link>
+                        :icon="serviceIcons[index % serviceIcons.length]"
+                    />
                 </div>
             </div>
         </section>
 
-        <HomeSections
+        <PageSections
             v-if="homeContent.blocks?.length"
             :blocks="homeContent.blocks"
             :packages="packages"
+            :services="publishedServices"
+            :team="team"
         />
 
         <!-- White with a hairline so it stays distinct whichever CMS block precedes it. -->
@@ -311,37 +298,6 @@ const serviceCards = computed(() =>
             </div>
         </section>
 
-        <section
-            class="bg-white pb-20 sm:pb-24"
-            aria-labelledby="contact-title"
-        >
-            <div class="site-container">
-                <div
-                    class="relative isolate overflow-hidden rounded-2xl bg-navy-900 px-6 py-14 text-center sm:px-12 sm:py-18"
-                >
-                    <BrandPattern
-                        class="absolute -bottom-24 -left-20 -z-10 hidden h-90 w-72 text-aqua-400/20 md:block"
-                    />
-                    <BrandPattern
-                        class="absolute -top-24 -right-20 -z-10 hidden h-90 w-72 rotate-180 text-aqua-400/20 md:block"
-                    />
-                    <SectionHeading
-                        id="contact-title"
-                        class="mx-auto max-w-2xl"
-                        tone="dark"
-                        eyebrow="Let's talk"
-                        title="Ready to bring more clarity to your business?"
-                        description="Tell us what you need help with and begin a conversation with ALCO."
-                    />
-                    <CtaLink
-                        href="/book-consultation"
-                        variant="accent"
-                        class="mt-8"
-                    >
-                        Book a Consultation
-                    </CtaLink>
-                </div>
-            </div>
-        </section>
+        <CtaPanel id="contact-title" flush-top />
     </PublicLayout>
 </template>

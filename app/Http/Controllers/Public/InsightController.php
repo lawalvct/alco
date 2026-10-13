@@ -7,6 +7,7 @@ use App\Models\ArticleCategory;
 use App\Models\Post;
 use App\Models\Service;
 use App\Models\TopicHub;
+use App\Support\StructuredData;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -29,13 +30,14 @@ class InsightController extends Controller
         return $this->listing($request, $selectedCategory);
     }
 
-    public function show(string $slug): Response
+    public function show(string $slug, StructuredData $structuredData): Response
     {
         $post = Post::published()
             ->where('slug', $slug)
             ->with(['categories', 'tags', 'coverMediaAsset'])
             ->firstOrFail();
         $detail = $post->publicDetail();
+        $this->describeArticle($structuredData, $detail);
         $relatedPosts = Post::publishedSummaries($detail['related_post_ids']);
 
         if ($relatedPosts === []) {
@@ -56,6 +58,34 @@ class InsightController extends Controller
             'post' => $detail,
             'relatedPosts' => $relatedPosts,
             'relatedServices' => $relatedServices,
+        ]);
+    }
+
+    /** @param  array<string, mixed>  $detail */
+    private function describeArticle(StructuredData $structuredData, array $detail): void
+    {
+        $path = "/insights/{$detail['slug']}";
+        $modified = $detail['reviewed_at'] ?? $detail['published_at'];
+
+        $structuredData->add(array_filter([
+            '@type' => 'BlogPosting',
+            'headline' => $detail['title'],
+            'description' => $detail['seo_description'] ?: null,
+            'url' => StructuredData::absolute($path),
+            'mainEntityOfPage' => StructuredData::absolute($path),
+            'datePublished' => $detail['published_at'],
+            'dateModified' => $modified,
+            'author' => $detail['author_name']
+                ? ['@type' => 'Person', 'name' => $detail['author_name']]
+                : ['@id' => StructuredData::absolute('/#organization')],
+            'publisher' => ['@id' => StructuredData::absolute('/#organization')],
+            'image' => isset($detail['cover']['src']) ? StructuredData::absolute($detail['cover']['src']) : null,
+        ], fn (mixed $value): bool => $value !== null && $value !== ''));
+
+        $structuredData->breadcrumbs([
+            ['name' => 'Home', 'path' => '/'],
+            ['name' => 'Insights', 'path' => '/insights'],
+            ['name' => (string) $detail['title'], 'path' => $path],
         ]);
     }
 

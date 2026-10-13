@@ -11,6 +11,7 @@ use App\Models\User;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Validation\ValidationException;
 
 /**
  * Publish/archive header actions for edit pages of draft-and-publish
@@ -26,13 +27,45 @@ trait HasPublicationActions
                 ->label('Publish saved draft')
                 ->color('success')
                 ->requiresConfirmation()
-                ->modalDescription('Visitors will see the last saved version. Save any changes on this screen first.')
+                ->modalDescription(function (): string {
+                    $record = $this->publishableRecord();
+
+                    if ($record instanceof Post && ($blocker = $record->publicationBlocker()) !== null) {
+                        return $blocker.' Save any changes on this screen first.';
+                    }
+
+                    return 'Visitors will see the last saved version. Save any changes on this screen first.';
+                })
+                ->modalSubmitActionLabel("Publish {$label}")
                 ->action(function () use ($label): void {
                     $record = $this->publishableRecord();
                     $user = $this->publishingUser();
 
                     Gate::forUser($user)->authorize('publish', $record);
-                    $record->publish(publisher: $user);
+
+                    if ($record instanceof Post && ($blocker = $record->publicationBlocker()) !== null) {
+                        Notification::make()
+                            ->title("{$label} is not ready to publish")
+                            ->body($blocker)
+                            ->danger()
+                            ->persistent()
+                            ->send();
+
+                        return;
+                    }
+
+                    try {
+                        $record->publish(publisher: $user);
+                    } catch (ValidationException $exception) {
+                        Notification::make()
+                            ->title("{$label} could not be published")
+                            ->body(collect($exception->errors())->flatten()->implode(' '))
+                            ->danger()
+                            ->persistent()
+                            ->send();
+
+                        return;
+                    }
 
                     Notification::make()->title("{$label} draft published")->success()->send();
                 }),

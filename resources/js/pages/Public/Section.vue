@@ -7,22 +7,17 @@ import PageHero from '@/components/public/PageHero.vue';
 import SectionHeading from '@/components/public/SectionHeading.vue';
 import PublicLayout from '@/layouts/PublicLayout.vue';
 import { plannedTools, services as fallbackServices } from '@/lib/publicSite';
-import type {
-    PackageSummary,
-    ServiceSummary,
-    TeamProfile,
-} from '@/types/publicContent';
+import type { PackageSummary, ServiceSummary } from '@/types/publicContent';
 
-type SectionKind = 'about' | 'services' | 'insights' | 'tools';
+type SectionKind = 'services' | 'insights' | 'tools';
 
 const props = withDefaults(
     defineProps<{
         kind: SectionKind;
         publishedServices?: ServiceSummary[];
         packages?: PackageSummary[];
-        team?: TeamProfile[];
     }>(),
-    { publishedServices: () => [], packages: () => [], team: () => [] },
+    { publishedServices: () => [], packages: () => [] },
 );
 
 const serviceCards = computed(() =>
@@ -43,11 +38,6 @@ const pageContent: Record<
     SectionKind,
     { eyebrow: string; title: string; intro: string }
 > = {
-    about: {
-        eyebrow: 'About ALCO',
-        title: 'Accounting support with a clear purpose.',
-        intro: 'ALCO Associate Solutions is an Accounting and Auditing Consultancy based in Ebute-Metta, Lagos.',
-    },
     services: {
         eyebrow: 'Our services',
         title: 'The right support for your numbers and your next decision.',
@@ -71,7 +61,8 @@ const content = computed(() => pageContent[props.kind]);
 <template>
     <Head :title="content.title">
         <meta name="description" :content="content.intro" />
-        <meta name="robots" content="noindex,follow" />
+        <!-- The tools page is a placeholder until the calculators are published. -->
+        <meta v-if="kind === 'tools'" name="robots" content="noindex,follow" />
     </Head>
 
     <PublicLayout>
@@ -145,74 +136,7 @@ const content = computed(() => pageContent[props.kind]);
         </template>
 
         <section v-else class="site-container py-16 sm:py-20">
-            <template v-if="kind === 'about'">
-                <div class="grid gap-10 lg:grid-cols-[1.2fr_0.8fr]">
-                    <div>
-                        <h2 class="text-2xl font-semibold">
-                            Professional Accounting Services.
-                        </h2>
-                        <p
-                            class="mt-4 max-w-2xl text-base leading-7 text-muted-foreground"
-                        >
-                            Bookkeeping, financial reporting, tax filings and
-                            business solutions are the focus of our work.
-                        </p>
-                        <CtaLink
-                            href="/services"
-                            variant="link"
-                            icon="arrow-right"
-                            class="mt-7"
-                        >
-                            Explore our services
-                        </CtaLink>
-                    </div>
-                    <div v-if="team.length" class="rounded-xl bg-aqua-50 p-7">
-                        <h2 class="text-xl font-semibold">Leadership</h2>
-                        <ul class="mt-5 grid gap-6">
-                            <li
-                                v-for="member in team"
-                                :key="member.id"
-                                class="flex gap-4"
-                            >
-                                <img
-                                    v-if="member.portrait"
-                                    :src="member.portrait.src"
-                                    :srcset="
-                                        member.portrait.srcset ?? undefined
-                                    "
-                                    sizes="64px"
-                                    alt=""
-                                    :width="member.portrait.width ?? undefined"
-                                    :height="
-                                        member.portrait.height ?? undefined
-                                    "
-                                    loading="lazy"
-                                    class="size-16 shrink-0 rounded-full object-cover"
-                                />
-                                <div>
-                                    <p class="text-base font-semibold">
-                                        {{ member.name }}
-                                    </p>
-                                    <p
-                                        v-if="member.role"
-                                        class="text-sm font-medium text-aqua-700"
-                                    >
-                                        {{ member.role }}
-                                    </p>
-                                    <p
-                                        v-if="member.bio"
-                                        class="mt-2 text-sm leading-6 whitespace-pre-line text-muted-foreground"
-                                    >
-                                        {{ member.bio }}
-                                    </p>
-                                </div>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </template>
-
-            <template v-else-if="kind === 'tools'">
+            <template v-if="kind === 'tools'">
                 <h2 class="text-2xl font-semibold">Planned tools</h2>
                 <p
                     class="mt-3 max-w-2xl text-base leading-7 text-muted-foreground"

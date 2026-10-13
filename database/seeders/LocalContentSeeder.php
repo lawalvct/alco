@@ -100,6 +100,8 @@ class LocalContentSeeder extends Seeder
             $home->publish();
         }
 
+        $this->seedAboutPage();
+
         foreach ($this->services() as $position => $item) {
             $service = Service::firstOrCreate(
                 ['slug' => $item['slug']],
@@ -148,6 +150,69 @@ class LocalContentSeeder extends Seeder
             );
 
             $parent = $package;
+        }
+    }
+
+    /**
+     * Provisional About page built only from confirmed facts (category,
+     * address, focus areas). ALCO's own story should replace the intro.
+     */
+    private function seedAboutPage(): void
+    {
+        $about = Page::firstOrCreate(
+            ['slug' => 'about'],
+            [
+                'title' => 'About',
+                'template_key' => 'about',
+                'draft_data' => [
+                    'hero_eyebrow' => 'About ALCO',
+                    'hero_line_one' => 'Accounting support with a clear purpose.',
+                    'hero_description' => 'ALCO Associate Solutions is an Accounting and Auditing Consultancy based in Ebute-Metta, Lagos.',
+                    'seo_description' => 'About ALCO Associate Solutions, an Accounting and Auditing Consultancy in Ebute-Metta, Lagos, and the people behind it.',
+                    'blocks' => [
+                        [
+                            'type' => 'intro',
+                            'data' => [
+                                'eyebrow' => 'Who we are',
+                                'title' => 'Professional accounting services from Ebute-Metta, Lagos.',
+                                'body' => 'ALCO Associate Solutions is registered as an Accounting and Auditing Consultancy and works from 18, Lagos Street, Ebute-Metta. Our work focuses on bookkeeping, financial reporting, tax filings and business solutions, so the people running a business can see their numbers clearly and plan with confidence.',
+                            ],
+                        ],
+                        [
+                            'type' => 'services',
+                            'data' => [
+                                'eyebrow' => 'What we do',
+                                'title' => 'Four areas of focus.',
+                                'body' => 'Each service starts with a conversation about your records, your obligations and the decisions ahead.',
+                            ],
+                        ],
+                        [
+                            'type' => 'process',
+                            'data' => [
+                                'eyebrow' => 'How we work',
+                                'title' => 'A straightforward conversation comes first.',
+                                'steps' => [
+                                    ['title' => 'Tell us what you need', 'detail' => 'Share the service or financial question you would like to discuss.'],
+                                    ['title' => 'Explore the scope', 'detail' => 'We talk through your goals, available information and possible next steps.'],
+                                    ['title' => 'Agree the way forward', 'detail' => 'If there is a fit, we can define the work before it begins.'],
+                                ],
+                            ],
+                        ],
+                        [
+                            'type' => 'team',
+                            'data' => [
+                                'eyebrow' => 'Leadership',
+                                'title' => 'The people behind ALCO.',
+                                'body' => null,
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        );
+
+        if ($about->wasRecentlyCreated) {
+            $about->publish();
         }
     }
 

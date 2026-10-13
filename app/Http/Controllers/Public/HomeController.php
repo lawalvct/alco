@@ -7,6 +7,7 @@ use App\Models\EngagementPackage;
 use App\Models\HomepageHeroSlide;
 use App\Models\Page;
 use App\Models\Service;
+use App\Models\TeamMember;
 use App\Support\HeroImageSpec;
 use App\Support\SiteSettings;
 use Inertia\Inertia;
@@ -20,11 +21,8 @@ class HomeController extends Controller
 
         return Inertia::render('Welcome', [
             'home' => $home?->publicContent(),
-            'publishedServices' => Service::published()
-                ->orderBy('sort_order')
-                ->get()
-                ->map(fn (Service $service): array => $service->publicSummary())
-                ->all(),
+            'publishedServices' => Service::publicSummaries(),
+            'team' => TeamMember::publicProfiles(),
             'heroSlides' => HomepageHeroSlide::visible()
                 ->with(['mediaAsset', 'mobileMediaAsset'])
                 ->limit(HeroImageSpec::MAX_VISIBLE_SLIDES)

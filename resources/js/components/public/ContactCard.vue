@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Mail, Phone } from '@lucide/vue';
+import { Mail, MessageCircle, Phone } from '@lucide/vue';
 import { useSite } from '@/composables/useSite';
 
 withDefaults(
@@ -15,6 +15,10 @@ withDefaults(
 );
 
 const site = useSite();
+
+const whatsappMessage = encodeURIComponent(
+    'Hello ALCO, I would like to ask about your services.',
+);
 </script>
 
 <template>
@@ -33,15 +37,33 @@ const site = useSite();
                     email
                 }}</a
             >
-            <a
+            <div
                 v-for="phone in site.phones"
                 :key="phone.tel"
-                :href="`tel:${phone.tel}`"
-                class="inline-flex w-fit items-center gap-3 text-lg font-semibold text-aqua-700 hover:underline"
-                ><Phone :size="19" class="shrink-0" aria-hidden="true" />{{
-                    phone.display
-                }}</a
+                class="flex flex-wrap items-center gap-x-4 gap-y-2"
             >
+                <a
+                    :href="`tel:${phone.tel}`"
+                    class="inline-flex w-fit items-center gap-3 text-lg font-semibold text-aqua-700 hover:underline"
+                    ><Phone :size="19" class="shrink-0" aria-hidden="true" />{{
+                        phone.display
+                    }}</a
+                >
+                <a
+                    v-if="phone.whatsapp"
+                    :href="`${phone.whatsapp}?text=${whatsappMessage}`"
+                    target="_blank"
+                    rel="noopener"
+                    class="inline-flex min-h-9 items-center gap-2 rounded-full border border-aqua-600 px-3.5 text-sm font-semibold text-aqua-700 transition-colors hover:bg-aqua-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-aqua-600"
+                    ><MessageCircle
+                        :size="16"
+                        class="shrink-0"
+                        aria-hidden="true"
+                    />Chat on WhatsApp<span class="sr-only">
+                        with {{ phone.display }} (opens in a new tab)</span
+                    ></a
+                >
+            </div>
         </div>
     </div>
 </template>
