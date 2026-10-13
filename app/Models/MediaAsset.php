@@ -114,6 +114,12 @@ class MediaAsset extends Model
         return $this->hasMany(TeamMember::class, 'portrait_media_asset_id');
     }
 
+    /** @return HasMany<Post, $this> */
+    public function postCovers(): HasMany
+    {
+        return $this->hasMany(Post::class, 'cover_media_asset_id');
+    }
+
     public function url(): string
     {
         return Storage::disk($this->disk)->url($this->path);
@@ -154,7 +160,8 @@ class MediaAsset extends Model
     {
         return $this->heroSlides()->count()
             + $this->mobileHeroSlides()->count()
-            + $this->teamPortraits()->count();
+            + $this->teamPortraits()->count()
+            + $this->postCovers()->count();
     }
 
     public function isInUse(): bool

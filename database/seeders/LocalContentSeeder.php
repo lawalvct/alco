@@ -2,13 +2,17 @@
 
 namespace Database\Seeders;
 
+use App\Models\ArticleCategory;
+use App\Models\ArticleTag;
 use App\Models\EngagementPackage;
 use App\Models\Faq;
 use App\Models\HomepageHeroSlide;
 use App\Models\MediaAsset;
 use App\Models\Page;
+use App\Models\Post;
 use App\Models\Service;
 use App\Models\TeamMember;
+use App\Models\TopicHub;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Storage;
 use RuntimeException;
@@ -114,6 +118,7 @@ class LocalContentSeeder extends Seeder
         $this->seedPackages();
         $this->seedTeam();
         $this->seedHeroSlides();
+        $this->seedInsights();
     }
 
     /**
@@ -216,6 +221,124 @@ class LocalContentSeeder extends Seeder
                 'is_visible' => false,
             ]);
         }
+    }
+
+    /**
+     * Initial local-only Insights material. The VAT series stays as a draft
+     * until an ALCO reviewer supplies approved sources and signs it off.
+     */
+    private function seedInsights(): void
+    {
+        $categories = collect([
+            ['name' => 'Tax & Compliance', 'slug' => 'tax-compliance'],
+            ['name' => 'Bookkeeping', 'slug' => 'bookkeeping'],
+            ['name' => 'Financial Reporting', 'slug' => 'financial-reporting'],
+            ['name' => 'Business Finance', 'slug' => 'business-finance'],
+            ['name' => 'Payroll', 'slug' => 'payroll'],
+            ['name' => 'Accounting Guides', 'slug' => 'accounting-guides'],
+        ])->mapWithKeys(fn (array $item, int $position): array => [
+            $item['slug'] => ArticleCategory::firstOrCreate(
+                ['slug' => $item['slug']],
+                ['name' => $item['name'], 'is_visible' => true, 'sort_order' => $position + 1],
+            ),
+        ]);
+
+        $tags = collect(['VAT' => 'vat', 'Record keeping' => 'record-keeping', 'Business decisions' => 'business-decisions'])
+            ->mapWithKeys(fn (string $slug, string $name): array => [
+                $slug => ArticleTag::firstOrCreate(['slug' => $slug], ['name' => $name]),
+            ]);
+
+        $sample = Post::firstOrCreate(
+            ['slug' => 'how-organised-records-support-clearer-decisions'],
+            [
+                'title' => 'How organised records support clearer decisions',
+                'review_status' => 'approved',
+                'draft_data' => [
+                    'author_name' => 'ALCO Associate Solutions',
+                    'excerpt' => 'A practical starting point for turning everyday business records into information you can discuss and use.',
+                    'body' => "Good records help a business see its activity more clearly. When transactions are captured consistently, it becomes easier to ask useful questions about income, costs and cash movement.\n\nA sensible starting point is to keep source documents together, record transactions regularly and reconcile the information against available bank or payment records. The exact process should fit the way your business operates.\n\nIf your records feel difficult to use, an accounting discussion can help identify what needs attention first. This article is a local prototype for review and should be refined with ALCO before production publication.",
+                    'seo_description' => 'A practical introduction to organised business records from ALCO Associate Solutions.',
+                    'category_ids' => [$categories['bookkeeping']->id, $categories['accounting-guides']->id],
+                    'tag_ids' => [$tags['record-keeping']->id, $tags['business-decisions']->id],
+                    'related_service_ids' => Service::query()->where('slug', 'bookkeeping')->pluck('id')->all(),
+                    'related_post_ids' => [],
+                    'sources' => [],
+                ],
+            ],
+        );
+
+        if ($sample->wasRecentlyCreated) {
+            $sample->publish();
+        }
+
+        $vatPosts = [];
+
+        foreach ($this->vatInsights() as $item) {
+            $post = Post::firstOrCreate(
+                ['slug' => $item['slug']],
+                [
+                    'title' => $item['title'],
+                    'review_status' => 'in_review',
+                    'draft_data' => [
+                        'author_name' => 'ALCO Associate Solutions',
+                        'excerpt' => $item['excerpt'],
+                        'body' => $item['body'],
+                        'seo_description' => $item['excerpt'],
+                        'category_ids' => [$categories['tax-compliance']->id],
+                        'tag_ids' => [$tags['vat']->id],
+                        'related_service_ids' => Service::query()->where('slug', 'tax-filings')->pluck('id')->all(),
+                        'related_post_ids' => [],
+                        'sources' => [],
+                    ],
+                ],
+            );
+            $vatPosts[] = $post->id;
+        }
+
+        TopicHub::firstOrCreate(
+            ['slug' => 'vat'],
+            [
+                'title' => 'VAT guidance for businesses',
+                'sort_order' => 1,
+                'draft_data' => [
+                    'intro' => 'A place for ALCO’s reviewed educational content about VAT preparation, record keeping and business questions.',
+                    'seo_description' => 'Reviewed educational VAT content from ALCO Associate Solutions.',
+                    'featured_post_id' => $vatPosts[0] ?? null,
+                    'post_ids' => $vatPosts,
+                ],
+            ],
+        );
+    }
+
+    /** @return list<array{slug: string, title: string, excerpt: string, body: string}> */
+    private function vatInsights(): array
+    {
+        return [
+            [
+                'slug' => 'understanding-vat-in-nigeria-a-practical-guide-for-businesses',
+                'title' => 'Understanding VAT in Nigeria: A Practical Guide for Businesses',
+                'excerpt' => 'Draft guide awaiting professional review of current rules, applicability, dates and sources.',
+                'body' => 'This draft is a framework for an educational VAT guide. Before publication, ALCO’s designated reviewer must confirm the applicable legislation, source materials, rates, exemptions, deadlines and the limits of the guidance.\n\nThe final guide will help business owners prepare useful questions and records for a VAT discussion. It will not replace advice that considers the circumstances of a particular business.',
+            ],
+            [
+                'slug' => 'vat-inclusive-and-exclusive-pricing',
+                'title' => 'VAT-inclusive and VAT-exclusive pricing',
+                'excerpt' => 'Draft explainer for the difference between inclusive and exclusive pricing.',
+                'body' => 'This article draft will explain the concepts behind VAT-inclusive and VAT-exclusive prices using reviewed examples. Current rules and examples must be confirmed before publication.\n\nA future standalone calculator will provide a controlled calculation experience after its settings have been reviewed and approved.',
+            ],
+            [
+                'slug' => 'records-to-prepare-for-vat-filing',
+                'title' => 'Records to prepare for VAT filing',
+                'excerpt' => 'Draft checklist of records to review before a VAT filing discussion.',
+                'body' => 'This article draft will help readers organise records ahead of a VAT filing discussion. It will be completed only after ALCO confirms the appropriate record categories and references.\n\nBusinesses should avoid treating a general checklist as a substitute for advice about their own transactions and obligations.',
+            ],
+            [
+                'slug' => 'common-vat-preparation-mistakes',
+                'title' => 'Common VAT preparation mistakes to discuss early',
+                'excerpt' => 'Draft discussion points for identifying VAT preparation issues early.',
+                'body' => 'This draft will become a practical discussion guide once the content has completed professional review. It will focus on record organisation and questions to raise, without making unsupported claims about tax outcomes.\n\nALCO will add verified sources and a review date before this article is published.',
+            ],
+        ];
     }
 
     /** @return list<array{slug: string, title: string, summary: string, audience: string, inclusions: list<string>, services: list<string>}> */

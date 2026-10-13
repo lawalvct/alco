@@ -4,7 +4,9 @@ namespace App\Filament\Concerns;
 
 use App\Models\EngagementPackage;
 use App\Models\Page;
+use App\Models\Post;
 use App\Models\Service;
+use App\Models\TopicHub;
 use App\Models\User;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
@@ -51,11 +53,11 @@ trait HasPublicationActions
         ];
     }
 
-    private function publishableRecord(): Page|Service|EngagementPackage
+    private function publishableRecord(): Page|Service|EngagementPackage|Post|TopicHub
     {
         $record = $this->getRecord();
 
-        abort_unless($record instanceof Page || $record instanceof Service || $record instanceof EngagementPackage, 403);
+        abort_unless($record instanceof Page || $record instanceof Service || $record instanceof EngagementPackage || $record instanceof Post || $record instanceof TopicHub, 403);
 
         return $record;
     }

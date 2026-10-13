@@ -115,6 +115,62 @@ export interface SiteNavigation {
     footer: MenuLink[];
 }
 
+export interface ArticleCover extends ImageSource {
+    alt: string;
+}
+
+export interface ArticleSummary {
+    slug: string;
+    title: string;
+    excerpt: string;
+    categories: string[];
+    published_at: string | null;
+    reading_minutes: number;
+    cover: ArticleCover | null;
+}
+
+export interface ArticleDetail extends ArticleSummary {
+    body: string;
+    seo_description: string;
+    author_name: string | null;
+    reviewer_name: string | null;
+    reviewed_at: string | null;
+    tags: string[];
+    sources: { title: string; url: string; accessed_on: string | null }[];
+    related_service_ids: number[];
+    related_post_ids: number[];
+}
+
+export interface InsightCategory {
+    slug: string;
+    name: string;
+    description?: string | null;
+    seo_description?: string | null;
+}
+
+export interface PaginationLink {
+    url: string | null;
+    label: string;
+    active: boolean;
+}
+
+export interface PaginatedArticles {
+    data: ArticleSummary[];
+    links: PaginationLink[];
+    current_page: number;
+    last_page: number;
+    total: number;
+}
+
+export interface TopicHubContent {
+    slug: string;
+    title: string;
+    intro: string;
+    seo_description: string;
+    featured: ArticleSummary | null;
+    articles: ArticleSummary[];
+}
+
 export interface ServiceOption {
     id: number;
     title: string;

@@ -35,6 +35,7 @@ defineProps<{
             >
                 {{ intro }}
             </p>
+            <slot name="after-intro" />
         </div>
     </section>
 </template>

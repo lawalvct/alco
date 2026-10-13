@@ -5,6 +5,7 @@ use App\Http\Controllers\Public\ConsultationController;
 use App\Http\Controllers\Public\ContactController;
 use App\Http\Controllers\Public\FaqController;
 use App\Http\Controllers\Public\HomeController;
+use App\Http\Controllers\Public\InsightController;
 use App\Http\Controllers\Public\ServiceController;
 use Illuminate\Support\Facades\Route;
 
@@ -13,7 +14,10 @@ Route::get('/', HomeController::class)->name('home');
 Route::get('/about', AboutController::class)->name('about');
 Route::get('/services', [ServiceController::class, 'index'])->name('services.index');
 Route::get('/services/{slug}', [ServiceController::class, 'show'])->name('services.show');
-Route::inertia('/insights', 'Public/Section', ['kind' => 'insights'])->name('insights.index');
+Route::get('/insights', [InsightController::class, 'index'])->name('insights.index');
+Route::get('/insights/topic/{slug}', [InsightController::class, 'topic'])->name('insights.topic');
+Route::get('/insights/category/{category}', [InsightController::class, 'category'])->name('insights.category');
+Route::get('/insights/{slug}', [InsightController::class, 'show'])->name('insights.show');
 Route::inertia('/tools', 'Public/Section', ['kind' => 'tools'])->name('tools.index');
 Route::get('/faq', FaqController::class)->name('faq');
 

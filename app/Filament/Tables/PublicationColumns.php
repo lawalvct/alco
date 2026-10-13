@@ -4,7 +4,9 @@ namespace App\Filament\Tables;
 
 use App\Models\EngagementPackage;
 use App\Models\Page;
+use App\Models\Post;
 use App\Models\Service;
+use App\Models\TopicHub;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -27,7 +29,7 @@ final class PublicationColumns
                 }),
             IconColumn::make('unpublished_changes')
                 ->label('Draft changes')
-                ->state(fn (Page|Service|EngagementPackage $record): bool => $record->hasUnpublishedChanges())
+                ->state(fn (Page|Service|EngagementPackage|Post|TopicHub $record): bool => $record->hasUnpublishedChanges())
                 ->boolean()
                 ->trueIcon(Heroicon::OutlinedPencilSquare)
                 ->trueColor('warning')
