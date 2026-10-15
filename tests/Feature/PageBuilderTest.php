@@ -142,4 +142,133 @@ class PageBuilderTest extends TestCase
             ->assertSet('data.draft_data.blocks.0.type', 'intro')
             ->assertSet('data.draft_data.blocks.1.type', 'process');
     }
+
+    public function test_all_page_block_bodies_keep_safe_rich_text_formatting(): void
+    {
+        $blocks = collect(['services', 'team', 'packages', 'intro', 'audience', 'rich_text'])
+            ->map(fn (string $type): array => [
+                'type' => $type,
+                'data' => [
+                    'eyebrow' => 'Overview',
+                    'title' => ucfirst($type),
+                    'body' => '<p><strong>Clear advice</strong> for owners.</p><script>alert(1)</script>',
+                ],
+            ])->all();
+
+        $page = Page::factory()->create([
+            'slug' => 'rich-page',
+            'template_key' => 'standard',
+            'draft_data' => [
+                'hero_eyebrow' => 'Overview',
+                'hero_line_one' => 'Rich page',
+                'hero_description' => 'A page with formatted sections.',
+                'blocks' => $blocks,
+            ],
+        ]);
+        $page->publish();
+
+        $publicBlocks = $page->publicContent()['blocks'];
+
+        foreach ($publicBlocks as $block) {
+            $this->assertStringContainsString('<strong>Clear advice</strong>', $block['data']['body_html']);
+            $this->assertStringNotContainsString('<script>', $block['data']['body_html']);
+            $this->assertArrayNotHasKey('body', $block['data']);
+        }
+
+        $this->get('/pages/rich-page')->assertOk()->assertInertia(fn (Assert $response) => $response
+            ->where('content.blocks.0.data.body_html', $publicBlocks[0]['data']['body_html'])
+            ->etc());
+    }
+
+    public function test_admin_can_publish_testimonial_highlights_resource_links_and_cta_blocks(): void
+    {
+        $this->actingAs(User::factory()->create(['is_admin' => true]));
+        $page = Page::factory()->create(['slug' => 'block-showcase', 'template_key' => 'standard']);
+
+        Livewire::test(EditPage::class, ['record' => $page->id])
+            ->fillForm(['draft_data' => [
+                'hero_eyebrow' => 'Showcase',
+                'hero_line_one' => 'Block showcase',
+                'hero_description' => 'Examples of reusable sections.',
+                'blocks' => [
+                    ['type' => 'testimonial', 'data' => [
+                        'eyebrow' => 'Feedback', 'title' => 'A client perspective',
+                        'quote' => 'A helpful test quote.', 'author' => 'Test Client', 'context' => 'Business owner',
+                    ]],
+                    ['type' => 'highlights', 'data' => [
+                        'title' => 'Highlights',
+                        'items' => [
+                            ['label' => 'First', 'detail' => 'First detail.'],
+                            ['label' => 'Second', 'detail' => 'Second detail.'],
+                        ],
+                    ]],
+                    ['type' => 'resource_links', 'data' => [
+                        'title' => 'Explore more',
+                        'items' => [['label' => 'Insights', 'detail' => 'Read our articles.', 'href' => '/insights']],
+                    ]],
+                    ['type' => 'cta', 'data' => [
+                        'eyebrow' => 'Let’s talk', 'title' => 'Ready to begin?',
+                        'description' => 'Tell us what you need.',
+                        'button_label' => 'Contact ALCO', 'button_href' => '/contact',
+                    ]],
+                ],
+            ]])
+            ->callAction('saveAndPublish')
+            ->assertHasNoFormErrors();
+
+        $this->get('/pages/block-showcase')->assertOk()->assertInertia(fn (Assert $response) => $response
+            ->where('content.blocks.0.data.quote', 'A helpful test quote.')
+            ->where('content.blocks.1.data.items.1.label', 'Second')
+            ->where('content.blocks.2.data.items.0.href', '/insights')
+            ->where('content.blocks.3.data.button_href', '/contact')
+            ->etc());
+    }
+
+    public function test_published_block_links_are_sanitized_even_if_content_bypasses_the_editor(): void
+    {
+        $page = Page::factory()->create([
+            'slug' => 'unsafe-links',
+            'template_key' => 'standard',
+            'draft_data' => [
+                'blocks' => [
+                    ['type' => 'resource_links', 'data' => ['items' => [
+                        ['label' => 'Safe', 'href' => '/contact'],
+                        ['label' => 'Unsafe', 'href' => 'javascript:alert(1)'],
+                    ]]],
+                    ['type' => 'cta', 'data' => ['title' => 'Get in touch', 'button_href' => 'javascript:alert(1)']],
+                ],
+            ],
+        ]);
+        $page->publish();
+
+        $blocks = $page->publicContent()['blocks'];
+        $this->assertCount(1, $blocks[0]['data']['items']);
+        $this->assertSame('/contact', $blocks[0]['data']['items'][0]['href']);
+        $this->assertSame('/book-consultation', $blocks[1]['data']['button_href']);
+    }
+
+    public function test_admin_can_insert_the_lets_talk_cta_on_the_homepage(): void
+    {
+        $this->actingAs(User::factory()->create(['is_admin' => true]));
+        $home = Page::factory()->create(['slug' => 'home', 'template_key' => 'home']);
+
+        Livewire::test(EditPage::class, ['record' => $home->id])
+            ->fillForm(['draft_data.blocks' => [[
+                'type' => 'cta',
+                'data' => [
+                    'eyebrow' => 'Let’s talk',
+                    'title' => 'Need help with your accounts?',
+                    'description' => 'Start a conversation with ALCO.',
+                    'button_label' => 'Contact us',
+                    'button_href' => '/contact',
+                ],
+            ]]])
+            ->callAction('saveAndPublish')
+            ->assertHasNoFormErrors();
+
+        $this->get('/')->assertOk()->assertInertia(fn (Assert $response) => $response
+            ->where('home.blocks.0.type', 'cta')
+            ->where('home.blocks.0.data.button_label', 'Contact us')
+            ->etc());
+    }
 }

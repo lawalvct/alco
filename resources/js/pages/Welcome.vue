@@ -96,6 +96,7 @@ const defaultHome = {
 } satisfies HomeContent;
 
 const homeContent = computed(() => props.home ?? defaultHome);
+const hasInsertedCta = computed(() => homeContent.value.blocks?.some((block) => block.type === 'cta') ?? false);
 // Homepages saved before the field existed keep the original line; an emptied field hides it.
 const heroTagline = computed(() =>
     homeContent.value.hero_tagline === undefined
@@ -313,6 +314,7 @@ const serviceCards = computed(() =>
         </section>
 
         <CtaPanel
+            v-if="!hasInsertedCta"
             id="contact-title"
             flush-top
             :eyebrow="homeContent.cta_eyebrow || defaultHome.cta_eyebrow"

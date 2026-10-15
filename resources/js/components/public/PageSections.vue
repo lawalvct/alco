@@ -2,12 +2,15 @@
 import { Link } from '@inertiajs/vue3';
 import {
     ArrowRight,
+    ArrowUpRight,
     BookOpen,
     ChartNoAxesCombined,
     FileText,
+    Quote,
     UsersRound,
 } from '@lucide/vue';
 import CtaLink from '@/components/public/CtaLink.vue';
+import CtaPanel from '@/components/public/CtaPanel.vue';
 import FaqList from '@/components/public/FaqList.vue';
 import SectionHeading from '@/components/public/SectionHeading.vue';
 import ServiceCard from '@/components/public/ServiceCard.vue';
@@ -61,7 +64,7 @@ function faqItems(block: HomeBlock): FaqItem[] {
                         class="max-w-2xl"
                         :eyebrow="block.data.eyebrow"
                         :title="block.data.title"
-                        :description="block.data.body"
+                        :description-html="block.data.body_html"
                     />
                     <CtaLink href="/services" variant="link" icon="arrow-right">
                         View all services
@@ -97,7 +100,7 @@ function faqItems(block: HomeBlock): FaqItem[] {
                     class="max-w-2xl"
                     :eyebrow="block.data.eyebrow"
                     :title="block.data.title"
-                    :description="block.data.body"
+                    :description-html="block.data.body_html"
                 />
                 <ul
                     class="mt-12 grid gap-6"
@@ -131,7 +134,7 @@ function faqItems(block: HomeBlock): FaqItem[] {
                         class="max-w-2xl"
                         :eyebrow="block.data.eyebrow"
                         :title="block.data.title"
-                        :description="block.data.body"
+                        :description-html="block.data.body_html"
                     />
                     <CtaLink
                         href="/services#packages"
@@ -197,11 +200,11 @@ function faqItems(block: HomeBlock): FaqItem[] {
                         class="max-w-3xl"
                         :title="block.data.title"
                     />
-                    <p
-                        class="mt-6 max-w-3xl text-base leading-8 text-muted-foreground sm:text-lg"
-                    >
-                        {{ block.data.body }}
-                    </p>
+                    <div
+                        v-if="block.data.body_html"
+                        class="article-rich-content mt-6 max-w-3xl text-base leading-8 text-muted-foreground sm:text-lg [&>:first-child]:mt-0"
+                        v-html="block.data.body_html"
+                    />
                 </div>
             </div>
         </section>
@@ -240,9 +243,11 @@ function faqItems(block: HomeBlock): FaqItem[] {
                         :eyebrow="block.data.eyebrow"
                         :title="block.data.title"
                     />
-                    <p class="max-w-lg leading-7 text-white/75">
-                        {{ block.data.body }}
-                    </p>
+                    <div
+                        v-if="block.data.body_html"
+                        class="article-rich-content dark-rich-content max-w-lg leading-7 text-white/75 [&>:first-child]:mt-0"
+                        v-html="block.data.body_html"
+                    />
                 </div>
                 <div class="mt-10 grid gap-4 md:grid-cols-3">
                     <div
@@ -292,6 +297,98 @@ function faqItems(block: HomeBlock): FaqItem[] {
                 </ol>
             </div>
         </section>
+
+        <section
+            v-else-if="block.type === 'testimonial' && block.data.quote && block.data.author"
+            class="bg-aqua-50 py-20 sm:py-24"
+            :aria-labelledby="`home-block-${index}`"
+        >
+            <div class="site-container grid gap-10 lg:grid-cols-[0.75fr_1.25fr] lg:items-center lg:gap-20">
+                <SectionHeading
+                    :id="`home-block-${index}`"
+                    :eyebrow="block.data.eyebrow"
+                    :title="block.data.title"
+                />
+                <figure class="rounded-2xl border border-aqua-200 bg-white p-8 shadow-card sm:p-11">
+                    <Quote :size="36" class="text-aqua-600" aria-hidden="true" />
+                    <blockquote class="mt-6 whitespace-pre-line text-xl leading-9 font-medium text-navy-900 sm:text-2xl sm:leading-10">
+                        {{ block.data.quote }}
+                    </blockquote>
+                    <figcaption class="mt-8 border-t border-border pt-5">
+                        <span class="block font-semibold text-navy-900">{{ block.data.author }}</span>
+                        <span v-if="block.data.context" class="mt-1 block text-sm text-muted-foreground">{{ block.data.context }}</span>
+                    </figcaption>
+                </figure>
+            </div>
+        </section>
+
+        <section
+            v-else-if="block.type === 'highlights' && block.data.items?.length"
+            class="border-t border-border bg-white py-20 sm:py-24"
+            :aria-labelledby="`home-block-${index}`"
+        >
+            <div class="site-container">
+                <SectionHeading
+                    :id="`home-block-${index}`"
+                    class="max-w-2xl"
+                    :eyebrow="block.data.eyebrow"
+                    :title="block.data.title"
+                />
+                <ul class="mt-10 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                    <li
+                        v-for="(item, itemIndex) in block.data.items"
+                        :key="`${item.label}-${itemIndex}`"
+                        class="rounded-xl border border-border bg-muted p-7 shadow-card"
+                    >
+                        <span class="text-sm font-bold text-aqua-700">{{ String(itemIndex + 1).padStart(2, '0') }}</span>
+                        <h3 class="mt-5 text-xl font-semibold text-navy-900">{{ item.label }}</h3>
+                        <p class="mt-3 text-sm leading-7 text-muted-foreground">{{ item.detail }}</p>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <section
+            v-else-if="block.type === 'resource_links' && block.data.items?.length"
+            class="border-t border-border bg-muted py-20 sm:py-24"
+            :aria-labelledby="`home-block-${index}`"
+        >
+            <div class="site-container">
+                <SectionHeading
+                    :id="`home-block-${index}`"
+                    class="max-w-2xl"
+                    :eyebrow="block.data.eyebrow"
+                    :title="block.data.title"
+                />
+                <ul class="mt-10 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                    <li v-for="(item, itemIndex) in block.data.items" :key="`${item.href}-${itemIndex}`">
+                        <component
+                            :is="item.href?.startsWith('https://') ? 'a' : Link"
+                            :href="item.href"
+                            :target="item.href?.startsWith('https://') ? '_blank' : undefined"
+                            :rel="item.href?.startsWith('https://') ? 'noopener noreferrer' : undefined"
+                            class="group flex h-full flex-col rounded-xl border border-border bg-white p-7 transition hover:border-aqua-400 hover:shadow-card focus-visible:outline-2 focus-visible:outline-aqua-600"
+                        >
+                            <h3 class="text-xl font-semibold text-navy-900">{{ item.label }}</h3>
+                            <p v-if="item.detail" class="mt-3 flex-1 text-sm leading-7 text-muted-foreground">{{ item.detail }}</p>
+                            <ArrowUpRight :size="20" class="mt-7 text-aqua-700 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" aria-hidden="true" />
+                        </component>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <CtaPanel
+            v-else-if="block.type === 'cta'"
+            :id="`home-block-${index}`"
+            :eyebrow="block.data.eyebrow || 'Let’s talk'"
+            :title="block.data.title || 'Ready to bring more clarity to your business?'"
+            :description="block.data.description || 'Tell us what you need help with and begin a conversation with ALCO.'"
+        >
+            <CtaLink :href="block.data.button_href || '/book-consultation'" variant="accent">
+                {{ block.data.button_label || 'Book a Consultation' }}
+            </CtaLink>
+        </CtaPanel>
 
         <section
             v-else-if="block.type === 'faq' && faqItems(block).length"

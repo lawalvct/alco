@@ -4,6 +4,7 @@ withDefaults(
         title: string;
         eyebrow?: string | null;
         description?: string | null;
+        descriptionHtml?: string | null;
         id?: string;
         tone?: 'light' | 'dark';
     }>(),
@@ -27,8 +28,14 @@ withDefaults(
         >
             {{ title }}
         </h2>
+        <div
+            v-if="descriptionHtml"
+            class="article-rich-content mt-5 text-base leading-7 [&>:first-child]:mt-0"
+            :class="tone === 'dark' ? 'dark-rich-content text-white/75' : 'text-muted-foreground'"
+            v-html="descriptionHtml"
+        />
         <p
-            v-if="description"
+            v-else-if="description"
             class="mt-5 text-base leading-7"
             :class="tone === 'dark' ? 'text-white/75' : 'text-muted-foreground'"
         >

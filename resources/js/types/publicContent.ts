@@ -20,17 +20,28 @@ export interface HomeBlock {
         | 'packages'
         | 'services'
         | 'team'
-        | 'rich_text';
+        | 'rich_text'
+        | 'testimonial'
+        | 'highlights'
+        | 'resource_links'
+        | 'cta';
     data: {
         eyebrow: string;
         title: string;
         body?: string;
         body_html?: string;
+        quote?: string;
+        author?: string;
+        context?: string;
+        description?: string;
+        button_label?: string;
+        button_href?: string;
         items?: {
             label?: string;
             detail?: string;
             question?: string;
             answer_html?: string;
+            href?: string;
         }[];
         steps?: { title: string; detail: string }[];
     };

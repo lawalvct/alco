@@ -8,6 +8,7 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -29,4 +30,16 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) => $request->is('api/*') || $request->expectsJson(),
         );
+
+        // Let the browser load the dependency-free error view after SPA navigation.
+        $exceptions->respond(function (Response $response, Throwable $exception, Request $request): Response {
+            if ($request->headers->has('X-Inertia')
+                && $request->isMethod('GET')
+                && ! $request->expectsJson()
+                && in_array($response->getStatusCode(), [404, 500], true)) {
+                return response('', 409, ['X-Inertia-Location' => $request->fullUrl()]);
+            }
+
+            return $response;
+        });
     })->create();

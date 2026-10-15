@@ -4,8 +4,9 @@ namespace App\Filament\Resources\Leads\RelationManagers;
 
 use App\Models\Lead;
 use App\Models\LeadActivity;
+use App\Support\ArticleRichText;
 use Filament\Actions\Action;
-use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\RichEditor;
 use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Support\Icons\Heroicon;
@@ -47,6 +48,8 @@ class ActivitiesRelationManager extends RelationManager
                     }),
                 TextColumn::make('body')
                     ->label('Details')
+                    ->formatStateUsing(fn (string $state): string => ArticleRichText::toSafeHtml($state))
+                    ->html()
                     ->wrap(),
                 TextColumn::make('user.name')
                     ->label('By')
@@ -57,11 +60,17 @@ class ActivitiesRelationManager extends RelationManager
                     ->label('Add note')
                     ->icon(Heroicon::OutlinedChatBubbleLeftEllipsis)
                     ->schema([
-                        Textarea::make('body')
+                        RichEditor::make('body')
                             ->label('Note')
                             ->required()
-                            ->rows(4)
-                            ->maxLength(2000)
+                            ->toolbarButtons([
+                                ['bold', 'italic', 'underline', 'link'],
+                                ['bulletList', 'orderedList'],
+                                ['undo', 'redo'],
+                            ])
+                            ->linkProtocols(['https', 'mailto', 'tel'])
+                            ->minHeight('10rem')
+                            ->maxLength(4000)
                             ->helperText('Visible to staff only.'),
                     ])
                     ->action(function (array $data): void {

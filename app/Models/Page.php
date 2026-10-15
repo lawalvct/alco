@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Concerns\HasPublishedContent;
 use App\Support\ArticleRichText;
+use App\Support\Navigation;
 use App\Support\PageBlueprints;
 use Database\Factories\PageFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -66,9 +67,28 @@ class Page extends Model
                         : (array) $item,
                     $block['data']['items'],
                 ));
-            } elseif (($block['type'] ?? null) === 'rich_text' && is_string($block['data']['body'] ?? null)) {
+            }
+
+            if (is_string($block['data']['body'] ?? null)) {
                 $block['data']['body_html'] = ArticleRichText::toSafeHtml($block['data']['body']);
                 unset($block['data']['body']);
+            }
+
+            if (($block['type'] ?? null) === 'cta') {
+                $href = $block['data']['button_href'] ?? null;
+
+                if (! is_string($href) || ! str_starts_with($href, '/') || ! Navigation::isSafeUrl($href)) {
+                    $block['data']['button_href'] = '/book-consultation';
+                }
+            }
+
+            if (($block['type'] ?? null) === 'resource_links' && is_array($block['data']['items'] ?? null)) {
+                $block['data']['items'] = array_values(array_filter(
+                    $block['data']['items'],
+                    static fn (mixed $item): bool => is_array($item)
+                        && is_string($item['href'] ?? null)
+                        && Navigation::isSafeUrl($item['href']),
+                ));
             }
 
             $blocks[] = $block;

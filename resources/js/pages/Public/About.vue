@@ -48,6 +48,7 @@ const defaultAbout: AboutContent = {
 
 const site = useSite();
 const content = computed(() => props.about ?? defaultAbout);
+const hasInsertedCta = computed(() => content.value.blocks?.some((block) => block.type === 'cta') ?? false);
 
 /** Verified business details from Site settings and Services, never marketing claims. */
 const facts = computed(() =>
@@ -168,6 +169,7 @@ const facts = computed(() =>
         />
 
         <CtaPanel
+            v-if="!hasInsertedCta"
             id="about-cta"
             :title="content.cta_title || 'Let\u2019s talk about your business.'"
             :description="content.cta_description || 'Tell us what you need help with and we will suggest a sensible starting point.'"

@@ -6,7 +6,9 @@ use App\Filament\Resources\HomepageHeroSlides\HomepageHeroSlideResource;
 use App\Models\Faq;
 use App\Models\Page;
 use App\Support\ArticleRichText;
+use App\Support\Navigation;
 use App\Support\PageBlueprints;
+use Closure;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Builder;
 use Filament\Forms\Components\Builder\Block;
@@ -134,6 +136,7 @@ class PageForm
                                 Textarea::make('tools_card_text')->label('Tools card description')->maxLength(300),
                             ])->columns(2),
                         Section::make('Final call to action')
+                            ->description('Shown at the bottom of Home or About unless a Call to action block is inserted in Page sections.')
                             ->visible(fn (Get $get): bool => self::isHome($get) || self::isAbout($get))
                             ->schema([
                                 TextInput::make('cta_eyebrow')->label('Small heading')->maxLength(80)
@@ -187,7 +190,7 @@ class PageForm
                                                 Text::make('Lists the published services from Website → Services, each linking to its page.'),
                                                 TextInput::make('eyebrow')->required()->maxLength(80),
                                                 TextInput::make('title')->required()->maxLength(160),
-                                                Textarea::make('body')->maxLength(400),
+                                                self::blockBodyEditor(2000),
                                             ]),
                                         Block::make('team')
                                             ->label('Leadership')
@@ -195,7 +198,7 @@ class PageForm
                                                 Text::make('Lists the published people from Website → Team, with their portrait, role and biography.'),
                                                 TextInput::make('eyebrow')->required()->maxLength(80),
                                                 TextInput::make('title')->required()->maxLength(160),
-                                                Textarea::make('body')->maxLength(400),
+                                                self::blockBodyEditor(2000),
                                             ]),
                                         Block::make('packages')
                                             ->label('Engagement packages')
@@ -203,14 +206,14 @@ class PageForm
                                                 Text::make('Lists the published packages from Website → Packages, with a link to compare them. Hidden while none are published.'),
                                                 TextInput::make('eyebrow')->required()->maxLength(80),
                                                 TextInput::make('title')->required()->maxLength(160),
-                                                Textarea::make('body')->maxLength(400),
+                                                self::blockBodyEditor(2000),
                                             ]),
                                         Block::make('intro')
                                             ->label('Introduction')
                                             ->schema([
                                                 TextInput::make('eyebrow')->required()->maxLength(80),
                                                 TextInput::make('title')->required()->maxLength(160),
-                                                Textarea::make('body')->required()->maxLength(1000),
+                                                self::blockBodyEditor(4000, required: true),
                                             ]),
                                         Block::make('rich_text')
                                             ->label('Text section')
@@ -235,7 +238,7 @@ class PageForm
                                             ->schema([
                                                 TextInput::make('eyebrow')->required()->maxLength(80),
                                                 TextInput::make('title')->required()->maxLength(160),
-                                                Textarea::make('body')->required()->maxLength(1000),
+                                                self::blockBodyEditor(4000, required: true),
                                                 Repeater::make('items')
                                                     ->schema([
                                                         TextInput::make('label')->required()->maxLength(80),
@@ -256,6 +259,80 @@ class PageForm
                                                     ])
                                                     ->minItems(1)
                                                     ->maxItems(6),
+                                            ]),
+                                        Block::make('testimonial')
+                                            ->label('Testimonial')
+                                            ->schema([
+                                                Text::make('Add a real client quote only after you have permission to publish it. No testimonial is created automatically.'),
+                                                TextInput::make('eyebrow')->label('Small heading')->maxLength(80),
+                                                TextInput::make('title')->label('Section heading')->required()->maxLength(160),
+                                                Textarea::make('quote')->label('Client quote')->required()->maxLength(1200)->rows(5),
+                                                TextInput::make('author')->label('Client name or approved attribution')->required()->maxLength(120),
+                                                TextInput::make('context')->label('Role or business (optional)')->maxLength(160),
+                                            ]),
+                                        Block::make('highlights')
+                                            ->label('Highlights grid')
+                                            ->schema([
+                                                TextInput::make('eyebrow')->label('Small heading')->maxLength(80),
+                                                TextInput::make('title')->label('Section heading')->required()->maxLength(160),
+                                                Repeater::make('items')
+                                                    ->label('Highlights')
+                                                    ->schema([
+                                                        TextInput::make('label')->label('Heading')->required()->maxLength(100),
+                                                        Textarea::make('detail')->label('Description')->required()->maxLength(350)->rows(3),
+                                                    ])
+                                                    ->minItems(2)
+                                                    ->maxItems(6)
+                                                    ->defaultItems(3)
+                                                    ->addActionLabel('Add highlight')
+                                                    ->collapsible(),
+                                            ]),
+                                        Block::make('resource_links')
+                                            ->label('Resource links')
+                                            ->schema([
+                                                TextInput::make('eyebrow')->label('Small heading')->maxLength(80),
+                                                TextInput::make('title')->label('Section heading')->required()->maxLength(160),
+                                                Repeater::make('items')
+                                                    ->label('Links')
+                                                    ->schema([
+                                                        TextInput::make('label')->label('Link title')->required()->maxLength(100),
+                                                        Textarea::make('detail')->label('Short description')->maxLength(250)->rows(3),
+                                                        TextInput::make('href')
+                                                            ->label('Destination')
+                                                            ->required()
+                                                            ->maxLength(255)
+                                                            ->rule(fn (): Closure => function (string $attribute, mixed $value, Closure $fail): void {
+                                                                if (! is_string($value) || ! Navigation::isSafeUrl($value)) {
+                                                                    $fail('Use a site path such as /insights or an https:// address.');
+                                                                }
+                                                            })
+                                                            ->helperText('Use a site path, such as /tools or /pages/your-page, or a full https:// link.'),
+                                                    ])
+                                                    ->minItems(1)
+                                                    ->maxItems(6)
+                                                    ->defaultItems(2)
+                                                    ->addActionLabel('Add link')
+                                                    ->collapsible(),
+                                            ]),
+                                        Block::make('cta')
+                                            ->label('Call to action — Let’s talk')
+                                            ->schema([
+                                                Text::make('Uses the same panel design as the existing “Let’s talk” section. On Home and About, this block replaces the fixed bottom panel.'),
+                                                TextInput::make('eyebrow')->label('Small heading')->default('Let’s talk')->maxLength(80),
+                                                TextInput::make('title')->label('Heading')->default('Ready to bring more clarity to your business?')->required()->maxLength(160),
+                                                Textarea::make('description')->default('Tell us what you need help with and begin a conversation with ALCO.')->maxLength(400)->rows(3),
+                                                TextInput::make('button_label')->label('Button text')->default('Book a Consultation')->required()->maxLength(60),
+                                                TextInput::make('button_href')
+                                                    ->label('Button destination')
+                                                    ->default('/book-consultation')
+                                                    ->required()
+                                                    ->maxLength(255)
+                                                    ->rule(fn (): Closure => function (string $attribute, mixed $value, Closure $fail): void {
+                                                        if (! is_string($value) || ! str_starts_with($value, '/') || ! Navigation::isSafeUrl($value)) {
+                                                            $fail('Use a site path such as /contact, /book-consultation or /pages/your-page.');
+                                                        }
+                                                    })
+                                                    ->helperText('Use an internal site path, for example /contact or /book-consultation.'),
                                             ]),
                                         Block::make('faq')
                                             ->label('Frequently asked questions')
@@ -287,6 +364,25 @@ class PageForm
     private static function isLegal(Get $get): bool
     {
         return ($get('../template_key') ?? $get('template_key')) === 'legal';
+    }
+
+    private static function blockBodyEditor(int $maxLength, bool $required = false): RichEditor
+    {
+        $editor = RichEditor::make('body')
+            ->label('Body')
+            ->toolbarButtons([
+                ['bold', 'italic', 'underline', 'link'],
+                ['h3'],
+                ['bulletList', 'orderedList', 'blockquote'],
+                ['undo', 'redo'],
+            ])
+            ->linkProtocols(['https', 'mailto', 'tel'])
+            ->formatStateUsing(fn (mixed $state): mixed => is_string($state) ? ArticleRichText::asHtml($state) : $state)
+            ->minHeight('10rem')
+            ->maxLength($maxLength)
+            ->helperText('Existing plain text is shown as a paragraph. Formatting is cleaned before it appears on the website.');
+
+        return $required ? $editor->required() : $editor;
     }
 
     private static function isAbout(Get $get): bool

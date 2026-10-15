@@ -70,8 +70,23 @@ class LeadAdminTest extends TestCase
             ->assertHasNoActionErrors();
 
         $note = $lead->activities()->where('type', 'note')->sole();
-        $this->assertSame('Asked for last year’s statements.', $note->body);
+        $this->assertSame('<p>Asked for last year’s statements.</p>', $note->body);
         $this->assertTrue($note->user?->is($admin));
+    }
+
+    public function test_staff_can_add_formatted_private_notes(): void
+    {
+        $this->actingAs(User::factory()->create(['is_admin' => true]));
+        $lead = Lead::factory()->create();
+
+        Livewire::test(ActivitiesRelationManager::class, ['ownerRecord' => $lead, 'pageClass' => ViewLead::class])
+            ->callAction(TestAction::make('addNote')->table(), ['body' => '<p><strong>Request</strong> received.</p>'])
+            ->assertHasNoActionErrors();
+
+        $this->assertSame('<p><strong>Request</strong> received.</p>', $lead->activities()->where('type', 'note')->sole()->body);
+
+        Livewire::test(ActivitiesRelationManager::class, ['ownerRecord' => $lead, 'pageClass' => ViewLead::class])
+            ->assertSeeHtml('<strong>Request</strong>');
     }
 
     public function test_spam_can_be_closed_in_bulk_and_tabs_filter_by_state(): void

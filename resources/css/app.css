@@ -278,3 +278,13 @@
     color: var(--color-navy-700);
     font-style: italic;
 }
+
+.dark-rich-content h2,
+.dark-rich-content h3,
+.dark-rich-content blockquote {
+    color: white;
+}
+
+.dark-rich-content a {
+    color: var(--color-aqua-400);
+}

@@ -14,8 +14,10 @@ The page title is used in browser tabs and social previews. The search engine de
 
 1. Choose **New page**, enter a title, and check the generated slug. A custom slug produces a URL such as `/pages/our-approach`. The slug is locked after creation to avoid breaking links.
 2. Pick **Blank page**, **Information page**, **Services overview**, or **How we work**. A template adds editable starter blocks; switching templates replaces draft blocks, so make this choice before writing detailed copy.
-3. Fill in the hero heading, introduction and search description. Add, remove or reorder page sections. Text sections support headings, links and lists.
+3. Fill in the hero heading, introduction and search description. Add, remove or reorder page sections. Every section's **Body** field supports formatted text, including headings, links and lists; existing plain text opens as a paragraph.
 4. Save the page, then choose **Save & publish page**. Unpublished custom pages return a 404 and stay out of the sitemap.
 5. To add the published page to the header or footer, go to **Website → Navigation**, choose the menu, and select or enter its `/pages/...` address.
 
 Preview the public page after publishing. Placeholder wording in starter blocks should be replaced before publishing.
+
+The insert-block list also includes **Testimonial**, **Highlights grid**, **Resource links**, and **Call to action — Let’s talk**. Add real testimonials only with permission to publish the quote and attribution. Resource links accept a site path or an HTTPS address. The CTA block uses the site's existing panel design; on Home or About it replaces the fixed bottom CTA, so only one appears.
