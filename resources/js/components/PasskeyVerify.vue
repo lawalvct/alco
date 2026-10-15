@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { UrlMethodPair } from '@inertiajs/core';
-import { router } from '@inertiajs/vue3';
 import { usePasskeyVerify } from '@laravel/passkeys/vue';
 import { KeyRound } from '@lucide/vue';
 import InputError from '@/components/InputError.vue';
@@ -30,7 +29,8 @@ const { verify, isLoading, error, isSupported } = usePasskeyVerify({
           }
         : {}),
     onSuccess: (response) => {
-        router.visit(response.redirect ?? '/dashboard');
+        // A full page load: the destination can be the admin, which is not an Inertia page.
+        window.location.assign(response.redirect ?? '/admin');
     },
 });
 </script>

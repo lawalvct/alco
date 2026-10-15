@@ -38,7 +38,8 @@ Route::get('/book-consultation', [ConsultationController::class, 'show'])->name(
 Route::post('/book-consultation', [ConsultationController::class, 'store'])->middleware('throttle:leads')->name('consultation.store');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::inertia('dashboard', 'Dashboard')->name('dashboard');
+    // The CMS dashboard lives at /admin; keep this address for old bookmarks.
+    Route::redirect('dashboard', '/admin')->name('dashboard');
 });
 
 require __DIR__.'/settings.php';

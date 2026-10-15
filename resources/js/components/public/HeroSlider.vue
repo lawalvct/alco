@@ -191,11 +191,11 @@ onBeforeUnmount(() => clearTimeout(timer));
 
         <div
             v-if="count > 1"
-            class="absolute top-3 right-3 flex items-center gap-1 rounded-full bg-navy-950/75 p-1 text-white backdrop-blur-sm sm:top-4 sm:right-4"
+            class="absolute top-2 right-2 flex items-center rounded-full bg-navy-950/45 p-0.5 text-white backdrop-blur-sm sm:top-4 sm:right-4 sm:gap-1 sm:bg-navy-950/75 sm:p-1"
         >
             <button
                 type="button"
-                class="inline-flex size-9 items-center justify-center rounded-full hover:bg-white/15 focus-visible:outline-2 focus-visible:outline-aqua-400"
+                class="hidden size-9 items-center justify-center rounded-full hover:bg-white/15 focus-visible:outline-2 focus-visible:outline-aqua-400 sm:inline-flex"
                 aria-label="Previous slide"
                 @click="select(active - 1)"
             >
@@ -212,11 +212,11 @@ onBeforeUnmount(() => clearTimeout(timer));
                     @click="select(index)"
                 >
                     <span
-                        class="block h-2 rounded-full transition-all motion-reduce:transition-none"
+                        class="block h-1.5 rounded-full transition-all motion-reduce:transition-none sm:h-2"
                         :class="
                             index === active
-                                ? 'w-5 bg-aqua-400'
-                                : 'w-2 bg-white/60 group-hover:bg-white'
+                                ? 'w-4 bg-aqua-400 sm:w-5'
+                                : 'w-1.5 bg-white/60 group-hover:bg-white sm:w-2'
                         "
                         aria-hidden="true"
                     />
@@ -224,7 +224,7 @@ onBeforeUnmount(() => clearTimeout(timer));
             </div>
             <button
                 type="button"
-                class="inline-flex size-9 items-center justify-center rounded-full hover:bg-white/15 focus-visible:outline-2 focus-visible:outline-aqua-400"
+                class="hidden size-9 items-center justify-center rounded-full hover:bg-white/15 focus-visible:outline-2 focus-visible:outline-aqua-400 sm:inline-flex"
                 aria-label="Next slide"
                 @click="select(active + 1)"
             >
@@ -233,7 +233,7 @@ onBeforeUnmount(() => clearTimeout(timer));
             <button
                 v-if="canAutoplay"
                 type="button"
-                class="inline-flex size-9 items-center justify-center rounded-full hover:bg-white/15 focus-visible:outline-2 focus-visible:outline-aqua-400"
+                class="inline-flex size-6 items-center justify-center rounded-full hover:bg-white/15 focus-visible:outline-2 focus-visible:outline-aqua-400 sm:size-9"
                 :aria-label="
                     pausedForSession
                         ? 'Start slide rotation'
@@ -241,8 +241,12 @@ onBeforeUnmount(() => clearTimeout(timer));
                 "
                 @click="togglePlayback"
             >
-                <Play v-if="pausedForSession" :size="16" aria-hidden="true" />
-                <Pause v-else :size="16" aria-hidden="true" />
+                <Play
+                    v-if="pausedForSession"
+                    class="size-3 sm:size-4"
+                    aria-hidden="true"
+                />
+                <Pause v-else class="size-3 sm:size-4" aria-hidden="true" />
             </button>
         </div>
     </section>

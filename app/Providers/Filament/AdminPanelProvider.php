@@ -2,6 +2,8 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Pages\Auth\SiteLogin;
+use Filament\Actions\Action;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -11,6 +13,7 @@ use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
 use Filament\Support\Facades\FilamentTimezone;
+use Filament\Support\Icons\Heroicon;
 use Filament\Widgets\AccountWidget;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
@@ -33,7 +36,13 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('admin')
-            ->login()
+            ->login(SiteLogin::class)
+            ->userMenuItems([
+                Action::make('security')
+                    ->label('Security: two-factor and passkeys')
+                    ->icon(Heroicon::OutlinedShieldCheck)
+                    ->url(fn (): string => route('security.edit')),
+            ])
             ->brandName('ALCO Associate Solutions')
             ->brandLogo(fn () => view('filament.admin.brand-logo'))
             ->darkModeBrandLogo(fn () => view('filament.admin.brand-logo', ['color' => '#ffffff']))
