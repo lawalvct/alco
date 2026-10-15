@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\ArticleRichText;
 use Database\Factories\FaqFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -46,13 +47,13 @@ class Faq extends Model
         return $query->where('is_published', true)->orderBy('sort_order')->orderBy('id');
     }
 
-    /** @return array{id: int, question: string, answer: string} */
+    /** @return array{id: int, question: string, answer_html: string} */
     public function publicItem(): array
     {
         return [
             'id' => $this->id,
             'question' => $this->question,
-            'answer' => $this->answer,
+            'answer_html' => ArticleRichText::toSafeHtml($this->answer),
         ];
     }
 
@@ -60,7 +61,7 @@ class Faq extends Model
      * Published FAQs in the given order; unknown or unpublished ids are skipped.
      *
      * @param  array<mixed>  $ids
-     * @return list<array{id: int, question: string, answer: string}>
+     * @return list<array{id: int, question: string, answer_html: string}>
      */
     public static function publishedItems(array $ids): array
     {

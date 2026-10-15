@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Concerns\HasPublishedContent;
+use App\Support\ArticleRichText;
 use Database\Factories\ServiceFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -66,7 +67,7 @@ class Service extends Model
         ];
     }
 
-    /** @return array{slug: string, title: string, summary: string, body: string, audience: string, seo_description: string, deliverables: list<array{label: string}>} */
+    /** @return array{slug: string, title: string, summary: string, body_html: string, audience: string, seo_description: string, deliverables: list<array{label: string}>} */
     public function publicDetail(): array
     {
         $content = $this->published_data ?? [];
@@ -80,7 +81,7 @@ class Service extends Model
 
         return [
             ...$this->publicSummary(),
-            'body' => is_string($content['body'] ?? null) ? $content['body'] : '',
+            'body_html' => ArticleRichText::toSafeHtml($content['body'] ?? null),
             'audience' => is_string($content['audience'] ?? null) ? $content['audience'] : '',
             'seo_description' => is_string($content['seo_description'] ?? null) && $content['seo_description'] !== ''
                 ? $content['seo_description']

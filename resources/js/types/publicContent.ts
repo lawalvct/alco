@@ -5,7 +5,7 @@ export interface ServiceSummary {
 }
 
 export interface ServiceDetail extends ServiceSummary {
-    body: string;
+    body_html: string;
     audience: string;
     seo_description: string;
     deliverables: { label: string }[];
@@ -28,7 +28,7 @@ export interface HomeBlock {
             label?: string;
             detail?: string;
             question?: string;
-            answer?: string;
+            answer_html?: string;
         }[];
         steps?: { title: string; detail: string }[];
     };
@@ -113,7 +113,7 @@ export interface TeamProfile {
 export interface FaqItem {
     id?: number;
     question: string;
-    answer: string;
+    answer_html: string;
 }
 
 export interface FaqGroup {
@@ -203,7 +203,7 @@ export interface LegalContent {
     intro: string | null;
     effective_date: string | null;
     seo_description: string | null;
-    sections: { heading: string; body: string }[];
+    sections: { heading: string; body_html: string }[];
 }
 
 export interface LegalLink {

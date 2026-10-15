@@ -3,8 +3,9 @@
 namespace App\Filament\Resources\Faqs\Schemas;
 
 use App\Models\Faq;
+use App\Support\ArticleRichText;
+use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Section;
@@ -23,10 +24,17 @@ class FaqForm
                         TextInput::make('question')
                             ->required()
                             ->maxLength(200),
-                        Textarea::make('answer')
+                        RichEditor::make('answer')
+                            ->toolbarButtons([
+                                ['bold', 'italic', 'link'],
+                                ['bulletList', 'orderedList'],
+                                ['undo', 'redo'],
+                            ])
+                            ->linkProtocols(['https', 'mailto', 'tel'])
+                            ->formatStateUsing(fn (mixed $state): mixed => is_string($state) ? ArticleRichText::asHtml($state) : $state)
                             ->required()
-                            ->rows(5)
-                            ->maxLength(2000),
+                            ->minHeight('8rem')
+                            ->maxLength(3000),
                     ]),
                 Section::make('Where it appears')
                     ->columns(2)

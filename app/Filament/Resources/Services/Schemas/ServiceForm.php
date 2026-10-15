@@ -2,7 +2,9 @@
 
 namespace App\Filament\Resources\Services\Schemas;
 
+use App\Support\ArticleRichText;
 use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Group;
@@ -34,7 +36,19 @@ class ServiceForm
                             ->description('Save changes first. The visitor site changes only when you publish the saved draft.')
                             ->schema([
                                 Textarea::make('summary')->required()->maxLength(350),
-                                Textarea::make('body')->required()->maxLength(4000),
+                                RichEditor::make('body')
+                                    ->toolbarButtons([
+                                        ['bold', 'italic', 'underline', 'link'],
+                                        ['h3'],
+                                        ['bulletList', 'orderedList', 'blockquote'],
+                                        ['undo', 'redo'],
+                                    ])
+                                    ->linkProtocols(['https', 'mailto', 'tel'])
+                                    ->formatStateUsing(fn (mixed $state): mixed => is_string($state) ? ArticleRichText::asHtml($state) : $state)
+                                    ->required()
+                                    ->minHeight('14rem')
+                                    ->maxLength(6000)
+                                    ->helperText('Pasted content is cleaned before it is displayed on the public website.'),
                                 Textarea::make('audience')->maxLength(500),
                                 Repeater::make('deliverables')
                                     ->label('What this service can cover')

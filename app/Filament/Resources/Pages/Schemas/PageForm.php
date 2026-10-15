@@ -5,11 +5,13 @@ namespace App\Filament\Resources\Pages\Schemas;
 use App\Filament\Resources\HomepageHeroSlides\HomepageHeroSlideResource;
 use App\Models\Faq;
 use App\Models\Page;
+use App\Support\ArticleRichText;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Builder;
 use Filament\Forms\Components\Builder\Block;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -118,11 +120,19 @@ class PageForm
                                     ->label('Sections')
                                     ->schema([
                                         TextInput::make('heading')->required()->maxLength(160),
-                                        Textarea::make('body')
+                                        RichEditor::make('body')
+                                            ->toolbarButtons([
+                                                ['bold', 'italic', 'underline', 'link'],
+                                                ['h3'],
+                                                ['bulletList', 'orderedList', 'blockquote'],
+                                                ['undo', 'redo'],
+                                            ])
+                                            ->linkProtocols(['https', 'mailto', 'tel'])
+                                            ->formatStateUsing(fn (mixed $state): mixed => is_string($state) ? ArticleRichText::asHtml($state) : $state)
                                             ->required()
-                                            ->rows(6)
-                                            ->maxLength(6000)
-                                            ->helperText('Plain text. A blank line starts a new paragraph.'),
+                                            ->minHeight('12rem')
+                                            ->maxLength(20000)
+                                            ->helperText('Use bold, links, lists and sub-headings. Pasted content is cleaned before it is displayed on the public website.'),
                                     ])
                                     ->minItems(1)
                                     ->maxItems(30)

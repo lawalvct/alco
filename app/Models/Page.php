@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Concerns\HasPublishedContent;
+use App\Support\ArticleRichText;
 use Database\Factories\PageFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -57,6 +58,13 @@ class Page extends Model
             if (($block['type'] ?? null) === 'faq' && is_array($block['data']['faq_ids'] ?? null)) {
                 $block['data']['items'] = Faq::publishedItems($block['data']['faq_ids']);
                 unset($block['data']['faq_ids']);
+            } elseif (($block['type'] ?? null) === 'faq' && is_array($block['data']['items'] ?? null)) {
+                $block['data']['items'] = array_values(array_map(
+                    static fn (mixed $item): array => is_array($item) && is_string($item['answer'] ?? null)
+                        ? [...$item, 'answer_html' => ArticleRichText::toSafeHtml($item['answer'])]
+                        : (array) $item,
+                    $block['data']['items'],
+                ));
             }
 
             $blocks[] = $block;

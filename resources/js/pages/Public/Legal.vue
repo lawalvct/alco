@@ -5,14 +5,6 @@ import PublicLayout from '@/layouts/PublicLayout.vue';
 import type { LegalContent } from '@/types/publicContent';
 
 defineProps<{ legal: LegalContent }>();
-
-/** Plain text in, paragraphs out: a blank line starts a new paragraph. */
-function paragraphs(body: string): string[] {
-    return body
-        .split(/\n\s*\n/)
-        .map((part) => part.trim())
-        .filter(Boolean);
-}
 </script>
 
 <template>
@@ -51,15 +43,10 @@ function paragraphs(body: string): string[] {
                     >
                         {{ section.heading }}
                     </h2>
-                    <p
-                        v-for="(paragraph, paragraphIndex) in paragraphs(
-                            section.body,
-                        )"
-                        :key="paragraphIndex"
-                        class="mt-4 text-base leading-8 whitespace-pre-line text-muted-foreground"
-                    >
-                        {{ paragraph }}
-                    </p>
+                    <div
+                        class="article-rich-content mt-4 text-base leading-8 text-muted-foreground [&>:first-child]:mt-0"
+                        v-html="section.body_html"
+                    />
                 </section>
             </div>
         </section>

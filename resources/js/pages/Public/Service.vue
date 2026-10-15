@@ -54,9 +54,10 @@ withDefaults(
                         eyebrow="The service"
                         title="A clearer view of the work ahead."
                     />
-                    <p class="mt-6 text-lg leading-8 text-muted-foreground">
-                        {{ service.body }}
-                    </p>
+                    <div
+                        class="article-rich-content mt-6 text-lg leading-8 text-muted-foreground [&>:first-child]:mt-0"
+                        v-html="service.body_html"
+                    />
                     <div
                         v-if="service.audience"
                         class="mt-10 rounded-xl bg-aqua-50 p-7"

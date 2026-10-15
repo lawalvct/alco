@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Public;
 
 use App\Http\Controllers\Controller;
 use App\Models\Page;
+use App\Support\ArticleRichText;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -22,7 +23,10 @@ class LegalController extends Controller
 
         foreach (is_array($content['sections'] ?? null) ? $content['sections'] : [] as $section) {
             if (is_array($section) && is_string($section['heading'] ?? null) && is_string($section['body'] ?? null)) {
-                $sections[] = ['heading' => $section['heading'], 'body' => $section['body']];
+                $sections[] = [
+                    'heading' => $section['heading'],
+                    'body_html' => ArticleRichText::toSafeHtml($section['body']),
+                ];
             }
         }
 

@@ -93,6 +93,31 @@ class FaqTest extends TestCase
             ->etc());
     }
 
+    public function test_faq_answers_are_shown_as_safe_rich_text(): void
+    {
+        Faq::factory()->create(['question' => 'Rich?', 'group' => 'General', 'sort_order' => 1, 'answer' => '<p>See <a href="https://example.com">this</a></p><script>alert(1)</script>']);
+        Faq::factory()->create(['question' => 'Plain?', 'group' => 'General', 'sort_order' => 2, 'answer' => "One.\n\nTwo."]);
+
+        $this->get('/faq')->assertOk()->assertInertia(fn (Assert $page) => $page
+            ->where('groups.0.items', fn ($items) => str_contains($items[0]['answer_html'], '<a href="https://example.com"')
+                && ! str_contains($items[0]['answer_html'], '<script')
+                && str_contains($items[1]['answer_html'], '<p>One.</p><p>Two.</p>'))
+            ->etc());
+    }
+
+    public function test_service_body_is_shown_as_safe_rich_text(): void
+    {
+        $service = Service::factory()->create(['slug' => 'rich-service', 'draft_data' => [
+            'summary' => 'Summary',
+            'body' => '<h3>Scope</h3><ul><li>Books</li></ul><script>alert(1)</script>',
+        ]]);
+        $service->publish();
+
+        $this->get('/services/rich-service')->assertOk()->assertInertia(fn (Assert $page) => $page
+            ->where('service.body_html', fn ($html) => str_contains($html, '<li>Books</li>') && ! str_contains($html, '<script'))
+            ->etc());
+    }
+
     public function test_inline_homepage_questions_move_into_the_library(): void
     {
         $home = Page::factory()->create([

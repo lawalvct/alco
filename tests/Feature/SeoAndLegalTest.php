@@ -73,6 +73,28 @@ class SeoAndLegalTest extends TestCase
         $this->get('/sitemap.xml')->assertSee('https://alcosolutions.ng/privacy');
     }
 
+    public function test_legal_section_text_is_shown_as_safe_rich_text(): void
+    {
+        $page = $this->legalPage('privacy', false);
+        $page->update(['draft_data' => [
+            ...$page->draft_data,
+            'sections' => [
+                ['heading' => 'Rich', 'body' => '<p>Hello <strong>world</strong></p><script>alert(1)</script><ul><li>One</li></ul>'],
+                ['heading' => 'Legacy', 'body' => "First paragraph.\n\nSecond paragraph & more."],
+            ],
+        ]]);
+        $page->publish();
+
+        $this->get('/privacy')->assertOk()->assertInertia(function (Assert $page) {
+            $page->where('legal.sections.0.body_html', fn ($html) => str_contains($html, '<strong>world</strong>')
+                && str_contains($html, '<li>One</li>')
+                && ! str_contains($html, '<script'));
+            $page->where('legal.sections.1.body_html', fn ($html) => str_contains($html, '<p>First paragraph.</p>')
+                && str_contains($html, '<p>Second paragraph &amp; more.</p>'));
+            $page->etc();
+        });
+    }
+
     public function test_a_homepage_or_about_page_cannot_be_served_as_legal_text(): void
     {
         Page::where('slug', 'privacy')->update(['template_key' => 'about']);

@@ -16,9 +16,10 @@ defineProps<{ items: FaqItem[] }>();
             >
                 {{ item.question }}
             </summary>
-            <p class="mt-4 leading-7 whitespace-pre-line text-muted-foreground">
-                {{ item.answer }}
-            </p>
+            <div
+                class="article-rich-content mt-4 leading-7 text-muted-foreground [&>:first-child]:mt-0"
+                v-html="item.answer_html"
+            />
         </details>
     </div>
 </template>

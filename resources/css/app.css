@@ -224,3 +224,57 @@
         padding-inline: 3rem;
     }
 }
+
+/* Styles for editor-written HTML on public pages (articles, legal text, services, FAQs). */
+.article-rich-content h2,
+.article-rich-content h3 {
+    margin-top: 2.5rem;
+    color: var(--color-navy-900);
+    font-weight: 700;
+    line-height: 1.25;
+}
+
+.article-rich-content h2 {
+    font-size: 1.5rem;
+}
+
+.article-rich-content h3 {
+    font-size: 1.25rem;
+}
+
+.article-rich-content p,
+.article-rich-content ul,
+.article-rich-content ol,
+.article-rich-content blockquote {
+    margin-top: 1.5rem;
+}
+
+.article-rich-content ul,
+.article-rich-content ol {
+    padding-left: 1.5rem;
+}
+
+.article-rich-content ul {
+    list-style: disc;
+}
+
+.article-rich-content ol {
+    list-style: decimal;
+}
+
+.article-rich-content li + li {
+    margin-top: 0.5rem;
+}
+
+.article-rich-content a {
+    color: var(--color-aqua-700);
+    font-weight: 600;
+    text-decoration: underline;
+}
+
+.article-rich-content blockquote {
+    border-left: 3px solid var(--color-aqua-400);
+    padding-left: 1.25rem;
+    color: var(--color-navy-700);
+    font-style: italic;
+}

@@ -25,7 +25,8 @@ final class ArticleRichText
             ->toHtml();
     }
 
-    private static function asHtml(string $content): string
+    /** Editor-ready HTML: plain text with blank-line paragraphs is wrapped in <p> tags. */
+    public static function asHtml(string $content): string
     {
         if (preg_match('/<\\/?[a-z][^>]*>/i', $content) === 1) {
             return $content;

@@ -38,8 +38,8 @@ const serviceIcons = [BookOpen, ChartNoAxesCombined, FileText, UsersRound];
 
 function faqItems(block: HomeBlock): FaqItem[] {
     return (block.data.items ?? []).flatMap((item) =>
-        item.question && item.answer
-            ? [{ question: item.question, answer: item.answer }]
+        item.question && item.answer_html
+            ? [{ question: item.question, answer_html: item.answer_html }]
             : [],
     );
 }
