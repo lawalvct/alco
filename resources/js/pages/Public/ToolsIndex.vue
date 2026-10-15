@@ -3,25 +3,27 @@ import { Head, Link } from '@inertiajs/vue3';
 import { ArrowUpRight, Calculator, ShieldCheck } from '@lucide/vue';
 import PageHero from '@/components/public/PageHero.vue';
 import PublicLayout from '@/layouts/PublicLayout.vue';
+import type { PageCopy } from '@/types/publicContent';
 
 defineProps<{
     tools: { slug: string; title: string; summary: string }[];
+    pageCopy: PageCopy;
 }>();
 </script>
 
 <template>
-    <Head title="Free accounting calculators for business">
+    <Head :title="pageCopy.title">
         <meta
             name="description"
-            content="Use ALCO’s free accounting calculators for VAT, withholding tax, profit margins, break-even, loans, depreciation, liquidity and cash collection."
+            :content="pageCopy.seo_description"
         />
     </Head>
 
     <PublicLayout>
         <PageHero
-            eyebrow="Accounting tools"
-            title="Free accounting calculators for clearer decisions."
-            intro="Explore VAT, withholding tax, pricing, profit, loans and cash-flow questions with practical tools. Enter your own figures and review the assumptions behind every result."
+            :eyebrow="pageCopy.hero_eyebrow"
+            :title="pageCopy.hero_line_one"
+            :intro="pageCopy.hero_description"
         />
 
         <section class="site-container py-14 sm:py-20">

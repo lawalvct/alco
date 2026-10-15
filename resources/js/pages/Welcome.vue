@@ -27,20 +27,20 @@ import type {
 } from '@/types/publicContent';
 
 const serviceIcons = [BookOpen, ChartNoAxesCombined, FileText, UsersRound];
-const discoverCards = [
+const discoverCards = computed(() => [
     {
         href: '/insights',
         icon: BookOpen,
-        title: 'Insights',
-        text: 'Practical articles on accounting, reporting and tax topics.',
+        title: homeContent.value.insights_card_title || defaultHome.insights_card_title,
+        text: homeContent.value.insights_card_text || defaultHome.insights_card_text,
     },
     {
         href: '/tools',
         icon: ChartNoAxesCombined,
-        title: 'Accounting Tools',
-        text: 'Calculators to help you test and understand key figures.',
+        title: homeContent.value.tools_card_title || defaultHome.tools_card_title,
+        text: homeContent.value.tools_card_text || defaultHome.tools_card_text,
     },
-];
+]);
 // Shown when no slide is visible, so the hero is never empty.
 const heroFallback = {
     src: '/images/hero-consultation.webp',
@@ -67,7 +67,7 @@ const props = withDefaults(
     },
 );
 
-const defaultHome: HomeContent = {
+const defaultHome = {
     title: 'Home',
     hero_eyebrow: 'ALCO Associate Solutions',
     hero_line_one: 'Your numbers, in order.',
@@ -78,8 +78,22 @@ const defaultHome: HomeContent = {
     hero_tagline: 'Clarity today. Confidence for what comes next.',
     seo_description:
         'ALCO Associate Solutions offers bookkeeping, financial reporting, tax filings and business solutions in Lagos, Nigeria.',
+    services_eyebrow: 'What we do',
+    services_title: 'Good decisions begin with a clear picture.',
+    discover_eyebrow: 'Explore more',
+    discover_title: 'Useful guidance for the work ahead.',
+    discover_description:
+        'Our Insights and Accounting Tools sections are being prepared to make everyday financial questions easier to explore.',
+    insights_card_title: 'Insights',
+    insights_card_text: 'Practical articles on accounting, reporting and tax topics.',
+    tools_card_title: 'Accounting Tools',
+    tools_card_text: 'Calculators to help you test and understand key figures.',
+    cta_eyebrow: 'Let’s talk',
+    cta_title: 'Ready to bring more clarity to your business?',
+    cta_description:
+        'Tell us what you need help with and begin a conversation with ALCO.',
     blocks: [],
-};
+} satisfies HomeContent;
 
 const homeContent = computed(() => props.home ?? defaultHome);
 // Homepages saved before the field existed keep the original line; an emptied field hides it.
@@ -226,8 +240,8 @@ const serviceCards = computed(() =>
                     <SectionHeading
                         id="services-title"
                         class="max-w-2xl"
-                        eyebrow="What we do"
-                        title="Good decisions begin with a clear picture."
+                        :eyebrow="homeContent.services_eyebrow || defaultHome.services_eyebrow"
+                        :title="homeContent.services_title || defaultHome.services_title"
                     />
                     <CtaLink href="/services" variant="link" icon="arrow-right">
                         View all services
@@ -265,9 +279,9 @@ const serviceCards = computed(() =>
                 <SectionHeading
                     id="discover-title"
                     class="max-w-lg"
-                    eyebrow="Explore more"
-                    title="Useful guidance for the work ahead."
-                    description="Our Insights and Accounting Tools sections are being prepared to make everyday financial questions easier to explore."
+                    :eyebrow="homeContent.discover_eyebrow || defaultHome.discover_eyebrow"
+                    :title="homeContent.discover_title || defaultHome.discover_title"
+                    :description="homeContent.discover_description || defaultHome.discover_description"
                 />
                 <div class="grid gap-4 sm:grid-cols-2">
                     <Link
@@ -298,6 +312,12 @@ const serviceCards = computed(() =>
             </div>
         </section>
 
-        <CtaPanel id="contact-title" flush-top />
+        <CtaPanel
+            id="contact-title"
+            flush-top
+            :eyebrow="homeContent.cta_eyebrow || defaultHome.cta_eyebrow"
+            :title="homeContent.cta_title || defaultHome.cta_title"
+            :description="homeContent.cta_description || defaultHome.cta_description"
+        />
     </PublicLayout>
 </template>

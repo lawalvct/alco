@@ -9,11 +9,12 @@ import EnquiryForm from '@/components/public/EnquiryForm.vue';
 import EnquirySuccess from '@/components/public/EnquirySuccess.vue';
 import PageHero from '@/components/public/PageHero.vue';
 import PublicLayout from '@/layouts/PublicLayout.vue';
-import type { PackageSummary, ServiceOption } from '@/types/publicContent';
+import type { PackageSummary, PageCopy, ServiceOption } from '@/types/publicContent';
 
 const props = withDefaults(
     defineProps<{
         packages?: PackageSummary[];
+        pageCopy: PageCopy;
         selectedPackage?: PackageSummary | null;
         packageUnavailable?: boolean;
         services?: ServiceOption[];
@@ -43,19 +44,19 @@ const chosen = computed(
 </script>
 
 <template>
-    <Head title="Book a consultation">
+    <Head :title="pageCopy.title">
         <meta
             name="description"
-            content="Request a consultation with ALCO Associate Solutions. Choose a starting package or ask for a tailored engagement."
+            :content="pageCopy.seo_description"
         />
         <meta name="robots" content="noindex,follow" />
     </Head>
 
     <PublicLayout>
         <PageHero
-            eyebrow="Book a consultation"
-            title="Let’s talk through what your business needs."
-            intro="Send a request below, or call or email us. We will confirm availability directly with you."
+            :eyebrow="pageCopy.hero_eyebrow"
+            :title="pageCopy.hero_line_one"
+            :intro="pageCopy.hero_description"
         />
 
         <section class="bg-muted py-16 sm:py-20">

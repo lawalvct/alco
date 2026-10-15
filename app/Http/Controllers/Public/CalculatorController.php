@@ -9,6 +9,7 @@ use App\Models\Post;
 use App\Support\Calculators\CalculatorCatalog;
 use App\Support\Calculators\CalculatorEngine;
 use App\Support\Calculators\CalculatorGuide;
+use App\Support\PageBlueprints;
 use App\Support\StructuredData;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -29,6 +30,7 @@ class CalculatorController extends Controller
         ]);
 
         return Inertia::render('Public/ToolsIndex', [
+            'pageCopy' => PageBlueprints::copyFor('tools'),
             'tools' => $tools,
         ]);
     }

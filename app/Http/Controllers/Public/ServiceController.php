@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\EngagementPackage;
 use App\Models\Faq;
 use App\Models\Service;
+use App\Support\PageBlueprints;
 use App\Support\StructuredData;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -16,6 +17,7 @@ class ServiceController extends Controller
     {
         return Inertia::render('Public/Section', [
             'kind' => 'services',
+            'pageCopy' => PageBlueprints::copyFor('services'),
             'publishedServices' => Service::published()
                 ->orderBy('sort_order')
                 ->get()

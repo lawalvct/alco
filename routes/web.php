@@ -8,6 +8,7 @@ use App\Http\Controllers\Public\FaqController;
 use App\Http\Controllers\Public\HomeController;
 use App\Http\Controllers\Public\InsightController;
 use App\Http\Controllers\Public\LegalController;
+use App\Http\Controllers\Public\PageController;
 use App\Http\Controllers\Public\ServiceController;
 use App\Http\Controllers\Public\SitemapController;
 use Illuminate\Support\Facades\Route;
@@ -36,6 +37,7 @@ Route::get('/contact', [ContactController::class, 'show'])->name('contact');
 Route::post('/contact', [ContactController::class, 'store'])->middleware('throttle:leads')->name('contact.store');
 Route::get('/book-consultation', [ConsultationController::class, 'show'])->name('consultation');
 Route::post('/book-consultation', [ConsultationController::class, 'store'])->middleware('throttle:leads')->name('consultation.store');
+Route::get('/pages/{slug}', [PageController::class, 'show'])->where('slug', '[a-z0-9]+(?:-[a-z0-9]+)*')->name('pages.show');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     // The CMS dashboard lives at /admin; keep this address for old bookmarks.

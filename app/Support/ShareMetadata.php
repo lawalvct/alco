@@ -18,18 +18,19 @@ final class ShareMetadata
 
         [$pageTitle, $description] = match ($component) {
             'Welcome' => [$name, self::first($props['home']['seo_description'] ?? null, $props['home']['hero_description'] ?? null, $defaultDescription)],
-            'Public/About' => ['About us', self::first($props['about']['seo_description'] ?? null, $props['about']['hero_description'] ?? null, $defaultDescription)],
-            'Public/Section' => ['Accounting and business services', 'Bookkeeping, financial reporting, tax filings and business support from ALCO Associate Solutions in Lagos.'],
+            'Public/About' => [self::first($props['about']['title'] ?? null, 'About us'), self::first($props['about']['seo_description'] ?? null, $props['about']['hero_description'] ?? null, $defaultDescription)],
+            'Public/Section' => [self::first($props['pageCopy']['title'] ?? null, 'Accounting and business services'), self::first($props['pageCopy']['seo_description'] ?? null, $props['pageCopy']['hero_description'] ?? null, $defaultDescription)],
             'Public/Service' => [self::first($props['service']['title'] ?? null, 'Our services'), self::first($props['service']['seo_description'] ?? null, $props['service']['summary'] ?? null, $defaultDescription)],
-            'Public/InsightsIndex' => [self::first($props['selectedCategory']['name'] ?? null, 'Insights'), self::first($props['selectedCategory']['seo_description'] ?? null, $props['selectedCategory']['description'] ?? null, 'Practical accounting, tax and business insights from ALCO Associate Solutions.')],
+            'Public/InsightsIndex' => [self::first($props['selectedCategory']['name'] ?? null, $props['pageCopy']['title'] ?? null, 'Insights'), self::first($props['selectedCategory']['seo_description'] ?? null, $props['selectedCategory']['description'] ?? null, $props['pageCopy']['seo_description'] ?? null, $defaultDescription)],
             'Public/TopicHub' => [self::first($props['topic']['title'] ?? null, 'Insights'), self::first($props['topic']['seo_description'] ?? null, $props['topic']['intro'] ?? null, $defaultDescription)],
             'Public/Article' => [self::first($props['post']['title'] ?? null, 'Insights'), self::first($props['post']['seo_description'] ?? null, $props['post']['excerpt'] ?? null, $defaultDescription)],
-            'Public/ToolsIndex' => ['Free accounting calculators for business', 'Explore free VAT, withholding tax, margin, loan, cash flow and other business calculators from ALCO Associate Solutions.'],
+            'Public/ToolsIndex' => [self::first($props['pageCopy']['title'] ?? null, 'Free accounting calculators for business'), self::first($props['pageCopy']['seo_description'] ?? null, $defaultDescription)],
             'Public/Calculator' => [self::first($props['tool']['seoTitle'] ?? null, $props['tool']['title'] ?? null, 'Accounting calculator'), self::first($props['tool']['seoDescription'] ?? null, $props['tool']['summary'] ?? null, $defaultDescription)],
-            'Public/Faq' => ['Frequently asked questions', 'Answers to common questions about ALCO Associate Solutions and our accounting services.'],
-            'Public/Contact' => ['Contact us', 'Contact ALCO Associate Solutions for bookkeeping, financial reporting, tax filings and business support in Lagos.'],
-            'Public/Consultation' => ['Book a consultation', 'Discuss your accounting and business support needs with ALCO Associate Solutions.'],
+            'Public/Faq' => [self::first($props['pageCopy']['title'] ?? null, 'Frequently asked questions'), self::first($props['pageCopy']['seo_description'] ?? null, $defaultDescription)],
+            'Public/Contact' => [self::first($props['pageCopy']['title'] ?? null, 'Contact us'), self::first($props['pageCopy']['seo_description'] ?? null, $defaultDescription)],
+            'Public/Consultation' => [self::first($props['pageCopy']['title'] ?? null, 'Book a consultation'), self::first($props['pageCopy']['seo_description'] ?? null, $defaultDescription)],
             'Public/Legal' => [self::first($props['legal']['title'] ?? null, 'Legal information'), self::first($props['legal']['seo_description'] ?? null, $props['legal']['intro'] ?? null, $defaultDescription)],
+            'Public/ContentPage' => [self::first($props['content']['title'] ?? null, $name), self::first($props['content']['seo_description'] ?? null, $props['content']['hero_description'] ?? null, $defaultDescription)],
             default => [$name, $defaultDescription],
         };
 

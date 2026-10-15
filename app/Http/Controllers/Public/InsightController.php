@@ -7,6 +7,7 @@ use App\Models\ArticleCategory;
 use App\Models\Post;
 use App\Models\Service;
 use App\Models\TopicHub;
+use App\Support\PageBlueprints;
 use App\Support\StructuredData;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
@@ -119,6 +120,7 @@ class InsightController extends Controller
             ->through(fn (Post $post): array => $post->publicSummary());
 
         return Inertia::render('Public/InsightsIndex', [
+            'pageCopy' => PageBlueprints::copyFor('insights'),
             'articles' => $articles,
             'categories' => ArticleCategory::publicOptions(),
             'selectedCategory' => $selectedCategory ? [

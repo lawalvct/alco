@@ -8,11 +8,12 @@ import EnquirySuccess from '@/components/public/EnquirySuccess.vue';
 import PageHero from '@/components/public/PageHero.vue';
 import VisitCard from '@/components/public/VisitCard.vue';
 import PublicLayout from '@/layouts/PublicLayout.vue';
-import type { ServiceOption } from '@/types/publicContent';
+import type { PageCopy, ServiceOption } from '@/types/publicContent';
 
 withDefaults(
     defineProps<{
         services?: ServiceOption[];
+        pageCopy: PageCopy;
         formsEnabled?: boolean;
         turnstileSiteKey?: string | null;
         consentText: string;
@@ -25,18 +26,18 @@ const submitted = computed(() => page.flash.leadSubmitted);
 </script>
 
 <template>
-    <Head title="Contact">
+    <Head :title="pageCopy.title">
         <meta
             name="description"
-            content="Call, email or send a message to ALCO Associate Solutions about bookkeeping, reporting, tax filings or a business question."
+            :content="pageCopy.seo_description"
         />
     </Head>
 
     <PublicLayout>
         <PageHero
-            eyebrow="Contact"
-            title="Start a conversation with ALCO."
-            intro="Call or email us about bookkeeping, reporting, tax filings or a business question, or send a message below."
+            :eyebrow="pageCopy.hero_eyebrow"
+            :title="pageCopy.hero_line_one"
+            :intro="pageCopy.hero_description"
         />
 
         <section class="bg-muted py-16 sm:py-20">

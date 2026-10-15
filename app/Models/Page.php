@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Concerns\HasPublishedContent;
 use App\Support\ArticleRichText;
+use App\Support\PageBlueprints;
 use Database\Factories\PageFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -65,6 +66,9 @@ class Page extends Model
                         : (array) $item,
                     $block['data']['items'],
                 ));
+            } elseif (($block['type'] ?? null) === 'rich_text' && is_string($block['data']['body'] ?? null)) {
+                $block['data']['body_html'] = ArticleRichText::toSafeHtml($block['data']['body']);
+                unset($block['data']['body']);
             }
 
             $blocks[] = $block;
@@ -73,5 +77,10 @@ class Page extends Model
         $content['blocks'] = $blocks;
 
         return $content;
+    }
+
+    public function publicPath(): string
+    {
+        return PageBlueprints::publicPath($this->slug);
     }
 }

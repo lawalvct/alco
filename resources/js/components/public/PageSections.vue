@@ -22,7 +22,7 @@ import type {
 
 /**
  * Renders a page's CMS blocks in order. Shared by the homepage and the
- * About page; blocks that list live data hide themselves when empty.
+ * About and custom pages; blocks that list live data hide themselves when empty.
  */
 withDefaults(
     defineProps<{
@@ -203,6 +203,24 @@ function faqItems(block: HomeBlock): FaqItem[] {
                         {{ block.data.body }}
                     </p>
                 </div>
+            </div>
+        </section>
+
+        <section
+            v-else-if="block.type === 'rich_text'"
+            class="border-t border-border bg-white py-16 sm:py-20"
+            :aria-labelledby="`home-block-${index}`"
+        >
+            <div class="site-container max-w-3xl">
+                <SectionHeading
+                    :id="`home-block-${index}`"
+                    :eyebrow="block.data.eyebrow"
+                    :title="block.data.title"
+                />
+                <div
+                    class="article-rich-content mt-7 text-base leading-8 text-muted-foreground [&>:first-child]:mt-0"
+                    v-html="block.data.body_html"
+                />
             </div>
         </section>
 

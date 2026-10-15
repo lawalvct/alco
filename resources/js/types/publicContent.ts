@@ -19,11 +19,13 @@ export interface HomeBlock {
         | 'faq'
         | 'packages'
         | 'services'
-        | 'team';
+        | 'team'
+        | 'rich_text';
     data: {
         eyebrow: string;
         title: string;
         body?: string;
+        body_html?: string;
         items?: {
             label?: string;
             detail?: string;
@@ -34,12 +36,22 @@ export interface HomeBlock {
     };
 }
 
+export interface PageCopy {
+    title: string;
+    hero_eyebrow: string;
+    hero_line_one: string;
+    hero_description: string;
+    seo_description: string;
+}
+
 export interface AboutContent {
     title: string;
     hero_eyebrow: string;
     hero_line_one: string;
     hero_description: string;
     seo_description?: string | null;
+    cta_title?: string | null;
+    cta_description?: string | null;
     blocks: HomeBlock[];
 }
 
@@ -52,6 +64,18 @@ export interface HomeContent {
     hero_description: string;
     hero_tagline?: string | null;
     seo_description?: string;
+    services_eyebrow?: string | null;
+    services_title?: string | null;
+    discover_eyebrow?: string | null;
+    discover_title?: string | null;
+    discover_description?: string | null;
+    insights_card_title?: string | null;
+    insights_card_text?: string | null;
+    tools_card_title?: string | null;
+    tools_card_text?: string | null;
+    cta_eyebrow?: string | null;
+    cta_title?: string | null;
+    cta_description?: string | null;
     blocks: HomeBlock[];
 }
 

@@ -3,8 +3,10 @@
 namespace App\Filament\Resources\NavigationItems\Schemas;
 
 use App\Models\NavigationItem;
+use App\Models\Page;
 use App\Models\Service;
 use App\Support\Navigation;
+use App\Support\PageBlueprints;
 use Closure;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -61,6 +63,13 @@ class NavigationItemForm
             ->map(fn (string $slug): string => "/services/{$slug}")
             ->all();
 
-        return array_values(array_merge(array_keys(Navigation::INTERNAL_PAGES), $services));
+        $pages = Page::published()
+            ->where('template_key', 'standard')
+            ->get()
+            ->filter(fn (Page $page): bool => PageBlueprints::isCustom($page->slug))
+            ->map(fn (Page $page): string => $page->publicPath())
+            ->all();
+
+        return array_values(array_merge(array_keys(Navigation::INTERNAL_PAGES), $services, $pages));
     }
 }

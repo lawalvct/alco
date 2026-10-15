@@ -169,8 +169,8 @@ const facts = computed(() =>
 
         <CtaPanel
             id="about-cta"
-            title="Let’s talk about your business."
-            description="Tell us what you need help with and we will suggest a sensible starting point."
+            :title="content.cta_title || 'Let\u2019s talk about your business.'"
+            :description="content.cta_description || 'Tell us what you need help with and we will suggest a sensible starting point.'"
         >
             <CtaLink href="/book-consultation" variant="accent">
                 Book a Consultation

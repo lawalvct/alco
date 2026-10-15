@@ -6,6 +6,7 @@ use App\Filament\Resources\HomepageHeroSlides\HomepageHeroSlideResource;
 use App\Models\Faq;
 use App\Models\Page;
 use App\Support\ArticleRichText;
+use App\Support\PageBlueprints;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Builder;
 use Filament\Forms\Components\Builder\Block;
@@ -25,39 +26,45 @@ use Filament\Support\Icons\Heroicon;
 
 class PageForm
 {
-    /** Pages with their own public template. The slug is also the template key. */
-    public const TEMPLATES = [
-        'home' => 'Homepage',
-        'about' => 'About page',
-        'privacy' => 'Privacy notice',
-        'terms' => 'Terms of use',
-        'calculator-disclaimer' => 'Calculator disclaimer',
-    ];
-
-    /** Slugs that use the plain legal-text template. */
-    public const LEGAL_SLUGS = ['privacy', 'terms', 'calculator-disclaimer'];
-
     public static function configure(Schema $schema): Schema
     {
         return $schema
             ->components([
                 Section::make('Page identity')
+                    ->description('Existing site pages keep their current address. A new page gets a /pages/your-slug address and can be added to Navigation after publication.')
                     ->schema([
-                        TextInput::make('title')->required()->maxLength(160),
-                        Select::make('slug')
-                            ->label('Page')
-                            ->options(self::TEMPLATES)
-                            ->default('home')
+                        TextInput::make('title')
                             ->required()
+                            ->maxLength(160)
+                            ->live(onBlur: true)
+                            ->afterStateUpdated(function (Get $get, Set $set, ?string $state): void {
+                                if (blank($get('slug')) && filled($state)) {
+                                    $slug = PageBlueprints::slugFromTitle($state);
+                                    $set('slug', $slug);
+                                    $set('template_key', PageBlueprints::templateForSlug($slug));
+                                    $set('draft_data.hero_line_one', $state);
+                                }
+                            }),
+                        TextInput::make('slug')
+                            ->label('Page address / slug')
+                            ->required()
+                            ->maxLength(120)
+                            ->regex('/^[a-z0-9]+(?:-[a-z0-9]+)*$/')
                             ->unique(ignoreRecord: true)
                             ->disabledOn('edit')
+                            ->live(onBlur: true)
+                            ->afterStateUpdated(fn (Set $set, ?string $state) => $set('template_key', PageBlueprints::templateForSlug((string) $state)))
+                            ->helperText('Existing pages are listed in the table. New page addresses appear at /pages/{slug}. Locked after creation.'),
+                        Select::make('starter_template')
+                            ->label('Starting layout')
+                            ->options(PageBlueprints::STARTERS)
+                            ->default('blank')
+                            ->dehydrated(false)
                             ->live()
-                            ->afterStateUpdated(fn (Set $set, ?string $state) => $set('template_key', match (true) {
-                                in_array($state, self::LEGAL_SLUGS, true) => 'legal',
-                                default => $state ?? 'home',
-                            }))
-                            ->helperText('Each page can be created once. Locked after creation.'),
-                        Hidden::make('template_key')->default('home'),
+                            ->visible(fn (Get $get): bool => filled($get('slug')) && PageBlueprints::isCustom((string) $get('slug')))
+                            ->afterStateUpdated(fn (Get $get, Set $set, ?string $state) => $set('draft_data.blocks', PageBlueprints::starterBlocks((string) $state, (string) $get('title'))))
+                            ->helperText('Choose a simple layout, then edit or reorder its blocks below. Changing this choice replaces the draft blocks.'),
+                        Hidden::make('template_key')->default('standard'),
                     ])
                     ->columns(2),
                 Group::make()
@@ -108,6 +115,32 @@ class PageForm
                                     ->maxLength(160),
                             ])
                             ->columns(2),
+                        Section::make('Homepage: service section')
+                            ->description('These are the fixed sections around the reorderable blocks. Service cards are edited under Website → Services.')
+                            ->visible(fn (Get $get): bool => self::isHome($get))
+                            ->schema([
+                                TextInput::make('services_eyebrow')->label('Small heading')->maxLength(80),
+                                TextInput::make('services_title')->label('Section heading')->maxLength(160),
+                            ])->columns(2),
+                        Section::make('Homepage: Insights and Tools cards')
+                            ->visible(fn (Get $get): bool => self::isHome($get))
+                            ->schema([
+                                TextInput::make('discover_eyebrow')->label('Small heading')->maxLength(80),
+                                TextInput::make('discover_title')->label('Section heading')->maxLength(160),
+                                Textarea::make('discover_description')->label('Section introduction')->maxLength(400)->columnSpanFull(),
+                                TextInput::make('insights_card_title')->label('Insights card title')->maxLength(80),
+                                Textarea::make('insights_card_text')->label('Insights card description')->maxLength(300),
+                                TextInput::make('tools_card_title')->label('Tools card title')->maxLength(80),
+                                Textarea::make('tools_card_text')->label('Tools card description')->maxLength(300),
+                            ])->columns(2),
+                        Section::make('Final call to action')
+                            ->visible(fn (Get $get): bool => self::isHome($get) || self::isAbout($get))
+                            ->schema([
+                                TextInput::make('cta_eyebrow')->label('Small heading')->maxLength(80)
+                                    ->visible(fn (Get $get): bool => self::isHome($get)),
+                                TextInput::make('cta_title')->label('Heading')->maxLength(160),
+                                Textarea::make('cta_description')->label('Description')->maxLength(400)->columnSpanFull(),
+                            ])->columns(2),
                         Section::make('Legal text')
                             ->description('Wording must be approved by ALCO and, where needed, legal advice before this page is published. The page stays hidden from the site until published.')
                             ->visible(fn (Get $get): bool => self::isLegal($get))
@@ -141,7 +174,7 @@ class PageForm
                                     ->collapsible(),
                             ]),
                         Section::make('Page sections')
-                            ->visible(fn (Get $get): bool => ! self::isLegal($get))
+                            ->visible(fn (Get $get): bool => self::supportsBlocks($get))
                             ->description(fn (Get $get): string => self::isHome($get)
                                 ? 'Reorder the approved content blocks below the service cards.'
                                 : 'Add, remove and reorder the sections shown below the page heading.')
@@ -178,6 +211,24 @@ class PageForm
                                                 TextInput::make('eyebrow')->required()->maxLength(80),
                                                 TextInput::make('title')->required()->maxLength(160),
                                                 Textarea::make('body')->required()->maxLength(1000),
+                                            ]),
+                                        Block::make('rich_text')
+                                            ->label('Text section')
+                                            ->schema([
+                                                TextInput::make('eyebrow')->label('Small heading')->maxLength(80),
+                                                TextInput::make('title')->label('Section heading')->required()->maxLength(160),
+                                                RichEditor::make('body')
+                                                    ->label('Content')
+                                                    ->toolbarButtons([
+                                                        ['bold', 'italic', 'underline', 'link'],
+                                                        ['h2', 'h3'],
+                                                        ['bulletList', 'orderedList', 'blockquote'],
+                                                        ['undo', 'redo'],
+                                                    ])
+                                                    ->linkProtocols(['https', 'mailto', 'tel'])
+                                                    ->required()
+                                                    ->maxLength(20000)
+                                                    ->helperText('Formatted text is cleaned before it appears on the public page.'),
                                             ]),
                                         Block::make('audience')
                                             ->label('Who we help')
@@ -236,6 +287,18 @@ class PageForm
     private static function isLegal(Get $get): bool
     {
         return ($get('../template_key') ?? $get('template_key')) === 'legal';
+    }
+
+    private static function isAbout(Get $get): bool
+    {
+        return ($get('../template_key') ?? $get('template_key')) === 'about';
+    }
+
+    private static function supportsBlocks(Get $get): bool
+    {
+        $slug = $get('../slug') ?? $get('slug');
+
+        return is_string($slug) && ($slug === 'home' || $slug === 'about' || PageBlueprints::isCustom($slug));
     }
 
     /** Fields inside draft_data read the template from the page level. */

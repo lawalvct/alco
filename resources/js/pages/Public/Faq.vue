@@ -4,24 +4,24 @@ import ContactCard from '@/components/public/ContactCard.vue';
 import FaqList from '@/components/public/FaqList.vue';
 import PageHero from '@/components/public/PageHero.vue';
 import PublicLayout from '@/layouts/PublicLayout.vue';
-import type { FaqGroup } from '@/types/publicContent';
+import type { FaqGroup, PageCopy } from '@/types/publicContent';
 
-withDefaults(defineProps<{ groups?: FaqGroup[] }>(), { groups: () => [] });
+withDefaults(defineProps<{ groups?: FaqGroup[]; pageCopy: PageCopy }>(), { groups: () => [] });
 </script>
 
 <template>
-    <Head title="Frequently asked questions">
+    <Head :title="pageCopy.title">
         <meta
             name="description"
-            content="Answers to common questions about working with ALCO Associate Solutions."
+            :content="pageCopy.seo_description"
         />
     </Head>
 
     <PublicLayout>
         <PageHero
-            eyebrow="FAQ"
-            title="Answers to common questions."
-            intro="If your question is not covered here, call or email us and we will help."
+            :eyebrow="pageCopy.hero_eyebrow"
+            :title="pageCopy.hero_line_one"
+            :intro="pageCopy.hero_description"
         />
 
         <section class="bg-aqua-50 py-16 sm:py-20">

@@ -9,6 +9,7 @@ use App\Models\Page;
 use App\Models\Post;
 use App\Models\Service;
 use App\Models\TopicHub;
+use App\Support\PageBlueprints;
 use App\Support\StructuredData;
 use Carbon\Carbon;
 use Carbon\CarbonInterface;
@@ -63,6 +64,12 @@ class SitemapController extends Controller
 
             if ($legal && $legal->template_key === 'legal') {
                 $add("/{$slug}", $legal->published_at);
+            }
+        }
+
+        foreach ($pages as $page) {
+            if ($page->template_key === 'standard' && PageBlueprints::isCustom($page->slug)) {
+                $add($page->publicPath(), $page->published_at);
             }
         }
 

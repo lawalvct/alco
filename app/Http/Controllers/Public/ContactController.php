@@ -8,6 +8,7 @@ use App\Http\Controllers\Public\Concerns\HandlesLeadSubmissions;
 use App\Http\Requests\Leads\ContactLeadRequest;
 use App\Http\Requests\Leads\LeadRequest;
 use App\Services\Leads\LeadSubmission;
+use App\Support\PageBlueprints;
 use App\Support\SiteSettings;
 use App\Support\Turnstile;
 use Illuminate\Http\RedirectResponse;
@@ -21,6 +22,7 @@ class ContactController extends Controller
     public function show(): Response
     {
         return Inertia::render('Public/Contact', [
+            'pageCopy' => PageBlueprints::copyFor('contact'),
             'services' => $this->serviceOptions(),
             'formsEnabled' => SiteSettings::formsEnabled(),
             'turnstileSiteKey' => Turnstile::siteKey(),

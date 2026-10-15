@@ -7,13 +7,14 @@ import PageHero from '@/components/public/PageHero.vue';
 import SectionHeading from '@/components/public/SectionHeading.vue';
 import PublicLayout from '@/layouts/PublicLayout.vue';
 import { plannedTools, services as fallbackServices } from '@/lib/publicSite';
-import type { PackageSummary, ServiceSummary } from '@/types/publicContent';
+import type { PackageSummary, PageCopy, ServiceSummary } from '@/types/publicContent';
 
 type SectionKind = 'services' | 'insights' | 'tools';
 
 const props = withDefaults(
     defineProps<{
         kind: SectionKind;
+        pageCopy?: PageCopy;
         publishedServices?: ServiceSummary[];
         packages?: PackageSummary[];
     }>(),
@@ -55,12 +56,21 @@ const pageContent: Record<
     },
 };
 
-const content = computed(() => pageContent[props.kind]);
+const content = computed(() =>
+    props.kind === 'services' && props.pageCopy
+        ? {
+              eyebrow: props.pageCopy.hero_eyebrow,
+              title: props.pageCopy.hero_line_one,
+              intro: props.pageCopy.hero_description,
+              seo: props.pageCopy.seo_description,
+          }
+        : pageContent[props.kind],
+);
 </script>
 
 <template>
     <Head :title="content.title">
-        <meta name="description" :content="content.intro" />
+        <meta name="description" :content="'seo' in content ? content.seo : content.intro" />
         <!-- The tools page is a placeholder until the calculators are published. -->
         <meta v-if="kind === 'tools'" name="robots" content="noindex,follow" />
     </Head>

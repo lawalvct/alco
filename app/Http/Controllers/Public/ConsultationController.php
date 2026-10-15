@@ -10,6 +10,7 @@ use App\Http\Requests\Leads\LeadRequest;
 use App\Models\EngagementPackage;
 use App\Models\Lead;
 use App\Services\Leads\LeadSubmission;
+use App\Support\PageBlueprints;
 use App\Support\SiteSettings;
 use App\Support\Turnstile;
 use Illuminate\Http\RedirectResponse;
@@ -37,6 +38,7 @@ class ConsultationController extends Controller
         $selected = $requested !== '' ? $packages->firstWhere('slug', $requested) : null;
 
         return Inertia::render('Public/Consultation', [
+            'pageCopy' => PageBlueprints::copyFor('book-consultation'),
             'packages' => $packages->all(),
             'selectedPackage' => $selected,
             'packageUnavailable' => $requested !== '' && $selected === null,

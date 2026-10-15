@@ -5,10 +5,11 @@ import { computed, ref } from 'vue';
 import ArticleCard from '@/components/public/ArticleCard.vue';
 import PageHero from '@/components/public/PageHero.vue';
 import PublicLayout from '@/layouts/PublicLayout.vue';
-import type { InsightCategory, PaginatedArticles } from '@/types/publicContent';
+import type { InsightCategory, PageCopy, PaginatedArticles } from '@/types/publicContent';
 
 const props = defineProps<{
     articles: PaginatedArticles;
+    pageCopy: PageCopy;
     categories: InsightCategory[];
     selectedCategory: InsightCategory | null;
     filters: { q: string };
@@ -16,13 +17,13 @@ const props = defineProps<{
 
 const search = ref(props.filters.q);
 const title = computed(() =>
-    props.selectedCategory ? props.selectedCategory.name : 'Insights',
+    props.selectedCategory ? props.selectedCategory.name : props.pageCopy.title,
 );
 const description = computed(
     () =>
         props.selectedCategory?.seo_description ||
         props.selectedCategory?.description ||
-        'Practical accounting and business insights from ALCO Associate Solutions.',
+        props.pageCopy.seo_description,
 );
 
 function submitSearch(): void {
@@ -43,16 +44,13 @@ function submitSearch(): void {
 
     <PublicLayout>
         <PageHero
-            eyebrow="ALCO Insights"
+            :eyebrow="pageCopy.hero_eyebrow"
             :title="
                 selectedCategory
                     ? `${selectedCategory.name} insights`
-                    : 'Clearer thinking for your business.'
+                    : pageCopy.hero_line_one
             "
-            :intro="
-                selectedCategory?.description ||
-                'Practical articles on accounting, reporting, tax preparation and business finance. We publish only content that has completed ALCO’s editorial review.'
-            "
+            :intro="selectedCategory?.description || pageCopy.hero_description"
         />
 
         <main class="bg-muted py-14 sm:py-20">
